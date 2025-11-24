@@ -24,6 +24,6 @@ find_package(OpenGL REQUIRED)
 
 
 add_subdirectory(deps/glad)
-add_executable(learnopengl "Sources/main.cpp" )
+add_executable(learnopengl "Sources/main.cpp" "Sources/Shader.cpp" )
 
 target_link_libraries(learnopengl PRIVATE glad glfw OpenGL::GL)
