@@ -31,6 +31,12 @@ add_executable(learnopengl "Sources/main.cpp" "Sources/Shader.cpp" "Sources/Shad
 
 target_link_libraries(learnopengl PRIVATE glad glfw OpenGL::GL spdlog::spdlog)
 
+#copy shaders for run time compile
 file(COPY ${PROJECT_SOURCE_DIR}/Sources/Shaders  
      DESTINATION ${PROJECT_BINARY_DIR}/Shaders
+)  
+
+# copy assets
+file(COPY ${PROJECT_SOURCE_DIR}/Assets/  
+     DESTINATION ${PROJECT_BINARY_DIR}/Assets
 )  
