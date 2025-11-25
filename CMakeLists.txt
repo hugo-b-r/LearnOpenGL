@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14)
 
 project(RaytraCer)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include(FetchContent)
@@ -24,9 +24,12 @@ find_package(OpenGL REQUIRED)
 
 
 add_subdirectory(deps/glad)
+add_subdirectory(deps/spdlog)
+
+
 add_executable(learnopengl "Sources/main.cpp" "Sources/Shader.cpp" "Sources/Shaders/shader.fs" "Sources/Shaders/shader.vs")
 
-target_link_libraries(learnopengl PRIVATE glad glfw OpenGL::GL)
+target_link_libraries(learnopengl PRIVATE glad glfw OpenGL::GL spdlog::spdlog)
 
 file(COPY ${PROJECT_SOURCE_DIR}/Sources/Shaders  
      DESTINATION ${PROJECT_BINARY_DIR}/Shaders

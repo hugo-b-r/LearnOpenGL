@@ -1,5 +1,7 @@
 #include "Shader.h"
 
+#include "spdlog/spdlog.h"
+
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -29,7 +31,7 @@ Shader::Shader(const char *vertexPath, const char *fragmentPath) {
     vertexCode = vShaderStream.str();
     fragmentCode = fShaderStream.str();
   } catch (std::ifstream::failure e) {
-    std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
+    spdlog::error("ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ");
   }
   const char *vShaderCode = vertexCode.c_str();
   const char *fShaderCode = fragmentCode.c_str();
@@ -50,10 +52,9 @@ Shader::Shader(const char *vertexPath, const char *fragmentPath) {
 
   if (!success) {
     glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-    std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n"
-              << infoLog << std::endl;
+    spdlog::error("ERROR::SHADER::VERTEX::COMPILATION_FAILED {}", infoLog);
   } else {
-    std::cout << "Success compiling vertex shader" << std::endl;
+    spdlog::info("Success compiling vertex shader");
   }
   // create the fragment shader
   fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -64,10 +65,9 @@ Shader::Shader(const char *vertexPath, const char *fragmentPath) {
 
   if (!success) {
     glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-    std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n"
-              << infoLog << std::endl;
+    spdlog::error("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n{}", infoLog);
   } else {
-    std::cout << "Success compiling fragment shader" << std::endl;
+    spdlog::info("Success compiling fragment shader");
   }
 
   // create the shader program
@@ -81,8 +81,7 @@ Shader::Shader(const char *vertexPath, const char *fragmentPath) {
   glGetProgramiv(id, GL_LINK_STATUS, &success);
   if (!success) {
     glGetProgramInfoLog(id, 512, NULL, infoLog);
-    std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n"
-              << infoLog << std::endl;
+    spdlog::error("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n{}", infoLog);
   }
 
   glDeleteShader(vertexShader);
@@ -90,3 +89,13 @@ Shader::Shader(const char *vertexPath, const char *fragmentPath) {
 }
 
 void Shader::use() { glUseProgram(id); }
+
+void Shader::setBool(const std::string &name, bool value) const {
+  glUniform1i(glGetUniformLocation(id, name.c_str()), (int)value);
+}
+void Shader::setInt(const std::string &name, int value) const {
+  glUniform1i(glGetUniformLocation(id, name.c_str()), value);
+}
+void Shader::setFloat(const std::string &name, float value) const {
+  glUniform1f(glGetUniformLocation(id, name.c_str()), value);
+}
