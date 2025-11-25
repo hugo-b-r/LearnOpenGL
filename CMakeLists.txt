@@ -25,6 +25,7 @@ find_package(OpenGL REQUIRED)
 
 add_subdirectory(deps/glad)
 add_subdirectory(deps/spdlog)
+add_subdirectory(deps/glm)
 
 
 add_executable(learnopengl "Sources/main.cpp" "Sources/Shader.cpp" "Sources/Shaders/shader.fs" "Sources/Shaders/shader.vs")
