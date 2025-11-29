@@ -7,6 +7,7 @@
 
 class Shader {
 public:
+    unsigned int id;
   Shader(const char *vertexPath, const char *fragmentPath);
   void use();
 
@@ -16,7 +17,7 @@ public:
   void setFloat(const std::string &name, float value) const;
 
 protected:
-  unsigned int id;
+
 };
 
 #endif

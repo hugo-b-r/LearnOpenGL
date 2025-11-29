@@ -2,6 +2,10 @@
 #include <cmath>
 #include <glad/glad.h>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include "Shader.h"
 
 #include "spdlog/spdlog.h"
@@ -19,7 +23,13 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
   glViewport(0, 0, width, height);
 }
 
-void processInput(GLFWwindow *window) { return; }
+void processInput(GLFWwindow *window, float * rotation) {
+    if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+        *rotation = 1.;
+    } else {
+        *rotation = 0.;
+    }
+}
 
 void key_callback(GLFWwindow *window, int key, int scancode, int action,
                   int mods) {
@@ -150,12 +160,23 @@ int main() {
   glBindVertexArray(VAO);
   glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
+  float rotation = 0;
+  glm::mat4 trans = glm::mat4(1.0f);
+  trans = glm::rotate(trans, glm::radians(rotation), glm::vec3(0.0, 0.0, 1.0));
+  trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
+
+  unsigned int transformLoc = glGetUniformLocation(mainShader.id, "transform");
+  glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+
   while (!glfwWindowShouldClose(window)) {
-    processInput(window);
+    processInput(window, &rotation);
 
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
+
+    trans = glm::rotate(trans, glm::radians(rotation), glm::vec3(0.0, 0.0, 1.0));
+    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
     glBindVertexArray(VAO);
     //    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 

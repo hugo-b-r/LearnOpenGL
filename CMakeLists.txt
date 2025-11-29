@@ -20,24 +20,20 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
 find_package(glfw3 REQUIRED)
 find_package(OpenGL REQUIRED)
 
-
-
-
 add_subdirectory(deps/glad)
 add_subdirectory(deps/spdlog)
 add_subdirectory(deps/glm)
 
-
 add_executable(learnopengl "Sources/main.cpp" "Sources/Shader.cpp" "Sources/Shaders/shader.fs" "Sources/Shaders/shader.vs")
 
-target_link_libraries(learnopengl PRIVATE glad glfw OpenGL::GL spdlog::spdlog)
+target_link_libraries(learnopengl PRIVATE glad glfw OpenGL::GL spdlog::spdlog glm::glm)
 
 #copy shaders for run time compile
-file(COPY ${PROJECT_SOURCE_DIR}/Sources/Shaders  
+file(COPY ${PROJECT_SOURCE_DIR}/Sources/Shaders
      DESTINATION ${PROJECT_BINARY_DIR}/Shaders
-)  
+)
 
 # copy assets
-file(COPY ${PROJECT_SOURCE_DIR}/Assets/  
+file(COPY ${PROJECT_SOURCE_DIR}/Assets/
      DESTINATION ${PROJECT_BINARY_DIR}/Assets
-)  
+)
