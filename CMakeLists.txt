@@ -24,7 +24,9 @@ add_subdirectory(deps/glad)
 add_subdirectory(deps/spdlog)
 add_subdirectory(deps/glm)
 
-add_executable(learnopengl "Sources/main.cpp" "Sources/Shader.cpp" "Sources/Shaders/shader.fs" "Sources/Shaders/shader.vs")
+add_compile_options(-Wall -Wextra -Wpedantic)
+
+add_executable(learnopengl "Sources/main.cpp" "Sources/Shader.cpp" "Sources/QuadRenderer.cpp" "Sources/Model.cpp" "Sources/Shaders/fragment.glsl" "Sources/Shaders/vertex.glsl")
 
 target_link_libraries(learnopengl PRIVATE glad glfw OpenGL::GL spdlog::spdlog glm::glm)
 

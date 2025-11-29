@@ -8,6 +8,9 @@
 #include <string>
 
 Shader::Shader(const char *vertexPath, const char *fragmentPath) {
+  spdlog::info("Creating shader");
+  spdlog::debug("Call to shader constructor");
+
   // 1. retrieve the vertex/fragment source code from filePath
   std::string vertexCode;
   std::string fragmentCode;

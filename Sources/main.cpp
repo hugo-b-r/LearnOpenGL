@@ -1,26 +1,27 @@
 
-#include <cmath>
-#include <glad/glad.h>
+#include "../deps/glad/include/glad/glad.h"
 
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 #include "Shader.h"
+#include "QuadRenderer.h"
 
 #include "spdlog/spdlog.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include <GLFW/glfw3.h>
-#include <chrono>
 #include <iostream>
-#include <thread>
 
 const int WINDOW_HEIGHT = 800;
 const int WINDOW_WIDTH = 1200;
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
   glViewport(0, 0, width, height);
+}
+
+void error_callback(int error, const char* description)
+{
+    std::cerr << "Erreur GLFW (" << error << "): " << description << std::endl;
 }
 
 void processInput(GLFWwindow *window, float * rotation) {
@@ -36,13 +37,14 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action,
   if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
     glfwSetWindowShouldClose(window, true);
   } else if (key == GLFW_KEY_Z && action == GLFW_PRESS) {
+      // to be fixed : check opengl polygone mode using some sort of app variable that has been linked to the gl window
     GLint polyg_mode;
     glGetIntegerv(GL_POLYGON_MODE, &polyg_mode);
 
     if (polyg_mode == GL_LINE) {
       glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     } else {
-      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     }
   }
 }
@@ -58,10 +60,12 @@ int main() {
   // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
   spdlog::info("GLFW has been initialized...");
 
+  glfwSetErrorCallback(error_callback);
+
   GLFWwindow *window =
       glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "LearnOpenGL", NULL, NULL);
   if (window == NULL) {
-    std::cout << "Failed to create GLFW window" << std::endl;
+    spdlog::error("Failed to create GLFW window");
     glfwTerminate();
     return -1;
   }
@@ -77,111 +81,22 @@ int main() {
   glfwGetFramebufferSize(window, &frameBufferWidth, &frameBufferHeight);
   glViewport(0, 0, frameBufferWidth, frameBufferHeight);
 
-  spdlog::info("Creating shader");
-  Shader mainShader("Sources/Shaders/shader.vs", "Sources/Shaders/shader.fs");
+  Shader mainShader("Sources/Shaders/vertex.glsl", "Sources/Shaders/fragment.glsl");
 
   // Scene variables
   // create vertices of what will beglUseProgram(shaderProgram); shown
-
-  float vertices[] = {
-      // positions          // colors           // texture coords
-      0.5f,  0.5f,  0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, // top right
-      0.5f,  -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // bottom right
-      -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom left
-      -0.5f, 0.5f,  0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f  // top left
-  };
-
-  float texCoords[] = {
-      0.0f, 0.0f, // lower-left corner
-      1.0f, 0.0f, // lower-right corner
-      0.5f, 1.0f  // top-center corner
-  };
-
-  unsigned int indices[] = {
-      // note that we start from 0!
-      0, 1, 3, // first triangle
-      1, 2, 3  // second triangle
-  };
-
-  unsigned int VBO, VAO, EBO;
-  glGenVertexArrays(1, &VAO);
-  glGenBuffers(1, &VBO);
-  glGenBuffers(1, &EBO);
-  glBindVertexArray(VAO);
-
   // 2. copy our vertices array in a buffer for OpenGL to use
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
-               GL_STATIC_DRAW);
-
-  // 3. then set our vertex attributes pointers
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
-                        (void *)(3 * sizeof(float)));
-  glEnableVertexAttribArray(1);
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
-                        (void *)(6 * sizeof(float)));
-  glEnableVertexAttribArray(2);
-  /**/
-  // glEnableVertexAttribArray(1);
-
-  unsigned int texture;
-  glGenTextures(1, &texture);
-  glBindTexture(GL_TEXTURE_2D, texture);
-  // handle textures
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                  GL_LINEAR_MIPMAP_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-  // load the texture
-
-  int width, height, nrChannels;
-  unsigned char *data =
-      stbi_load("Assets/container.jpg", &width, &height, &nrChannels, 0);
-  if (data == NULL) {
-    spdlog::error("Failed to load texture !");
-  } else {
-    spdlog::debug("Correctly loaded image");
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
-                 GL_UNSIGNED_BYTE, data);
-    glGenerateMipmap(GL_TEXTURE_2D);
-  }
-
-  stbi_image_free(data);
-
-  mainShader.use();
-
-  glBindTexture(GL_TEXTURE_2D, texture);
-  glBindVertexArray(VAO);
-  glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
+  QuadRenderer r;
   float rotation = 0;
-  glm::mat4 trans = glm::mat4(1.0f);
-  trans = glm::rotate(trans, glm::radians(rotation), glm::vec3(0.0, 0.0, 1.0));
-  trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
-
-  unsigned int transformLoc = glGetUniformLocation(mainShader.id, "transform");
-  glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
 
   while (!glfwWindowShouldClose(window)) {
     processInput(window, &rotation);
 
+
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-
-    trans = glm::rotate(trans, glm::radians(rotation), glm::vec3(0.0, 0.0, 1.0));
-    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
-    glBindVertexArray(VAO);
-    //    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-
-    // glDrawArrays(GL_TRIANGLES, 0, 3);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    r.render(mainShader);
 
     glfwSwapBuffers(window);
     glfwPollEvents();

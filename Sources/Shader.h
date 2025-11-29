@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include <glad/glad.h> // include glad to get all the required OpenGL headers
+#include "../deps/glad/include/glad/glad.h" // include glad to get all the required OpenGL headers
 
 class Shader {
 public:
