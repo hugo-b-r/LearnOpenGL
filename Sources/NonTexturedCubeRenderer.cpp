@@ -25,6 +25,12 @@ NonTexturedCubeRenderer::NonTexturedCubeRenderer() {
                             7, 0, 5, // HAF
                             4, 5, 6, // EFG
                             1, 2, 7, // BCH
+                            0, 5, 4, // ABE
+                            1, 4, 3, // BCD
+                            2, 3, 6, // CHG
+                            7, 6, 5, // HAF
+                            4, 3, 6, // EFG
+                            1, 0, 7, // BCH
                         }});
 }
 
@@ -43,7 +49,7 @@ void NonTexturedCubeRenderer::render(Shader &shader, Camera &cam) {
   glm::mat4 projection = glm::mat4(1.0f);
   model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f),
                       glm::vec3(0.4f, 0.2f, 1.0f));
-  view = glm::translate(view, glm::vec3(0.0f, 0.0f, -4.0f));
+  view = glm::translate(view, glm::vec3(0.0f, 0.0f, -2.0f));
   projection = cam.getProjMatrix();
 
   shader.setMat4("model", model);
