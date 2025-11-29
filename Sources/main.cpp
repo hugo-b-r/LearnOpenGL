@@ -1,19 +1,20 @@
 
 #include "../deps/glad/include/glad/glad.h"
 
-#include <glm/glm.hpp>
+#include "../deps/glm/glm/glm.hpp"
 
+#include "Camera.h"
+#include "Configuration.h"
+#include "NonTexturedCubeRenderer.h"
 #include "Shader.h"
 #include "QuadRenderer.h"
 
 #include "spdlog/spdlog.h"
-#define STB_IMAGE_IMPLEMENTATION
+//#define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include <GLFW/glfw3.h>
 #include <iostream>
 
-const int WINDOW_HEIGHT = 800;
-const int WINDOW_WIDTH = 1200;
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
   glViewport(0, 0, width, height);
@@ -50,6 +51,8 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action,
 }
 int main() {
 
+    Configuration conf;
+
   // ----------------------
   // Init glfw
 
@@ -63,7 +66,7 @@ int main() {
   glfwSetErrorCallback(error_callback);
 
   GLFWwindow *window =
-      glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "LearnOpenGL", NULL, NULL);
+      glfwCreateWindow(conf.windowWidth, conf.windowHeight, "LearnOpenGL", NULL, NULL);
   if (window == NULL) {
     spdlog::error("Failed to create GLFW window");
     glfwTerminate();
@@ -80,13 +83,17 @@ int main() {
   int frameBufferWidth, frameBufferHeight;
   glfwGetFramebufferSize(window, &frameBufferWidth, &frameBufferHeight);
   glViewport(0, 0, frameBufferWidth, frameBufferHeight);
+  conf.windowHeight = frameBufferHeight;
+  conf.windowWidth = frameBufferWidth;
 
-  Shader mainShader("Sources/Shaders/vertex.glsl", "Sources/Shaders/fragment.glsl");
+  Shader mainShader("Sources/Shaders/quad_vertex.glsl", "Sources/Shaders/quad_fragment.glsl");
+  Camera cam(conf);
 
   // Scene variables
   // create vertices of what will beglUseProgram(shaderProgram); shown
   // 2. copy our vertices array in a buffer for OpenGL to use
   QuadRenderer r;
+  NonTexturedCubeRenderer cube_rend;
   float rotation = 0;
 
   while (!glfwWindowShouldClose(window)) {
@@ -96,7 +103,8 @@ int main() {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    r.render(mainShader);
+    cube_rend.render(mainShader, cam);
+    //r.render(mainShader, cam);
 
     glfwSwapBuffers(window);
     glfwPollEvents();

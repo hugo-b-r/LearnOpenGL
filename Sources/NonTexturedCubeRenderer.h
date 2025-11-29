@@ -1,17 +1,19 @@
 #ifndef NONTEXTUREDCUBERENDERER_H
 #define NONTEXTUREDCUBERENDERER_H
 
-#include "../deps/glad/include/glad/glad.h"
+#include "Shader.h"
+#include "Camera.h"
+#include "Model.h"
 
-#include <vector>
+class NonTexturedCubeRenderer {
+public:
+  NonTexturedCubeRenderer();
+  void render(Shader &shader, Camera& cam);
 
-class CubeRenderer {
-  public:
-    CubeRenderer();
-    void render (const Camera& camera);
-  protected:
-    std::vector<GLfloat> vertexCoords;
+private:
+  Model m_quadModel;
 
+  glm::mat4 m_transforModel;
 };
 
 #endif
