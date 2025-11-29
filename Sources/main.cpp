@@ -85,6 +85,7 @@ int main() {
   conf.windowHeight = frameBufferHeight;
   conf.windowWidth = frameBufferWidth;
 
+  glEnable(GL_DEPTH_TEST);
   Shader mainShader("Sources/Shaders/quad_vertex.glsl", "Sources/Shaders/quad_fragment.glsl");
   Camera cam(conf);
 

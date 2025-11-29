@@ -36,6 +36,7 @@ NonTexturedCubeRenderer::NonTexturedCubeRenderer() {
 
 void NonTexturedCubeRenderer::render(Shader &shader, Camera &cam) {
   shader.use();
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   // send matrices for rendering
   m_quadModel.bindVAO();
   // make sure to initialize matrix to identity matrix first
