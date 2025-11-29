@@ -1,8 +1,9 @@
 #include "NonTexturedCubeRenderer.h"
 #include "Camera.h"
-#include "Configuration.h"
 #include "Shader.h"
 #include <GLFW/glfw3.h>
+
+const int CUBE_NB_VERTICES = 36;
 
 NonTexturedCubeRenderer::NonTexturedCubeRenderer() {
   m_transforModel = glm::mat4(1.f);
@@ -41,8 +42,8 @@ void NonTexturedCubeRenderer::render(Shader &shader, Camera &cam) {
   glm::mat4 view = glm::mat4(1.0f);
   glm::mat4 projection = glm::mat4(1.0f);
   model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f),
-                      glm::vec3(0.f, 0.2f, 1.0f));
-  view = glm::translate(view, glm::vec3(0.0f, 0.0f, -2.0f));
+                      glm::vec3(0.4f, 0.2f, 1.0f));
+  view = glm::translate(view, glm::vec3(0.0f, 0.0f, -4.0f));
   projection = cam.getProjMatrix();
 
   shader.setMat4("model", model);
@@ -52,5 +53,5 @@ void NonTexturedCubeRenderer::render(Shader &shader, Camera &cam) {
   // render container
   glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
   // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, &);
-  glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+  glDrawElements(GL_TRIANGLES, CUBE_NB_VERTICES, GL_UNSIGNED_INT, 0);
 }

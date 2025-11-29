@@ -1,7 +1,6 @@
 
 #include "../deps/glad/include/glad/glad.h"
 
-#include "../deps/glm/glm/glm.hpp"
 
 #include "Camera.h"
 #include "Configuration.h"

@@ -1,7 +1,5 @@
 #include "QuadRenderer.h"
-#include "../deps/glm/glm/gtc/type_ptr.hpp"
 #include "Camera.h"
-#include "Configuration.h"
 #include "Shader.h"
 #include <GLFW/glfw3.h>
 
@@ -45,7 +43,6 @@ void QuadRenderer::render(Shader &shader, Camera &cam) {
   shader.setMat4("projection", projection);
 
   // render container
-  glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
   // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, &);
   glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }

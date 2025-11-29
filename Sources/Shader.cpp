@@ -1,6 +1,5 @@
 #include "Shader.h"
 
-#include "../deps/glm/glm/glm.hpp"
 #include "spdlog/spdlog.h"
 
 #include <fstream>
