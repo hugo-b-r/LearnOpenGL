@@ -34,12 +34,7 @@ class Camera : public Entity {
         glm::mat4 m_viewMatrix{1.0f};
         glm::mat4 m_projViewMatrix{1.0f};
         // the place the camera is pointing at
-        glm::vec3 m_target;
-        glm::vec3 m_direction;
         glm::vec3 m_upVector;
-
-
-
 
         Configuration m_config;
 };
