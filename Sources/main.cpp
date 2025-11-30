@@ -1,35 +1,84 @@
 
 #include "../deps/glad/include/glad/glad.h"
+#include <pthread.h>
+#define GLM_ENABLE_EXPERIMENTAL
+#include "../deps/glm/glm/gtx/string_cast.hpp"
 
+#include "Scene.h"
 
 #include "Camera.h"
 #include "Configuration.h"
 #include "NonTexturedCubeRenderer.h"
-#include "Shader.h"
 #include "QuadRenderer.h"
+#include "Shader.h"
 
 #include "spdlog/spdlog.h"
-//#define STB_IMAGE_IMPLEMENTATION
+// #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include <GLFW/glfw3.h>
 #include <iostream>
 
+void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
+  Scene *scene = static_cast<Scene *>(glfwGetWindowUserPointer(window));
+
+  float xoffset = xpos - scene->getCamera().lastX;
+  float yoffset = scene->getCamera().lastY -
+                  ypos; // reversed since y-coordinates range from bottom to top
+  scene->getCamera().lastX = xpos;
+  scene->getCamera().lastY = ypos;
+
+  const float sensitivity = 0.1f;
+  xoffset *= sensitivity;
+  yoffset *= sensitivity;
+
+  scene->getCamera().m_yaw += xoffset;
+  scene->getCamera().m_pitch += yoffset;
+
+  if (scene->getCamera().m_pitch > 89.0f)
+    scene->getCamera().m_pitch = 89.0f;
+  if (scene->getCamera().m_pitch < -89.0f)
+    scene->getCamera().m_pitch = -89.0f;
+
+  glm::vec3 direction;
+  direction.x = cos(glm::radians(scene->getCamera().m_yaw)) * cos(glm::radians(scene->getCamera().m_pitch));
+  direction.y = sin(glm::radians(scene->getCamera().m_pitch));
+  direction.z = sin(glm::radians(scene->getCamera().m_yaw)) * cos(glm::radians(scene->getCamera().m_pitch));
+  scene->getCamera().m_frontPos = glm::normalize(direction);
+  scene->getCamera().updateProjViewMatrix();
+}
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
   glViewport(0, 0, width, height);
 }
 
-void error_callback(int error, const char* description)
-{
-    std::cerr << "Erreur GLFW (" << error << "): " << description << std::endl;
+void error_callback(int error, const char *description) {
+  std::cerr << "Erreur GLFW (" << error << "): " << description << std::endl;
 }
 
-void processInput(GLFWwindow *window, float * rotation) {
-    if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        *rotation = 1.;
-    } else {
-        *rotation = 0.;
-    }
+void processInput(GLFWwindow *window, Camera &cam) {
+  static float currentFrame, deltaTime, lastFrame;
+  currentFrame = glfwGetTime();
+  deltaTime = currentFrame - lastFrame;
+  lastFrame = currentFrame;
+
+  const float camera_speed = 10 * deltaTime;
+  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+    cam.translate_forward(camera_speed);
+    spdlog::debug("translate forward");
+  }
+  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+
+    cam.translate_left(camera_speed);
+    spdlog::debug("translate left");
+  }
+  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+      cam.translate_forward(-camera_speed);
+    spdlog::debug("translate backward");
+  }
+  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+      cam.translate_right(camera_speed);
+    spdlog::debug("translate right");
+  }
 }
 
 void key_callback(GLFWwindow *window, int key, int scancode, int action,
@@ -37,20 +86,23 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action,
   if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
     glfwSetWindowShouldClose(window, true);
   } else if (key == GLFW_KEY_Z && action == GLFW_PRESS) {
-      // to be fixed : check opengl polygone mode using some sort of app variable that has been linked to the gl window
+    // to be fixed : check opengl polygone mode using some sort of app
+    // variable that has been linked to the gl window
     GLint polyg_mode;
     glGetIntegerv(GL_POLYGON_MODE, &polyg_mode);
 
     if (polyg_mode == GL_LINE) {
       glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     } else {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     }
   }
 }
 int main() {
 
-    Configuration conf;
+  Configuration conf;
+  spdlog::set_level(spdlog::level::info);
+  Scene scene = {Camera(conf)};
 
   // ----------------------
   // Init glfw
@@ -64,8 +116,8 @@ int main() {
 
   glfwSetErrorCallback(error_callback);
 
-  GLFWwindow *window =
-      glfwCreateWindow(conf.windowWidth, conf.windowHeight, "LearnOpenGL", NULL, NULL);
+  GLFWwindow *window = glfwCreateWindow(conf.windowWidth, conf.windowHeight,
+                                        "LearnOpenGL", NULL, NULL);
   if (window == NULL) {
     spdlog::error("Failed to create GLFW window");
     glfwTerminate();
@@ -77,8 +129,12 @@ int main() {
     return -1;
   }
   spdlog::info("Window has been created");
+  glfwSetWindowUserPointer(window, &scene);
+  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
   glfwSetKeyCallback(window, key_callback);
+  glfwSetCursorPosCallback(window, mouse_callback);
   int frameBufferWidth, frameBufferHeight;
   glfwGetFramebufferSize(window, &frameBufferWidth, &frameBufferHeight);
   glViewport(0, 0, frameBufferWidth, frameBufferHeight);
@@ -86,25 +142,38 @@ int main() {
   conf.windowWidth = frameBufferWidth;
 
   glEnable(GL_DEPTH_TEST);
-  Shader mainShader("Sources/Shaders/quad_vertex.glsl", "Sources/Shaders/quad_fragment.glsl");
-  Camera cam(conf);
+  Shader mainShader("Sources/Shaders/quad_vertex.glsl",
+                    "Sources/Shaders/quad_fragment.glsl");
 
   // Scene variables
   // create vertices of what will beglUseProgram(shaderProgram); shown
   // 2. copy our vertices array in a buffer for OpenGL to use
   QuadRenderer r;
-  NonTexturedCubeRenderer cube_rend;
-  float rotation = 0;
+  std::vector<NonTexturedCubeRenderer> cubes;
+  const int nbCubes = 12;
+  cubes.reserve(nbCubes);
+  for (int i = 0; i < nbCubes; i++) {
+    cubes.push_back(NonTexturedCubeRenderer(
+        glm::vec3((float)(i % 4), (float)(i / 4), -4.0f)));
+  }
+  // NonTexturedCubeRenderer cube_rend(glm::vec3(0.0f, 0.0f, -4.0f));
+  // NonTexturedCubeRenderer cube_rend2(glm::vec3(3.0f, 0.0f, -4.0f));
+  // NonTexturedCubeRenderer cube_rend2() ;
+  // float rotation = 0;
 
   while (!glfwWindowShouldClose(window)) {
-    processInput(window, &rotation);
-
+    processInput(window, scene.getCamera());
+    // spdlog::debug(glm::to_string(scene.cam.getViewMatrix()));
 
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    cube_rend.render(mainShader, cam);
-    //r.render(mainShader, cam);
+    for (auto &cube : cubes) {
+      cube.render(mainShader, scene.getCamera());
+    }
+    // cube_rend.render(mainShader, cam);
+    // cube_rend2.render(mainShader, cam);
+    // r.render(mainShader, cam);
 
     glfwSwapBuffers(window);
     glfwPollEvents();

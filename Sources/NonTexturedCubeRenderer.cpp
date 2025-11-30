@@ -5,8 +5,9 @@
 
 const int CUBE_NB_VERTICES = 36;
 
-NonTexturedCubeRenderer::NonTexturedCubeRenderer() {
-  m_transforModel = glm::mat4(1.f);
+NonTexturedCubeRenderer::NonTexturedCubeRenderer(glm::vec3 pos, bool rotating) : m_pos(pos), m_rotating(rotating){
+    glm::mat4 m_view (1.0f);
+    m_view = glm::translate(m_view, pos);
   m_quadModel.loadData({{
                             -0.5, -0.5, -0.5, // A
                             0.5, -0.5, -0.5, // B
@@ -36,7 +37,7 @@ NonTexturedCubeRenderer::NonTexturedCubeRenderer() {
 
 void NonTexturedCubeRenderer::render(Shader &shader, Camera &cam) {
   shader.use();
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   // send matrices for rendering
   m_quadModel.bindVAO();
   // make sure to initialize matrix to identity matrix first
@@ -44,21 +45,22 @@ void NonTexturedCubeRenderer::render(Shader &shader, Camera &cam) {
   // glm::vec3(0.0f, 0.0f, 1.0f));
 
   //
-  glm::mat4 model = glm::mat4(1.0f);
 
+  glm::mat4 model = glm::mat4(1.0f);
   glm::mat4 view = glm::mat4(1.0f);
   glm::mat4 projection = glm::mat4(1.0f);
-  model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f),
-                      glm::vec3(0.4f, 0.2f, 1.0f));
-  view = glm::translate(view, glm::vec3(0.0f, 0.0f, -2.0f));
-  projection = cam.getProjMatrix();
-
+  if (m_rotating) {
+      model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f),
+                     glm::vec3(0.4f, 0.2f, 1.0f));
+  }
+  view = glm::translate(view, m_pos);
+  projection = cam.getProjectionViewMatrix();
   shader.setMat4("model", model);
   shader.setMat4("view", view);
   shader.setMat4("projection", projection);
 
   // render container
-  glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+  //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
   // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, &);
   glDrawElements(GL_TRIANGLES, CUBE_NB_VERTICES, GL_UNSIGNED_INT, 0);
 }

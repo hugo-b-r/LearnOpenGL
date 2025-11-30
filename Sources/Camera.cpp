@@ -2,14 +2,47 @@
 #include "Configuration.h"
 
 Camera::Camera(const Configuration& c) : m_config(c) {
+
     float x = (float)m_config.windowWidth;
     float y = (float)m_config.windowHeight;
     float fov = (float)m_config.fov;
+    m_yaw = 0.;
+    m_pitch = 0.;
+    float lastX = c.windowWidth/2., lastY = c.windowHeight/2.;
 
     m_projectionMatrix = glm::perspective(glm::radians(fov), x / y, 0.1f, 2000.0f);
     position = glm::vec3(0., 0., -3.5);
+    m_frontPos = position - glm::vec3(0.0f, 0.0f, 4.0f);
+    m_upVector = glm::vec3(0.0f, 1.0f,  0.0f);
 
     m_viewMatrix = makeViewMatrix(*this);
+    m_projViewMatrix = m_projectionMatrix * m_viewMatrix;
+}
+
+void Camera::translate(glm::vec3 trans) {
+    position += trans;
+    //m_viewMatrix = glm::translate(m_viewMatrix, trans);
+    updateProjViewMatrix();
+}
+
+void Camera::translate_forward(float how_much) {
+    position += m_frontPos * how_much;
+    //m_viewMatrix = glm::translate(m_viewMatrix, trans);
+    updateProjViewMatrix();
+}
+
+void Camera::translate_right(float how_much) {
+    position += glm::normalize(glm::cross(m_frontPos, m_upVector)) * how_much;
+    updateProjViewMatrix();
+
+}
+void Camera::translate_left(float how_much) {
+    position -= glm::normalize(glm::cross(m_frontPos, m_upVector)) * how_much;
+    updateProjViewMatrix();
+}
+
+void Camera::updateProjViewMatrix() {
+    m_viewMatrix = glm::lookAt(position, position + m_frontPos, m_upVector);
     m_projViewMatrix = m_projectionMatrix * m_viewMatrix;
 }
 
