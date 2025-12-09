@@ -79,6 +79,14 @@ void processInput(GLFWwindow *window, Camera &cam) {
       cam.translate_right(camera_speed);
     spdlog::debug("translate right");
   }
+  if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+      cam.translate(camera_speed*glm::vec3(0., -1., 0.));
+    spdlog::debug("translate downwards");
+  }
+  if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+      cam.translate(camera_speed*glm::vec3(0., 1., 0.));
+    spdlog::debug("translate upwards");
+  }
 }
 
 void key_callback(GLFWwindow *window, int key, int scancode, int action,

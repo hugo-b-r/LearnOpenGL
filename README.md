@@ -12,7 +12,6 @@
 - [ ] des chunks, un renderer de chunk etc...
 - [ ] configuration : des inputs, des gamemode...
 - [ ] implémenter une classe d'entrée pour faire des entrées propres qui appellent correctement la translation de la camera
-- [ ] translation verticale (haut/bas avec shift/espace)
 - [ ] un générateur de chunks type bruit de perlin
 - [ ] la gravité et la détection des collisions
 - [ ] une interface
