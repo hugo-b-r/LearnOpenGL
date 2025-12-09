@@ -10,9 +10,17 @@ FetchContent_Declare(
   googletest
   URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
 )
+FetchContent_MakeAvailable(googletest)
 # For Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(googletest)
+
+
+option(BUILD_TESTS "Build Unit Tests" OFF)
+if(BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(Tests)
+endif()
+
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
@@ -26,7 +34,7 @@ add_subdirectory(deps/glm)
 
 add_compile_options(-Wall -Wextra -Wpedantic)
 
-add_executable(learnopengl "Sources/main.cpp" "Sources/Shader.cpp" "Sources/QuadRenderer.cpp" "Sources/Model.cpp" "Sources/Camera.cpp""Sources/Entity.cpp" "Sources/NonTexturedCubeRenderer.cpp" "Sources/Shaders/fragment.glsl" "Sources/Shaders/vertex.glsl")
+add_executable(learnopengl "Sources/main.cpp" "Sources/Shader.cpp" "Sources/QuadRenderer.cpp" "Sources/Model.cpp" "Sources/Camera.cpp""Sources/Entity.cpp" "Sources/NonTexturedCubeRenderer.cpp" "Sources/Texture.cpp" "Sources/Shaders/fragment.glsl" "Sources/Shaders/vertex.glsl")
 
 target_link_libraries(learnopengl PRIVATE glad glfw OpenGL::GL spdlog::spdlog glm::glm)
 
