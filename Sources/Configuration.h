@@ -7,6 +7,7 @@ struct Configuration {
     bool isFullScreen = false;
     int renderDistance = 8;
     int fov = 90;
+    bool mouseFree = false;
 };
 
 #endif

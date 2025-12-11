@@ -19,30 +19,35 @@
 void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
   Scene *scene = static_cast<Scene *>(glfwGetWindowUserPointer(window));
 
-  float xoffset = xpos - scene->getCamera().lastX;
-  float yoffset = scene->getCamera().lastY -
-                  ypos; // reversed since y-coordinates range from bottom to top
-  scene->getCamera().lastX = xpos;
-  scene->getCamera().lastY = ypos;
+  if (!scene->getConfig().mouseFree) {
+    float xoffset = xpos - scene->getCamera().lastX;
+    float yoffset =
+        scene->getCamera().lastY -
+        ypos; // reversed since y-coordinates range from bottom to top
+    scene->getCamera().lastX = xpos;
+    scene->getCamera().lastY = ypos;
 
-  const float sensitivity = 0.1f;
-  xoffset *= sensitivity;
-  yoffset *= sensitivity;
+    const float sensitivity = 0.1f;
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
 
-  scene->getCamera().m_yaw += xoffset;
-  scene->getCamera().m_pitch += yoffset;
+    scene->getCamera().m_yaw += xoffset;
+    scene->getCamera().m_pitch += yoffset;
 
-  if (scene->getCamera().m_pitch > 89.0f)
-    scene->getCamera().m_pitch = 89.0f;
-  if (scene->getCamera().m_pitch < -89.0f)
-    scene->getCamera().m_pitch = -89.0f;
+    if (scene->getCamera().m_pitch > 89.0f)
+      scene->getCamera().m_pitch = 89.0f;
+    if (scene->getCamera().m_pitch < -89.0f)
+      scene->getCamera().m_pitch = -89.0f;
 
-  glm::vec3 direction;
-  direction.x = cos(glm::radians(scene->getCamera().m_yaw)) * cos(glm::radians(scene->getCamera().m_pitch));
-  direction.y = sin(glm::radians(scene->getCamera().m_pitch));
-  direction.z = sin(glm::radians(scene->getCamera().m_yaw)) * cos(glm::radians(scene->getCamera().m_pitch));
-  scene->getCamera().m_frontPos = glm::normalize(direction);
-  scene->getCamera().updateProjViewMatrix();
+    glm::vec3 direction;
+    direction.x = cos(glm::radians(scene->getCamera().m_yaw)) *
+                  cos(glm::radians(scene->getCamera().m_pitch));
+    direction.y = sin(glm::radians(scene->getCamera().m_pitch));
+    direction.z = sin(glm::radians(scene->getCamera().m_yaw)) *
+                  cos(glm::radians(scene->getCamera().m_pitch));
+    scene->getCamera().m_frontPos = glm::normalize(direction);
+    scene->getCamera().updateProjViewMatrix();
+  }
 }
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
@@ -53,7 +58,7 @@ void error_callback(int error, const char *description) {
   std::cerr << "Erreur GLFW (" << error << "): " << description << std::endl;
 }
 
-void processInput(GLFWwindow *window, Camera &cam) {
+void processInput(GLFWwindow *window, Scene &s) {
   static float currentFrame, deltaTime, lastFrame;
   currentFrame = glfwGetTime();
   deltaTime = currentFrame - lastFrame;
@@ -61,37 +66,36 @@ void processInput(GLFWwindow *window, Camera &cam) {
 
   const float camera_speed = 5 * deltaTime;
   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-    cam.translate_forward(camera_speed);
+    s.getCamera().translate_forward(camera_speed);
     spdlog::debug("translate forward");
   }
   if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
 
-    cam.translate_left(camera_speed);
+    s.getCamera().translate_left(camera_speed);
     spdlog::debug("translate left");
   }
   if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-      cam.translate_forward(-camera_speed);
+    s.getCamera().translate_forward(-camera_speed);
     spdlog::debug("translate backward");
   }
   if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-      cam.translate_right(camera_speed);
+    s.getCamera().translate_right(camera_speed);
     spdlog::debug("translate right");
   }
   if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
-      cam.translate(camera_speed*glm::vec3(0., -1., 0.));
+    s.getCamera().translate(camera_speed * glm::vec3(0., -1., 0.));
     spdlog::debug("translate downwards");
   }
   if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-      cam.translate(camera_speed*glm::vec3(0., 1., 0.));
+    s.getCamera().translate(camera_speed * glm::vec3(0., 1., 0.));
     spdlog::debug("translate upwards");
   }
 }
 
 void key_callback(GLFWwindow *window, int key, int scancode, int action,
                   int mods) {
-  if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-    glfwSetWindowShouldClose(window, true);
-  } else if (key == GLFW_KEY_Z && action == GLFW_PRESS) {
+  Scene *sc_ptr = (Scene *)glfwGetWindowUserPointer(window);
+  if (key == GLFW_KEY_Z && action == GLFW_PRESS) {
     // to be fixed : check opengl polygone mode using some sort of app
     // variable that has been linked to the gl window
     GLint polyg_mode;
@@ -101,6 +105,26 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action,
       glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     } else {
       glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    }
+  }
+  if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+    sc_ptr->getConfig().mouseFree = !sc_ptr->getConfig().mouseFree;
+    if (sc_ptr->getConfig().mouseFree) {
+      glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    } else {
+      glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    }
+  }
+}
+
+void mouse_button_callback(GLFWwindow *window, int button, int action,
+                           int mods) {
+  Scene *sc_ptr = (Scene *)glfwGetWindowUserPointer(window);
+  if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+    spdlog::info("Left mouse button pressed");
+    if (sc_ptr->getConfig().mouseFree) {
+      sc_ptr->getConfig().mouseFree = !sc_ptr->getConfig().mouseFree;
+      glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     }
   }
 }
@@ -140,6 +164,7 @@ int main() {
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
   glfwSetKeyCallback(window, key_callback);
+  glfwSetMouseButtonCallback(window, mouse_button_callback);
   glfwSetCursorPosCallback(window, mouse_callback);
   int frameBufferWidth, frameBufferHeight;
   glfwGetFramebufferSize(window, &frameBufferWidth, &frameBufferHeight);
@@ -161,7 +186,7 @@ int main() {
   // float rotation = 0;
 
   while (!glfwWindowShouldClose(window)) {
-    processInput(window, scene.getCamera());
+    processInput(window, scene);
     // spdlog::debug(mat_to_string(scene.cam.getViewMatrix()));
 
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
