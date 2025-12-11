@@ -22,11 +22,11 @@ class Model {
 
 
     private:
+        unsigned int m_vboCount;
         unsigned int m_VBO;
         unsigned int m_VAO;
         unsigned int m_EBO;
         unsigned int m_indicesCount;
-        int m_vboCounts;
 
         std::vector<GLuint> m_buffers;
 
