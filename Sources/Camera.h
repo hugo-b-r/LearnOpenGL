@@ -8,7 +8,7 @@
 
 class Camera : public Entity {
     public:
-        Camera(const Configuration& c);
+        Camera(Configuration& c);
         void update();
 
         void translate(glm::vec3 trans);
@@ -36,7 +36,7 @@ class Camera : public Entity {
         // the place the camera is pointing at
         glm::vec3 m_upVector;
 
-        Configuration m_config;
+        Configuration& m_config;
 };
 
 #endif // CAMERA_H

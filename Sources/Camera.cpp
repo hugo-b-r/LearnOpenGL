@@ -1,7 +1,7 @@
 #include "Camera.h"
 #include "Configuration.h"
 
-Camera::Camera(const Configuration& c) : m_config(c) {
+Camera::Camera(Configuration& c) : m_config(c) {
 
     float x = (float)m_config.windowWidth;
     float y = (float)m_config.windowHeight;

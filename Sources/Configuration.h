@@ -2,7 +2,7 @@
 #define CONFIGURATION_H
 
 struct Configuration {
-    int windowWidth = 1000;
+    int windowWidth = 1300;
     int windowHeight = 800;
     bool isFullScreen = false;
     int renderDistance = 8;

@@ -1,5 +1,6 @@
 
 #include "../deps/glad/include/glad/glad.h"
+#include "NonTexturedCubeRenderer.h"
 #include "TexturedCubeRenderer.h"
 #define GLM_ENABLE_EXPERIMENTAL
 #include "../deps/glm/glm/gtx/string_cast.hpp"
@@ -51,6 +52,10 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
 }
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
+    Scene * s = (Scene *)glfwGetWindowUserPointer(window);
+    s->getConfig().windowHeight = height;
+    s->getConfig().windowWidth = width;
+    s->getCamera().updateProjViewMatrix();
   glViewport(0, 0, width, height);
 }
 
@@ -121,7 +126,6 @@ void mouse_button_callback(GLFWwindow *window, int button, int action,
                            int mods) {
   Scene *sc_ptr = (Scene *)glfwGetWindowUserPointer(window);
   if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-    spdlog::info("Left mouse button pressed");
     if (sc_ptr->getConfig().mouseFree) {
       sc_ptr->getConfig().mouseFree = !sc_ptr->getConfig().mouseFree;
       glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -179,11 +183,13 @@ int main() {
   // Scene variables
   // create vertices of what will beglUseProgram(shaderProgram); shown
   // 2. copy our vertices array in a buffer for OpenGL to use
-  TexturedCubeRenderer c;
+  TexturedCubeRenderer c(glm::vec3(0.0, 0., -8.0));
   // NonTexturedCubeRenderer cube_rend(glm::vec3(0.0f, 0.0f, -4.0f));
   // NonTexturedCubeRenderer cube_rend2(glm::vec3(3.0f, 0.0f, -4.0f));
   // NonTexturedCubeRenderer cube_rend2() ;
   // float rotation = 0;
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
   while (!glfwWindowShouldClose(window)) {
     processInput(window, scene);
