@@ -6,7 +6,6 @@
 
 ## To-do 
 
-- [ ] améliorer les destructeurs pour détruire les objets opengl proprement
 - [ ] dessiner des textures
 - [ ] des textures
 - [ ] des chunks, un renderer de chunk etc...
