@@ -26,8 +26,9 @@ void Camera::translate(glm::vec3 trans) {
 }
 
 void Camera::translate_forward(float how_much) {
-    position += m_frontPos * how_much;
-    //m_viewMatrix = glm::translate(m_viewMatrix, trans);
+    glm::vec3 t = m_frontPos;
+    t[1] = 0;
+    position += glm::normalize(t) * how_much;
     updateProjViewMatrix();
 }
 
