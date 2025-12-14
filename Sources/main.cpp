@@ -135,7 +135,7 @@ void mouse_button_callback(GLFWwindow *window, int button, int action,
 int main() {
 
   Configuration conf;
-  spdlog::set_level(spdlog::level::info);
+  spdlog::set_level(spdlog::level::debug);
   Scene scene = {Camera(conf)};
 
   // ----------------------
@@ -183,11 +183,10 @@ int main() {
   // Scene variables
   // create vertices of what will beglUseProgram(shaderProgram); shown
   // 2. copy our vertices array in a buffer for OpenGL to use
-  TexturedCubeRenderer c(glm::vec3(0.0, 0., -8.0));
-  // NonTexturedCubeRenderer cube_rend(glm::vec3(0.0f, 0.0f, -4.0f));
-  // NonTexturedCubeRenderer cube_rend2(glm::vec3(3.0f, 0.0f, -4.0f));
-  // NonTexturedCubeRenderer cube_rend2() ;
-  // float rotation = 0;
+  TexturedCubeRenderer c;
+  c.add(glm::vec3(0.0, 0., -8.0), Grass);
+  c.add(glm::vec3(2.0, 0., -8.0), Grass);
+
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 

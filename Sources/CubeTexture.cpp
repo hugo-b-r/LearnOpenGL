@@ -41,11 +41,11 @@ CubeTexture::~CubeTexture()
 
 float CubeTexture::FactorWidth() const
 {
-    return (float)usedTextureWidth / (float) realTextureWidth;
+    return usedTextureWidth / realTextureWidth;
 
 }
 
 float CubeTexture::FactorHeight() const
 {
-    return (float)usedTextureHeight / (float) realTextureHeight;
+    return usedTextureHeight / realTextureHeight;
 }

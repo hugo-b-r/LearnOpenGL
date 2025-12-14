@@ -5,11 +5,13 @@
 #include "Shader.h"
 #include "Camera.h"
 #include "Model.h"
+#include <tuple>
 
 class TexturedCubeRenderer {
 public:
-  TexturedCubeRenderer(glm::vec3 pos = glm::vec3(0.f), bool rotating = false);
+  TexturedCubeRenderer();
   void render(Shader &shader, Camera& cam);
+  void add(glm::vec3 pos = glm::vec3(0.f), CubeAtlas ca = Grass);
 
 private:
   Model m_quadModel;
@@ -21,6 +23,7 @@ private:
   float height = 1;
   float length = 1;
   CubeTexture tex;
+  std::vector<std::tuple<CubeAtlas, glm::mat4>> cubes;
 
 };
 
