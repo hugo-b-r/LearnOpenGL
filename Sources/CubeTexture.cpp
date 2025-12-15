@@ -1,7 +1,7 @@
 #include "CubeTexture.h"
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+#include "../deps/stb_image.h"
 
 #include "../deps/glad/include/glad/glad.h"
 #include <spdlog/spdlog.h>
