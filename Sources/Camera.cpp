@@ -1,6 +1,8 @@
 #include "Camera.h"
 #include "Configuration.h"
 
+#include <format>
+
 Camera::Camera(Configuration& c) : m_config(c) {
 
     float x = (float)m_config.windowWidth;
@@ -40,6 +42,12 @@ void Camera::translate_right(float how_much) {
 void Camera::translate_left(float how_much) {
     position -= glm::normalize(glm::cross(m_frontPos, m_upVector)) * how_much;
     updateProjViewMatrix();
+}
+
+
+std::string Camera::debug_pos() {
+    std::string res = std::format("Pos : x : {:0.2f}; y : {:0.2f}; z : {:0.2f}; ", position.x, position.y, position.z);
+    return res;
 }
 
 void Camera::updateProjViewMatrix() {

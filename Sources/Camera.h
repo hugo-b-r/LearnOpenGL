@@ -6,6 +6,8 @@
 #include "../deps/glm/glm/glm.hpp"
 #include "../deps/glm/glm/gtc/matrix_transform.hpp"
 
+#include <string>
+
 class Camera : public Entity {
     public:
         Camera(Configuration& c);
@@ -15,6 +17,8 @@ class Camera : public Entity {
         void translate_forward(float how_much);
         void translate_right(float how_much);
         void translate_left(float how_much);
+
+        std::string debug_pos();
 
 
         void updateProjViewMatrix();

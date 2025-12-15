@@ -14,6 +14,11 @@ class DebugInfos {
         void initFrame();
         // should be used after opengl draw
         void drawFrame(Scene& scene);
+        // should be called before glfwTerminate
+        void terminate();
+    private:
+        double lastFrameTime;
+        double framerate;
 };
 
 #endif

@@ -148,6 +148,8 @@ int main() {
   Configuration conf;
   spdlog::set_level(spdlog::level::debug);
   Scene scene = {Camera(conf)};
+  double lastWindowTime = glfwGetTime();
+  double framerate = 1.;
 
   // ----------------------
   // Init glfw
@@ -187,7 +189,7 @@ int main() {
   conf.windowHeight = frameBufferHeight;
   conf.windowWidth = frameBufferWidth;
 
-  DebugInfos* debug_inf = new DebugInfos(window);
+  DebugInfos debug_inf(window);
 
   // ----------------------
   // Init imgui
@@ -213,10 +215,14 @@ int main() {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
   while (!glfwWindowShouldClose(window)) {
+    framerate = 1./(glfwGetTime()-lastWindowTime);
+    lastWindowTime = glfwGetTime();
     glfwPollEvents();
 
+
+
     if (scene.getConfig().showDebugInfos) {
-      debug_inf->initFrame();
+      debug_inf.initFrame();
     }
     // ImGui::ShowDemoWindow(); // Show demo window! :)
     processInput(window, scene);
@@ -228,14 +234,14 @@ int main() {
     c.render(mainShader, scene.getCamera());
 
     if (scene.getConfig().showDebugInfos) {
-      debug_inf->drawFrame(scene);
+      debug_inf.drawFrame(scene);
     }
 
     glfwSwapBuffers(window);
   }
 
   // needed to delete before glfw terminate
-  delete debug_inf;
+  debug_inf.terminate();
   glfwTerminate();
   return 0;
 }
