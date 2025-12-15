@@ -8,6 +8,7 @@ struct Configuration {
     int renderDistance = 8;
     int fov = 90;
     bool mouseFree = false;
+    bool showDebugInfos = false;
 };
 
 #endif

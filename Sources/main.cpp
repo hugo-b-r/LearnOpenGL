@@ -1,6 +1,6 @@
 
 #include "../deps/glad/include/glad/glad.h"
-#include "NonTexturedCubeRenderer.h"
+#include "DebugInfos.h"
 #include "TexturedCubeRenderer.h"
 #define GLM_ENABLE_EXPERIMENTAL
 #include "../deps/glm/glm/gtx/string_cast.hpp"
@@ -13,49 +13,53 @@
 
 #include "spdlog/spdlog.h"
 // #define STB_IMAGE_IMPLEMENTATION
+#include "../deps/imgui/imgui.h"
 #include "stb_image.h"
 #include <GLFW/glfw3.h>
 #include <iostream>
 
 void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
-  Scene *scene = static_cast<Scene *>(glfwGetWindowUserPointer(window));
+  ImGuiIO &io = ImGui::GetIO();
+  if (!io.WantCaptureMouse) {
+    Scene *scene = static_cast<Scene *>(glfwGetWindowUserPointer(window));
 
-  if (!scene->getConfig().mouseFree) {
-    float xoffset = xpos - scene->getCamera().lastX;
-    float yoffset =
-        scene->getCamera().lastY -
-        ypos; // reversed since y-coordinates range from bottom to top
-    scene->getCamera().lastX = xpos;
-    scene->getCamera().lastY = ypos;
+    if (!scene->getConfig().mouseFree) {
+      float xoffset = xpos - scene->getCamera().lastX;
+      float yoffset =
+          scene->getCamera().lastY -
+          ypos; // reversed since y-coordinates range from bottom to top
+      scene->getCamera().lastX = xpos;
+      scene->getCamera().lastY = ypos;
 
-    const float sensitivity = 0.1f;
-    xoffset *= sensitivity;
-    yoffset *= sensitivity;
+      const float sensitivity = 0.1f;
+      xoffset *= sensitivity;
+      yoffset *= sensitivity;
 
-    scene->getCamera().m_yaw += xoffset;
-    scene->getCamera().m_pitch += yoffset;
+      scene->getCamera().m_yaw += xoffset;
+      scene->getCamera().m_pitch += yoffset;
 
-    if (scene->getCamera().m_pitch > 89.0f)
-      scene->getCamera().m_pitch = 89.0f;
-    if (scene->getCamera().m_pitch < -89.0f)
-      scene->getCamera().m_pitch = -89.0f;
+      if (scene->getCamera().m_pitch > 89.0f)
+        scene->getCamera().m_pitch = 89.0f;
+      if (scene->getCamera().m_pitch < -89.0f)
+        scene->getCamera().m_pitch = -89.0f;
 
-    glm::vec3 direction;
-    direction.x = cos(glm::radians(scene->getCamera().m_yaw)) *
-                  cos(glm::radians(scene->getCamera().m_pitch));
-    direction.y = sin(glm::radians(scene->getCamera().m_pitch));
-    direction.z = sin(glm::radians(scene->getCamera().m_yaw)) *
-                  cos(glm::radians(scene->getCamera().m_pitch));
-    scene->getCamera().m_frontPos = glm::normalize(direction);
-    scene->getCamera().updateProjViewMatrix();
+      glm::vec3 direction;
+      direction.x = cos(glm::radians(scene->getCamera().m_yaw)) *
+                    cos(glm::radians(scene->getCamera().m_pitch));
+      direction.y = sin(glm::radians(scene->getCamera().m_pitch));
+      direction.z = sin(glm::radians(scene->getCamera().m_yaw)) *
+                    cos(glm::radians(scene->getCamera().m_pitch));
+      scene->getCamera().m_frontPos = glm::normalize(direction);
+      scene->getCamera().updateProjViewMatrix();
+    }
   }
 }
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
-    Scene * s = (Scene *)glfwGetWindowUserPointer(window);
-    s->getConfig().windowHeight = height;
-    s->getConfig().windowWidth = width;
-    s->getCamera().updateProjViewMatrix();
+  Scene *s = (Scene *)glfwGetWindowUserPointer(window);
+  s->getConfig().windowHeight = height;
+  s->getConfig().windowWidth = width;
+  s->getCamera().updateProjViewMatrix();
   glViewport(0, 0, width, height);
 }
 
@@ -120,15 +124,22 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action,
       glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     }
   }
+  if (key == GLFW_KEY_F3 && action == GLFW_PRESS) {
+    sc_ptr->getConfig().showDebugInfos = !sc_ptr->getConfig().showDebugInfos;
+    spdlog::debug("Show or hide now debug infos");
+  }
 }
 
 void mouse_button_callback(GLFWwindow *window, int button, int action,
                            int mods) {
-  Scene *sc_ptr = (Scene *)glfwGetWindowUserPointer(window);
-  if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-    if (sc_ptr->getConfig().mouseFree) {
-      sc_ptr->getConfig().mouseFree = !sc_ptr->getConfig().mouseFree;
-      glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+  ImGuiIO &io = ImGui::GetIO();
+  if (!io.WantCaptureMouse) {
+    Scene *sc_ptr = (Scene *)glfwGetWindowUserPointer(window);
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+      if (sc_ptr->getConfig().mouseFree) {
+        sc_ptr->getConfig().mouseFree = !sc_ptr->getConfig().mouseFree;
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+      }
     }
   }
 }
@@ -176,6 +187,12 @@ int main() {
   conf.windowHeight = frameBufferHeight;
   conf.windowWidth = frameBufferWidth;
 
+  DebugInfos* debug_inf = new DebugInfos(window);
+
+  // ----------------------
+  // Init imgui
+  // Setup Dear ImGui context
+
   glEnable(GL_DEPTH_TEST);
   Shader mainShader("Sources/Shaders/textured_cube_vertex.glsl",
                     "Sources/Shaders/textured_cube_fragment.glsl");
@@ -184,15 +201,24 @@ int main() {
   // create vertices of what will beglUseProgram(shaderProgram); shown
   // 2. copy our vertices array in a buffer for OpenGL to use
   TexturedCubeRenderer c;
-  const CubeOrientation orientations_table[] = {CubeOrientation::Up, CubeOrientation::Down, CubeOrientation::Left, CubeOrientation::Right, CubeOrientation::Front, CubeOrientation::Rear};
+  const CubeOrientation orientations_table[] = {
+      CubeOrientation::Up,    CubeOrientation::Down,  CubeOrientation::Left,
+      CubeOrientation::Right, CubeOrientation::Front, CubeOrientation::Rear};
   for (int i = 0; i < 6; i++) {
-      c.add(glm::vec3(-4.0+ 2.0* (float) i, 0., -8.0), Grass, orientations_table[i]);
+    c.add(glm::vec3(-4.0 + 2.0 * (float)i, 0., -8.0), Grass,
+          orientations_table[i]);
   }
 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
   while (!glfwWindowShouldClose(window)) {
+    glfwPollEvents();
+
+    if (scene.getConfig().showDebugInfos) {
+      debug_inf->initFrame();
+    }
+    // ImGui::ShowDemoWindow(); // Show demo window! :)
     processInput(window, scene);
     // spdlog::debug(mat_to_string(scene.cam.getViewMatrix()));
 
@@ -200,14 +226,16 @@ int main() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     c.render(mainShader, scene.getCamera());
-    // cube_rend.render(mainShader, cam);
-    // cube_rend2.render(mainShader, cam);
-    // r.render(mainShader, cam);
+
+    if (scene.getConfig().showDebugInfos) {
+      debug_inf->drawFrame(scene);
+    }
 
     glfwSwapBuffers(window);
-    glfwPollEvents();
   }
 
+  // needed to delete before glfw terminate
+  delete debug_inf;
   glfwTerminate();
   return 0;
 }

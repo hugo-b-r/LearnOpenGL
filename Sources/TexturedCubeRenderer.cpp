@@ -2,12 +2,10 @@
 #include "Camera.h"
 #include "CubeTexture.h"
 #include "Shader.h"
-#include "utils.h"
 #include <GLFW/glfw3.h>
 #include <spdlog/spdlog.h>
 #include <vector>
 #define GLM_ENABLE_EXPERIMENTAL
-#include "../deps/glm/glm/glm.hpp"
 #include "../deps/glm/glm/gtx/string_cast.hpp"
 
 const int CUBE_NB_VERTICES = 36;
