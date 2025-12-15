@@ -184,8 +184,10 @@ int main() {
   // create vertices of what will beglUseProgram(shaderProgram); shown
   // 2. copy our vertices array in a buffer for OpenGL to use
   TexturedCubeRenderer c;
-  c.add(glm::vec3(0.0, 0., -8.0), Grass);
-  c.add(glm::vec3(2.0, 0., -8.0), Grass);
+  const CubeOrientation orientations_table[] = {CubeOrientation::Up, CubeOrientation::Down, CubeOrientation::Left, CubeOrientation::Right, CubeOrientation::Front, CubeOrientation::Rear};
+  for (int i = 0; i < 6; i++) {
+      c.add(glm::vec3(-4.0+ 2.0* (float) i, 0., -8.0), Grass, orientations_table[i]);
+  }
 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);

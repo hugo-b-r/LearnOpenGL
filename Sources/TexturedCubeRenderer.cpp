@@ -64,23 +64,44 @@ TexturedCubeRenderer::TexturedCubeRenderer()
   m_quadModel.loadData({vertices, {}, {}}, {3, 2});
 }
 
-void TexturedCubeRenderer::add(glm::vec3 pos, CubeAtlas ca) {
-  glm::mat4 m_view(1.0f);
-  glm::mat4 view = glm::translate(m_view, pos);
-  cubes.push_back(std::tuple(ca, view));
+void TexturedCubeRenderer::add(glm::vec3 pos, CubeAtlas ca, CubeOrientation orientation) {
+    glm::mat4 m_view(1.0f);
+    glm::mat4 model(1.0f);
+    m_view = glm::translate(m_view, pos);
+    switch (orientation) {
+        case CubeOrientation::Up:
+        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0., 0., 1.));
+        break;
+        case CubeOrientation::Down:
+        model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0., 0., 1.));
+        break;
+        case CubeOrientation::Left:
+        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0., 1., 0.));
+        break;
+        case CubeOrientation::Right:
+        model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0., 0., 1.));
+        break;
+        case CubeOrientation::Front:
+        // deja dans la bonne orientation
+        break;
+        case CubeOrientation::Rear:
+        model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0., 0., 1.));
+        break;
+    }
+
+  cubes.push_back(std::tuple(ca, m_view, model));
 }
 
 void TexturedCubeRenderer::render(Shader &shader, Camera &cam) {
   shader.use();
   m_quadModel.bindVAO();
 
-  glm::mat4 model = glm::mat4(1.0f);
   glm::mat4 projection = glm::mat4(1.0f);
   projection = cam.getProjectionViewMatrix();
 
   for (auto &cube : cubes) {
 
-    shader.setMat4("model", model);
+    shader.setMat4("model", std::get<2>(cube));
     shader.setMat4("view", std::get<1>(cube));
     shader.setMat4("projection", projection);
     // render container
