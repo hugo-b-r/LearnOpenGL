@@ -15,14 +15,13 @@ CubeTexture::CubeTexture(const std::string& path)
 {
     correctlyLoad = false;
     unsigned char *data = stbi_load(path.c_str(), &realTextureWidth, &realTextureHeight, &nbChannels, 0);
-
     glGenTextures(1, &id);
     glBindTexture(GL_TEXTURE_2D, id);
 
 
     if (data)
     {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, usedTextureWidth, usedTextureHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, realTextureWidth, realTextureHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
         correctlyLoad = true;
     }
