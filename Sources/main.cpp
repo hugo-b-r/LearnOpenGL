@@ -206,14 +206,16 @@ int main() {
   TexturedCubeRenderer c (CubeAtlas::Grass);
     TexturedCubeRenderer c2 (CubeAtlas::Stone);
     TexturedCubeRenderer c3 (CubeAtlas::Sand);
+    TexturedCubeRenderer c4 (CubeAtlas::Planks);
 
-const int cote = 60;
+const int cote = 40;
   for (int i = 0; i < cote; i++) {
       for (int j =0; j< cote; j++) {
           for (int k =0; k < cote; k++) {
               c.add(glm::vec3(j, k, i));
               c2.add(glm::vec3(j, k, -i));
               c3.add(glm::vec3(j, k+2*cote, -i));
+              c4.add(glm::vec3(j, k+1*cote, -i));
           }
       }
   }
@@ -247,6 +249,7 @@ const int cote = 60;
         c.render(mainShader, scene.getCamera());
         c2.render(mainShader, scene.getCamera());
         c3.render(mainShader, scene.getCamera());
+        c4.render(mainShader, scene.getCamera());
     // }
 
     if (scene.getConfig().showDebugInfos) {
