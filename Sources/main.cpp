@@ -203,14 +203,27 @@ int main() {
   // Scene variables
   // create vertices of what will beglUseProgram(shaderProgram); shown
   // 2. copy our vertices array in a buffer for OpenGL to use
-  TexturedCubeRenderer c(CubeAtlas::Planks);
+  TexturedCubeRenderer c (CubeAtlas::Grass);
+    TexturedCubeRenderer c2 (CubeAtlas::Stone);
+    TexturedCubeRenderer c3 (CubeAtlas::Sand);
+
+const int cote = 60;
+  for (int i = 0; i < cote; i++) {
+      for (int j =0; j< cote; j++) {
+          for (int k =0; k < cote; k++) {
+              c.add(glm::vec3(j, k, i));
+              c2.add(glm::vec3(j, k, -i));
+              c3.add(glm::vec3(j, k+2*cote, -i));
+          }
+      }
+  }
+
+
   const CubeOrientation orientations_table[] = {
       CubeOrientation::Up,    CubeOrientation::Down,  CubeOrientation::Left,
       CubeOrientation::Right, CubeOrientation::Front, CubeOrientation::Rear};
-  for (int i = 0; i < 6; i++) {
-    c.add(glm::vec3(-4.0 + 2.0 * (float)i, 0., -8.0),
-          orientations_table[i]);
-  }
+
+
 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -225,14 +238,16 @@ int main() {
     if (scene.getConfig().showDebugInfos) {
       debug_inf.initFrame();
     }
-    // ImGui::ShowDemoWindow(); // Show demo window! :)
     processInput(window, scene);
-    // spdlog::debug(mat_to_string(scene.cam.getViewMatrix()));
 
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    c.render(mainShader, scene.getCamera());
+    // for (auto& r: c) {
+        c.render(mainShader, scene.getCamera());
+        c2.render(mainShader, scene.getCamera());
+        c3.render(mainShader, scene.getCamera());
+    // }
 
     if (scene.getConfig().showDebugInfos) {
       debug_inf.drawFrame(scene);

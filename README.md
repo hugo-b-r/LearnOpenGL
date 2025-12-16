@@ -2,7 +2,10 @@
 
 ## Semaine 1
 
-![Le premier cube de la vie](./Assets/3Dcube.png)
+![Le premier cube de la vie](./Assets/Week1.png)
+
+## Semaine 3
+![Les premiers 648 000 cubes de la vie](./Assets/Week3.png)
 
 ## To-do 
 
