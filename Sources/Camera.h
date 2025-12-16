@@ -6,15 +6,19 @@
 #include "../deps/glm/glm/glm.hpp"
 #include "../deps/glm/glm/gtc/matrix_transform.hpp"
 
+#include <string>
+
 class Camera : public Entity {
     public:
-        Camera(const Configuration& c);
+        Camera(Configuration& c);
         void update();
 
         void translate(glm::vec3 trans);
         void translate_forward(float how_much);
         void translate_right(float how_much);
         void translate_left(float how_much);
+
+        std::string debug_pos();
 
 
         void updateProjViewMatrix();
@@ -36,7 +40,7 @@ class Camera : public Entity {
         // the place the camera is pointing at
         glm::vec3 m_upVector;
 
-        Configuration m_config;
+        Configuration& m_config;
 };
 
 #endif // CAMERA_H

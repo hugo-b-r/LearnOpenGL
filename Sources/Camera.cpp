@@ -1,7 +1,9 @@
 #include "Camera.h"
 #include "Configuration.h"
 
-Camera::Camera(const Configuration& c) : m_config(c) {
+#include <format>
+
+Camera::Camera(Configuration& c) : m_config(c) {
 
     float x = (float)m_config.windowWidth;
     float y = (float)m_config.windowHeight;
@@ -26,8 +28,9 @@ void Camera::translate(glm::vec3 trans) {
 }
 
 void Camera::translate_forward(float how_much) {
-    position += m_frontPos * how_much;
-    //m_viewMatrix = glm::translate(m_viewMatrix, trans);
+    glm::vec3 t = m_frontPos;
+    t[1] = 0;
+    position += glm::normalize(t) * how_much;
     updateProjViewMatrix();
 }
 
@@ -39,6 +42,12 @@ void Camera::translate_right(float how_much) {
 void Camera::translate_left(float how_much) {
     position -= glm::normalize(glm::cross(m_frontPos, m_upVector)) * how_much;
     updateProjViewMatrix();
+}
+
+
+std::string Camera::debug_pos() {
+    std::string res = std::format("Pos : x : {:0.2f}; y : {:0.2f}; z : {:0.2f}; ", position.x, position.y, position.z);
+    return res;
 }
 
 void Camera::updateProjViewMatrix() {

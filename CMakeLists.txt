@@ -31,12 +31,13 @@ find_package(OpenGL REQUIRED)
 add_subdirectory(deps/glad)
 add_subdirectory(deps/spdlog)
 add_subdirectory(deps/glm)
+add_subdirectory(deps/imgui)
 
 add_compile_options(-Wall -Wextra -Wpedantic)
 
-add_executable(learnopengl "Sources/main.cpp" "Sources/Shader.cpp" "Sources/QuadRenderer.cpp" "Sources/Model.cpp" "Sources/Camera.cpp""Sources/Entity.cpp" "Sources/NonTexturedCubeRenderer.cpp" "Sources/CubeTexture.cpp" "Sources/TexturedCubeRenderer.cpp" "Sources/Shaders/fragment.glsl" "Sources/Shaders/vertex.glsl")
+add_executable(learnopengl "Sources/main.cpp" "Sources/Shader.cpp" "Sources/QuadRenderer.cpp" "Sources/Model.cpp" "Sources/Camera.cpp""Sources/Entity.cpp" "Sources/NonTexturedCubeRenderer.cpp" "Sources/CubeTexture.cpp" "Sources/TexturedCubeRenderer.cpp" "Sources/Shaders/fragment.glsl" "Sources/Shaders/vertex.glsl" "Sources/utils.cpp" "Sources/DebugInfos.cpp")
 
-target_link_libraries(learnopengl PRIVATE glad glfw OpenGL::GL spdlog::spdlog glm::glm)
+target_link_libraries(learnopengl PRIVATE imgui glad glfw OpenGL::GL spdlog::spdlog glm::glm)
 
 #copy shaders for run time compile
 file(COPY ${PROJECT_SOURCE_DIR}/Sources/Shaders

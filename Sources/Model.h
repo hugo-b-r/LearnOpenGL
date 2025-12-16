@@ -13,13 +13,12 @@ class Model {
         // Model(const Model& other);
         // Model& operator=(const Model& other) const;
 
-        void loadData(const Mesh& mesh);
+        void loadData(const Mesh& mesh, std::vector<int> dimensions = {});
 
         void genVAO();
         void addEBO(const std::vector<GLuint>& indices);
         void addVBO(int dimensions, const std::vector<GLfloat>& data);
         void bindVAO();
-
 
     private:
         unsigned int m_vboCount;

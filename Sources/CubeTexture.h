@@ -3,6 +3,7 @@
 
 #include <string>
 
+enum CubeAtlas { Grass = 0, Sand = 1, Stone = 2, Planks = 3 };
 
 class CubeTexture
 {
@@ -20,8 +21,8 @@ class CubeTexture
         int realTextureWidth;
         int realTextureHeight;
         // the part of the texture that we use
-        static constexpr int usedTextureWidth = 96;
-        static constexpr int usedTextureHeight = 16;
+        static constexpr float usedTextureWidth = 96;
+        static constexpr float usedTextureHeight = 16;
         // the number of channels of the image
         int nbChannels;
         // the opengl texture number

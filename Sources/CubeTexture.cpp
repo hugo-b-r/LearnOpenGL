@@ -1,7 +1,7 @@
 #include "CubeTexture.h"
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+#include "../deps/stb_image.h"
 
 #include "../deps/glad/include/glad/glad.h"
 #include <spdlog/spdlog.h>
@@ -15,14 +15,13 @@ CubeTexture::CubeTexture(const std::string& path)
 {
     correctlyLoad = false;
     unsigned char *data = stbi_load(path.c_str(), &realTextureWidth, &realTextureHeight, &nbChannels, 0);
-
     glGenTextures(1, &id);
     glBindTexture(GL_TEXTURE_2D, id);
 
 
     if (data)
     {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, usedTextureWidth, usedTextureHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, realTextureWidth, realTextureHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
         correctlyLoad = true;
     }
@@ -41,11 +40,11 @@ CubeTexture::~CubeTexture()
 
 float CubeTexture::FactorWidth() const
 {
-    return (float)usedTextureWidth / (float) realTextureWidth;
+    return usedTextureWidth / realTextureWidth;
 
 }
 
 float CubeTexture::FactorHeight() const
 {
-    return (float)usedTextureHeight / (float) realTextureHeight;
+    return usedTextureHeight / realTextureHeight;
 }
