@@ -55,6 +55,7 @@ void DebugInfos::drawFrame(Scene& scene) {
     ImGui::PopFont();
 
     ImGui::Text(scene.getCamera().debug_pos().c_str());
+    ImGui::Text(scene.getCamera().debug_direction().c_str());
 
     ImGui::Separator();
 

@@ -50,6 +50,12 @@ std::string Camera::debug_pos() {
     return res;
 }
 
+std::string Camera::debug_direction() {
+    std::string res = std::format("Direction : x : {:0.2f}; y : {:0.2f}; z : {:0.2f}; ", m_frontPos.x, m_frontPos.y, m_frontPos.z);
+    return res;
+}
+
+
 void Camera::updateProjViewMatrix() {
     m_viewMatrix = glm::lookAt(position, position + m_frontPos, m_upVector);
     m_projViewMatrix = m_projectionMatrix * m_viewMatrix;

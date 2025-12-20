@@ -19,6 +19,7 @@ class Camera : public Entity {
         void translate_left(float how_much);
 
         std::string debug_pos();
+        std::string debug_direction();
 
 
         void updateProjViewMatrix();
