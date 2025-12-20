@@ -25,6 +25,7 @@ class DebugInfos {
         std::vector<float> framerates_values;
         std::vector<float> framerates_times;
         double time_last_framerate;
+        bool show_fr_plot;
 };
 
 #endif

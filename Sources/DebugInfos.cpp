@@ -2,7 +2,6 @@
 
 #include "Scene.h"
 
-
 #include <GLFW/glfw3.h>
 #include <tuple>
 
@@ -13,7 +12,10 @@
 #include "../deps/implot/implot.h"
 #include <spdlog/spdlog.h>
 
-DebugInfos::DebugInfos(GLFWwindow *window) : lastFrameTime (glfwGetTime()), framerates_times(NB_VALUES_FRAMERATE, glfwGetTime()), framerates_values(NB_VALUES_FRAMERATE, 0) {
+DebugInfos::DebugInfos(GLFWwindow *window)
+    : lastFrameTime(glfwGetTime()),
+      framerates_times(NB_VALUES_FRAMERATE, glfwGetTime()),
+      framerates_values(NB_VALUES_FRAMERATE, 0), show_fr_plot(false) {
 
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
@@ -30,72 +32,90 @@ DebugInfos::DebugInfos(GLFWwindow *window) : lastFrameTime (glfwGetTime()), fram
                      // callbacks and chain to existing ones.
   ImGui_ImplOpenGL3_Init();
   ImPlot::CreateContext();
-
 }
 
-DebugInfos::~DebugInfos() {
-
-}
+DebugInfos::~DebugInfos() {}
 
 void DebugInfos::initFrame() {
-    double time = glfwGetTime();
-    if (time - time_last_framerate > FRAMERATE_TIME_INTERVAL) {
-        framerate = 1./(time -lastFrameTime);
+  double time = glfwGetTime();
+  framerate = 1. / (time - lastFrameTime);
+  if (time - time_last_framerate > FRAMERATE_TIME_INTERVAL && show_fr_plot) {
 
-        framerates_values.push_back(framerate);
-        framerates_times.push_back(time);
+    framerates_values.push_back(framerate);
+    framerates_times.push_back(time);
 
-        framerates_times.erase(framerates_times.begin());
-        framerates_values.erase(framerates_values.begin());
-        time_last_framerate = time;
-    }
-    lastFrameTime = time;
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();
-
+    framerates_times.erase(framerates_times.begin());
+    framerates_values.erase(framerates_values.begin());
+    time_last_framerate = time;
+  }
+  lastFrameTime = time;
+  ImGui_ImplOpenGL3_NewFrame();
+  ImGui_ImplGlfw_NewFrame();
+  ImGui::NewFrame();
 }
 
-void DebugInfos::drawFrame(Scene& scene) {
-    ImGuiStyle& style = ImGui::GetStyle();
+void DebugInfos::drawFrame(Scene &scene) {
+  ImGuiStyle &style = ImGui::GetStyle();
 
-    constexpr float title_size = 1.5f;
+  constexpr float title_size = 1.5f;
 
-    ImGui::PushFont(NULL, style.FontSizeBase * title_size);
-    ImGui::Text("General");
-    ImGui::PopFont();
-    ImGui::Text("FPS : %lf", framerate);
+  ImGui::PushFont(NULL, style.FontSizeBase * title_size);
+  ImGui::Text("General");
+  ImGui::PopFont();
+  ImGui::Text("FPS : %lf", framerate);
 
+  spdlog::debug("start : {}, end : {}", framerates_times[0],
+                framerates_times[framerates_times.size() - 1]);
+  if (ImPlot::BeginPlot("Line Plots")) {
+    ImPlot::SetupAxes("x", "y", ImPlotAxisFlags_AutoFit,
+                      ImPlotAxisFlags_AutoFit);
+    spdlog::debug("start : {}, end : {}", framerates_times[0],
+                  framerates_times[framerates_times.size() - 1]);
+    ImPlot::SetupAxesLimits(framerates_times[0],
+                            framerates_times[framerates_times.size() - 1], 0,
+                            1000, 0);
+    ImPlot::PlotLine("f(x)", framerates_times.data(), framerates_values.data(),
+                     NB_VALUES_FRAMERATE);
+    ImPlot::EndPlot();
+  }
 
-    spdlog::debug("start : {}, end : {}", framerates_times[0],framerates_times[framerates_times.size()-1]);
+  ImGui::Separator();
+  ImGui::PushFont(NULL, style.FontSizeBase * title_size);
+  ImGui::Text("Camera");
+  ImGui::PopFont();
+  ImGui::Checkbox("Show fps plot", &show_fr_plot);
+  if (show_fr_plot) {
     if (ImPlot::BeginPlot("Line Plots")) {
-        ImPlot::SetupAxes("x","y", ImPlotAxisFlags_AutoFit, ImPlotAxisFlags_AutoFit);
-        spdlog::debug("start : {}, end : {}", framerates_times[0],framerates_times[framerates_times.size()-1]);
-        ImPlot::SetupAxesLimits(framerates_times[0],framerates_times[framerates_times.size()-1],0,1000, 0);
-        ImPlot::PlotLine("f(x)", framerates_times.data(), framerates_values.data(), NB_VALUES_FRAMERATE);
-        ImPlot::EndPlot();
+      ImPlot::SetupAxes("x", "y", ImPlotAxisFlags_AutoFit,
+                        ImPlotAxisFlags_AutoFit);
+      spdlog::debug("start : {}, end : {}", framerates_times[0],
+                    framerates_times[framerates_times.size() - 1]);
+      ImPlot::SetupAxesLimits(framerates_times[0],
+                              framerates_times[framerates_times.size() - 1], 0,
+                              1000, 0);
+      ImPlot::PlotLine("f(x)", framerates_times.data(),
+                       framerates_values.data(), NB_VALUES_FRAMERATE);
+      ImPlot::EndPlot();
     }
+  }
 
+  ImGui::Separator();
+  ImGui::PushFont(NULL, style.FontSizeBase * title_size);
+  ImGui::Text("Camera");
+  ImGui::PopFont();
 
+  ImGui::Text(scene.getCamera().debug_pos().c_str());
+  ImGui::Text(scene.getCamera().debug_direction().c_str());
 
+  ImGui::Separator();
 
-    ImGui::Separator();
-    ImGui::PushFont(NULL, style.FontSizeBase * title_size);
-    ImGui::Text("Camera");
-    ImGui::PopFont();
-
-    ImGui::Text(scene.getCamera().debug_pos().c_str());
-    ImGui::Text(scene.getCamera().debug_direction().c_str());
-
-    ImGui::Separator();
-
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+  ImGui::Render();
+  ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 void DebugInfos::terminate() {
-    ImPlot::DestroyContext();
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
+  ImPlot::DestroyContext();
+  ImGui_ImplOpenGL3_Shutdown();
+  ImGui_ImplGlfw_Shutdown();
+  ImGui::DestroyContext();
 }
