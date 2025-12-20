@@ -222,6 +222,7 @@ int main() {
   c.setBlockAt(0., 5, 1., CubeAtlas::Grass);
   c.setBlockAt(0., 4, 2., CubeAtlas::Planks);
   ChunkRenderer cr(c, glm::vec3(0., 128., 0.));
+  ChunkRenderer cr2(c, glm::vec3(32., 128., 0.));
   TexturedCubeRenderer tc;
   for (int i = 0; i < 10; i++) {
     tc.add(glm::vec3((float)i, (float)i, (float)i));
@@ -248,6 +249,7 @@ int main() {
 
     // for (auto& r: c) {
     cr.render(mainShader, scene.getCamera());
+    cr2.render(mainShader, scene.getCamera());
     tc.render(mainShader, scene.getCamera());
     // }
 
