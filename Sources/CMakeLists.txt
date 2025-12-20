@@ -1,0 +1,15 @@
+target_sources(learnopengl PRIVATE
+    "Camera.cpp"
+    "Chunk.cpp"
+    "ChunkMeshCreator.cpp"
+    "ChunkRenderer.cpp"
+    "CubeTexture.cpp"
+    "DebugInfos.cpp"
+    "Entity.cpp"
+    "main.cpp"
+    "Model.cpp"
+    "NonTexturedCubeRenderer.cpp"
+    "QuadRenderer.cpp"
+    "Shader.cpp"
+    "TexturedCubeRenderer.cpp"
+    "utils.cpp")

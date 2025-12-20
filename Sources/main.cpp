@@ -1,5 +1,7 @@
 
 #include "../deps/glad/include/glad/glad.h"
+#include "Chunk.h"
+#include "ChunkRenderer.h"
 #include "CubeTexture.h"
 #include "DebugInfos.h"
 #include "TexturedCubeRenderer.h"
@@ -150,7 +152,6 @@ int main() {
   spdlog::set_level(spdlog::level::debug);
   Scene scene = {Camera(conf)};
   double lastWindowTime = glfwGetTime();
-  double framerate = 1.;
 
   // ----------------------
   // Init glfw
@@ -202,54 +203,46 @@ int main() {
 
   // Scene variables
   // create vertices of what will beglUseProgram(shaderProgram); shown
-  // 2. copy our vertices array in a buffer for OpenGL to use
-  TexturedCubeRenderer c (CubeAtlas::Grass);
-    TexturedCubeRenderer c2 (CubeAtlas::Stone);
-    TexturedCubeRenderer c3 (CubeAtlas::Sand);
-    TexturedCubeRenderer c4 (CubeAtlas::Planks);
+  // 2. copy our vertices array in a buffer for OpenGL to useChun
+  Chunk c;
 
-const int cote = 40;
+  const int cote = 2;
   for (int i = 0; i < cote; i++) {
-      for (int j =0; j< cote; j++) {
-          for (int k =0; k < cote; k++) {
-              c.add(glm::vec3(j, k, i));
-              c2.add(glm::vec3(j, k, -i));
-              c3.add(glm::vec3(j, k+2*cote, -i));
-              c4.add(glm::vec3(j, k+1*cote, -i));
-          }
+    for (int j = 0; j < cote; j++) {
+      for (int k = 0; k < cote; k++) {
+        c.setBlockAt(j, k, i, CubeAtlas::Grass);
+        std::cout << "1" << std::endl;
       }
+    }
   }
-
+  ChunkRenderer cr(c, glm::vec3(0.));
+  TexturedCubeRenderer tc;
+  for (int i = 0; i < 10; i++) {
+    tc.add(glm::vec3((float)i, (float)i, (float)i));
+  }
 
   const CubeOrientation orientations_table[] = {
       CubeOrientation::Up,    CubeOrientation::Down,  CubeOrientation::Left,
       CubeOrientation::Right, CubeOrientation::Front, CubeOrientation::Rear};
 
-
-
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
   while (!glfwWindowShouldClose(window)) {
-    framerate = 1./(glfwGetTime()-lastWindowTime);
     lastWindowTime = glfwGetTime();
     glfwPollEvents();
-
-
 
     if (scene.getConfig().showDebugInfos) {
       debug_inf.initFrame();
     }
     processInput(window, scene);
 
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClearColor(0.63f, 0.87f, 1.f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // for (auto& r: c) {
-        c.render(mainShader, scene.getCamera());
-        c2.render(mainShader, scene.getCamera());
-        c3.render(mainShader, scene.getCamera());
-        c4.render(mainShader, scene.getCamera());
+    cr.render(mainShader, scene.getCamera());
+    tc.render(mainShader, scene.getCamera());
     // }
 
     if (scene.getConfig().showDebugInfos) {

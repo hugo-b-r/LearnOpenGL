@@ -33,10 +33,13 @@ add_subdirectory(deps/spdlog)
 add_subdirectory(deps/glm)
 add_subdirectory(deps/imgui)
 
+
 add_compile_options(-Wall -Wextra -Wpedantic)
 
-add_executable(learnopengl "Sources/main.cpp" "Sources/Shader.cpp" "Sources/QuadRenderer.cpp" "Sources/Model.cpp" "Sources/Camera.cpp""Sources/Entity.cpp" "Sources/NonTexturedCubeRenderer.cpp" "Sources/CubeTexture.cpp" "Sources/TexturedCubeRenderer.cpp" "Sources/Shaders/fragment.glsl" "Sources/Shaders/vertex.glsl" "Sources/utils.cpp" "Sources/DebugInfos.cpp")
 
+add_executable(learnopengl)
+
+add_subdirectory(Sources/)
 target_link_libraries(learnopengl PRIVATE imgui glad glfw OpenGL::GL spdlog::spdlog glm::glm)
 
 #copy shaders for run time compile

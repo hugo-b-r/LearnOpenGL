@@ -12,7 +12,7 @@ enum class CubeOrientation {Up, Down, Left, Right, Front, Rear};
 
 class TexturedCubeRenderer {
 public:
-  TexturedCubeRenderer(CubeAtlas ca = Grass);
+  TexturedCubeRenderer(CubeAtlas ca = CubeAtlas::Grass);
   void render(Shader &shader, Camera& cam);
   void add(glm::vec3 pos = glm::vec3(0.f), CubeOrientation orientation = CubeOrientation::Front);
 
