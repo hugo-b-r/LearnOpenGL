@@ -4,7 +4,6 @@
 #include "ChunkMeshCreator.h"
 #include "CubeTexture.h"
 #include "Shader.h"
-#include "utils.h"
 #include <GLFW/glfw3.h>
 #include <spdlog/spdlog.h>
 #include <vector>

@@ -2,9 +2,8 @@
 #include "Chunk.h"
 #include "CubeTexture.h"
 #include "Mesh.h"
-#include <algorithm>
 #include <spdlog/spdlog.h>
-#include <iostream>
+
 
 struct NeighbooringFaces {
     void update(int x, int y, int z) {
