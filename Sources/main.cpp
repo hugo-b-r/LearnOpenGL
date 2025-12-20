@@ -207,14 +207,15 @@ int main() {
   // create vertices of what will beglUseProgram(shaderProgram); shown
   // 2. copy our vertices array in a buffer for OpenGL to useChun
 
-
   Chunk c;
 
-  const int cote = 4;
+  const int cote = 10;
   for (int i = 0; i < cote; i++) {
     for (int j = 0; j < cote; j++) {
       for (int k = 0; k < cote; k++) {
-        c.setBlockAt(j, k, i, (CubeAtlas) k);
+        if (k != j || j != i || i != k) {
+          c.setBlockAt(j, k, i, (CubeAtlas)CubeAtlas::Planks);
+        }
       }
     }
   }
@@ -229,7 +230,6 @@ int main() {
   const CubeOrientation orientations_table[] = {
       CubeOrientation::Up,    CubeOrientation::Down,  CubeOrientation::Left,
       CubeOrientation::Right, CubeOrientation::Front, CubeOrientation::Rear};
-
 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
