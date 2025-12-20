@@ -11,7 +11,6 @@
 
 class ChunkMeshCreator {
 public:
-  ChunkMeshCreator();
   ChunkMeshCreator(Chunk& c, CubeTexture& tex);
   int buildMesh(Mesh& m, Chunk& c);
 

@@ -155,12 +155,12 @@ void TexturedCubeRenderer::add(glm::vec3 pos, CubeOrientation orientation) {
 void TexturedCubeRenderer::render(Shader &shader, Camera &cam) {
   shader.use();
   m_quadModel.bindVAO();
+  tex.bind();
 
   glm::mat4 projection = glm::mat4(1.0f);
   projection = cam.getProjectionViewMatrix();
 
   for (auto &cube : cubes) {
-
     shader.setMat4("model", std::get<1>(cube));
     shader.setMat4("view", std::get<0>(cube));
     shader.setMat4("projection", projection);

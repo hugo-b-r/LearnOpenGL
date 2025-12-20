@@ -17,6 +17,8 @@ class CubeTexture
         // the actual factor by which to multiply to get the correct proportion  = (tile_height/texture_height)
         float FactorHeight() const;
 
+        void bind();
+
     protected:
         // the total texture size
         int realTextureWidth;

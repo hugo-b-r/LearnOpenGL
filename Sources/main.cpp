@@ -191,6 +191,8 @@ int main() {
   conf.windowHeight = frameBufferHeight;
   conf.windowWidth = frameBufferWidth;
 
+  glfwSwapInterval(0);
+
   DebugInfos debug_inf(window);
 
   // ----------------------
@@ -204,18 +206,21 @@ int main() {
   // Scene variables
   // create vertices of what will beglUseProgram(shaderProgram); shown
   // 2. copy our vertices array in a buffer for OpenGL to useChun
+
+
   Chunk c;
 
-  const int cote = 2;
+  const int cote = 4;
   for (int i = 0; i < cote; i++) {
     for (int j = 0; j < cote; j++) {
       for (int k = 0; k < cote; k++) {
-        c.setBlockAt(j, k, i, CubeAtlas::Grass);
-        std::cout << "1" << std::endl;
+        c.setBlockAt(j, k, i, (CubeAtlas) k);
       }
     }
   }
-  ChunkRenderer cr(c, glm::vec3(0.));
+  c.setBlockAt(0., 5, 1., CubeAtlas::Grass);
+  c.setBlockAt(0., 4, 2., CubeAtlas::Planks);
+  ChunkRenderer cr(c, glm::vec3(0., 128., 0.));
   TexturedCubeRenderer tc;
   for (int i = 0; i < 10; i++) {
     tc.add(glm::vec3((float)i, (float)i, (float)i));
@@ -224,6 +229,7 @@ int main() {
   const CubeOrientation orientations_table[] = {
       CubeOrientation::Up,    CubeOrientation::Down,  CubeOrientation::Left,
       CubeOrientation::Right, CubeOrientation::Front, CubeOrientation::Rear};
+
 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
