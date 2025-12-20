@@ -32,7 +32,7 @@ add_subdirectory(deps/glad)
 add_subdirectory(deps/spdlog)
 add_subdirectory(deps/glm)
 add_subdirectory(deps/imgui)
-
+add_subdirectory(deps/implot)
 
 add_compile_options(-Wall -Wextra -Wpedantic)
 
@@ -40,7 +40,7 @@ add_compile_options(-Wall -Wextra -Wpedantic)
 add_executable(learnopengl)
 
 add_subdirectory(Sources/)
-target_link_libraries(learnopengl PRIVATE imgui glad glfw OpenGL::GL spdlog::spdlog glm::glm)
+target_link_libraries(learnopengl PRIVATE imgui implot glad glfw OpenGL::GL spdlog::spdlog glm::glm)
 
 #copy shaders for run time compile
 file(COPY ${PROJECT_SOURCE_DIR}/Sources/Shaders
