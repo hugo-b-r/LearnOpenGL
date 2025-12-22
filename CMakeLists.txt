@@ -28,11 +28,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
 find_package(glfw3 REQUIRED)
 find_package(OpenGL REQUIRED)
 
-add_subdirectory(deps/glad)
-add_subdirectory(deps/spdlog)
-add_subdirectory(deps/glm)
-add_subdirectory(deps/imgui)
-add_subdirectory(deps/implot)
+add_subdirectory(deps)
 
 add_compile_options(-Wall -Wextra -Wpedantic)
 
