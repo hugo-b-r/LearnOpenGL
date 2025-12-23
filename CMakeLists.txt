@@ -25,7 +25,7 @@ endif()
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
 
-find_package(glfw3 REQUIRED)
+add_subdirectory(deps/glfw)
 find_package(OpenGL REQUIRED)
 
 add_subdirectory(deps)

@@ -10,3 +10,6 @@
 [submodule "deps/implot"]
 	path = deps/implot
 	url = https://github.com/epezent/implot.git
+[submodule "deps/glfw"]
+	path = deps/glfw
+	url = https://github.com/glfw/glfw.git
