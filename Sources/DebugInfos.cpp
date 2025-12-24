@@ -13,9 +13,10 @@
 #include <spdlog/spdlog.h>
 
 DebugInfos::DebugInfos(GLFWwindow *window)
-    : lastFrameTime((float) glfwGetTime()),
+    : lastFrameTime((float)glfwGetTime()),
+      framerates_values(NB_VALUES_FRAMERATE, 0),
       framerates_times(NB_VALUES_FRAMERATE, lastFrameTime),
-      framerates_values(NB_VALUES_FRAMERATE, 0), show_fr_plot(false) {
+      show_fr_plot(false) {
 
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
@@ -37,7 +38,7 @@ DebugInfos::DebugInfos(GLFWwindow *window)
 DebugInfos::~DebugInfos() {}
 
 void DebugInfos::initFrame() {
-  float time = (float) glfwGetTime();
+  float time = (float)glfwGetTime();
   framerate = 1.f / (time - lastFrameTime);
   if (time - time_last_framerate > FRAMERATE_TIME_INTERVAL && show_fr_plot) {
 

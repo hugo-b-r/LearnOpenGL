@@ -154,7 +154,6 @@ int main() {
 
   spdlog::set_level(spdlog::level::debug);
   Scene scene;
-  double lastWindowTime = glfwGetTime();
 
   // ----------------------
   // Init glfw
@@ -231,15 +230,10 @@ int main() {
     tc.add(glm::vec3((float)i, (float)i, (float)i));
   }
 
-  const CubeOrientation orientations_table[] = {
-      CubeOrientation::Up,    CubeOrientation::Down,  CubeOrientation::Left,
-      CubeOrientation::Right, CubeOrientation::Front, CubeOrientation::Rear};
-
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
   while (!glfwWindowShouldClose(window)) {
-    lastWindowTime = glfwGetTime();
     glfwPollEvents();
 
     if (scene.getConfig().showDebugInfos) {

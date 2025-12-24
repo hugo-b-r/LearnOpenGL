@@ -25,7 +25,6 @@ target_link_libraries(imgui PUBLIC glfw OpenGL::GL)
 # ImGui sources
 set(IMPLOT_SOURCES
     implot/implot.cpp
-    implot/implot_demo.cpp
     implot/implot_items.cpp
 )
 
