@@ -12,10 +12,10 @@
 class ChunkMeshCreator {
 public:
   ChunkMeshCreator(Chunk& c, CubeTexture& tex);
-  int buildMesh(Mesh& m, Chunk& c);
+  int buildMesh(Mesh& m);
 
 protected:
-    bool shouldMakeFace(Chunk& c, glm::vec3 side_block);
+    bool shouldMakeFace(glm::ivec3 side_block);
     Mesh m_mesh;
 
     std::vector<GLfloat> upFace(int select, float x, float y, float z) const;
@@ -27,6 +27,7 @@ protected:
 
     const float cube_width = 1 , cube_length = 1, cube_height = 1;
     float tex_vertical_factor;
+    Chunk& data;
 
 };
 

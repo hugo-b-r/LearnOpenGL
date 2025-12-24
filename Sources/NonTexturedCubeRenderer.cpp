@@ -6,8 +6,8 @@
 const int CUBE_NB_VERTICES = 36;
 
 NonTexturedCubeRenderer::NonTexturedCubeRenderer(glm::vec3 pos, bool rotating) : m_pos(pos), m_rotating(rotating){
-    glm::mat4 m_view (1.0f);
-    m_view = glm::translate(m_view, pos);
+glm::mat4 view (1.0f);
+    view = glm::translate(view, pos);
   m_quadModel.loadData({{
                             -0.5, -0.5, -0.5, // A
                             0.5, -0.5, -0.5, // B

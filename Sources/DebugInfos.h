@@ -20,8 +20,8 @@ class DebugInfos {
         // should be called before glfwTerminate
         void terminate();
     private:
-        double lastFrameTime;
-        double framerate;
+        float lastFrameTime;
+        float framerate;
         std::vector<float> framerates_values;
         std::vector<float> framerates_times;
         double time_last_framerate;

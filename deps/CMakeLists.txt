@@ -19,6 +19,9 @@ target_include_directories(imgui PUBLIC
     imgui/backends/
 )
 
+target_link_libraries(imgui PUBLIC glfw OpenGL::GL)
+
+
 # ImGui sources
 set(IMPLOT_SOURCES
     implot/implot.cpp
@@ -26,8 +29,12 @@ set(IMPLOT_SOURCES
     implot/implot_items.cpp
 )
 
+
+
 add_library(implot STATIC ${IMPLOT_SOURCES})
 
 target_include_directories(implot PUBLIC
     implot/
 )
+
+target_link_libraries(implot PUBLIC imgui glfw OpenGL::GL)

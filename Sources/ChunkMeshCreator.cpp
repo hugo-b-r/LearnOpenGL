@@ -15,12 +15,12 @@ struct NeighbooringFaces {
          rear = {x, y, z-1};
     }
 
-    glm::vec3 left;
-    glm::vec3 right;
-    glm::vec3 up;
-    glm::vec3 down;
-    glm::vec3 front;
-    glm::vec3 rear;
+    glm::ivec3 left;
+    glm::ivec3 right;
+    glm::ivec3 up;
+    glm::ivec3 down;
+    glm::ivec3 front;
+    glm::ivec3 rear;
 };
 
 
@@ -88,57 +88,57 @@ std::vector<GLfloat> ChunkMeshCreator::rearFace(int select, float x, float y, fl
 };
 
 
-ChunkMeshCreator::ChunkMeshCreator(Chunk& c, CubeTexture& tex) : tex_vertical_factor(tex.FactorHeight()){
+ChunkMeshCreator::ChunkMeshCreator(Chunk& c, CubeTexture& tex) : tex_vertical_factor(tex.FactorHeight()), data(c) {
     m_mesh = {{}, {}, {}};
 
 }
 
-int ChunkMeshCreator::buildMesh(Mesh &m, Chunk &c) {
+int ChunkMeshCreator::buildMesh(Mesh &m) {
     int nb_vertices = 0;
   for (int i = 0; i < CHUNK_WIDTH; i++) {
     for (int j = 0; j < CHUNK_HEIGHT; j++) {
       for (int k = 0; k < CHUNK_LENGTH; k++) {
           NeighbooringFaces neighboors;
           neighboors.update(i, j, k);
-          CubeAtlas block = c.getBlockAt(i, j, k);
+          CubeAtlas block = data.getBlockAt(i, j, k);
 
           if (block == CubeAtlas::Air) {
               continue;
           }
 
-          if (shouldMakeFace(c, neighboors.up)) {
-              std::vector<GLfloat> temp = upFace((int)block, i, j, k);
+          if (shouldMakeFace(neighboors.up)) {
+              std::vector<GLfloat> temp = upFace((int)block, (float) i, (float) j, (float) k);
 
               m.vertexPositions.insert(m.vertexPositions.end(), temp.begin(), temp.end());
               nb_vertices+=6;
           }
 
-          if (shouldMakeFace(c, neighboors.down)) {
-              std::vector<GLfloat> temp = downFace((int)block, i, j, k);
+          if (shouldMakeFace(neighboors.down)) {
+              std::vector<GLfloat> temp = downFace((int)block, (float) i, (float) j, (float) k);
 
               m.vertexPositions.insert(m.vertexPositions.end(), temp.begin(), temp.end());
               nb_vertices+=6;
           }
-          if (shouldMakeFace(c, neighboors.left)) {
-              std::vector<GLfloat> temp = leftFace((int)block, i, j, k);
+          if (shouldMakeFace(neighboors.left)) {
+              std::vector<GLfloat> temp = leftFace((int)block, (float) i, (float) j, (float) k);
 
               m.vertexPositions.insert(m.vertexPositions.end(), temp.begin(), temp.end());
               nb_vertices+=6;
           }
-          if (shouldMakeFace(c, neighboors.right)) {
-              std::vector<GLfloat> temp = rightFace((int)block, i, j, k);
+          if (shouldMakeFace(neighboors.right)) {
+              std::vector<GLfloat> temp = rightFace((int)block, (float) i, (float) j, (float) k);
 
               m.vertexPositions.insert(m.vertexPositions.end(), temp.begin(), temp.end());
               nb_vertices+=6;
           }
-          if (shouldMakeFace(c, neighboors.front)) {
-              std::vector<GLfloat> temp = frontFace((int)block, i, j, k);
+          if (shouldMakeFace(neighboors.front)) {
+              std::vector<GLfloat> temp = frontFace((int)block, (float) i, (float) j, (float) k);
 
               m.vertexPositions.insert(m.vertexPositions.end(), temp.begin(), temp.end());
               nb_vertices+=6;
           }
-          if (shouldMakeFace(c, neighboors.rear)) {
-              std::vector<GLfloat> temp = rearFace((int)block, i, j, k);
+          if (shouldMakeFace(neighboors.rear)) {
+              std::vector<GLfloat> temp = rearFace((int)block, (float) i, (float) j, (float) k);
 
               m.vertexPositions.insert(m.vertexPositions.end(), temp.begin(), temp.end());
               nb_vertices+=6;
@@ -150,11 +150,11 @@ int ChunkMeshCreator::buildMesh(Mesh &m, Chunk &c) {
   return nb_vertices;
 }
 
-bool ChunkMeshCreator::shouldMakeFace(Chunk &c, glm::vec3 side_block) {
+bool ChunkMeshCreator::shouldMakeFace(glm::ivec3 side_block) {
   if (side_block.x >= CHUNK_WIDTH || side_block.x < 0 ||
       side_block.y >= CHUNK_HEIGHT || side_block.y < 0 ||
       side_block.z >= CHUNK_LENGTH || side_block.z < 0 ||
-      c.getBlockAt(side_block.x, side_block.y, side_block.z) ==
+      data.getBlockAt(side_block.x, side_block.y, side_block.z) ==
           CubeAtlas::Air) {
     return true;
   } else {

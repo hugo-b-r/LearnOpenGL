@@ -125,9 +125,9 @@ TexturedCubeRenderer::TexturedCubeRenderer(CubeAtlas ca)
 }
 
 void TexturedCubeRenderer::add(glm::vec3 pos, CubeOrientation orientation) {
-    glm::mat4 m_view(1.0f);
+    glm::mat4 view(1.0f);
     glm::mat4 model(1.0f);
-    m_view = glm::translate(m_view, pos + glm::vec3(0.5f, 0.5f, 0.5f));
+    view = glm::translate(view, pos + glm::vec3(0.5f, 0.5f, 0.5f));
     switch (orientation) {
         case CubeOrientation::Up:
         model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0., 0., 1.));
@@ -149,7 +149,7 @@ void TexturedCubeRenderer::add(glm::vec3 pos, CubeOrientation orientation) {
         break;
     }
 
-  cubes.push_back(std::tuple(m_view, model));
+  cubes.push_back(std::tuple(view, model));
 }
 
 void TexturedCubeRenderer::render(Shader &shader, Camera &cam) {

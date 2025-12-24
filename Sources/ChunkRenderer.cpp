@@ -21,12 +21,9 @@ ChunkRenderer::ChunkRenderer(Chunk& c, glm::vec3 pos) : m_chunk_data(c), m_textu
 
     Mesh m;
     ChunkMeshCreator chunk_m_creator(c, m_texture);
-    m_nb_vertices = chunk_m_creator.buildMesh(m, c);
+    m_nb_vertices = chunk_m_creator.buildMesh(m);
     m_view_mat = glm::mat4(1.0f);
     m_view_mat = glm::translate(m_view_mat, pos);
-    for (auto a : m.vertexPositions) {
-        std::cout << " " << a;
-    }
 
     m_model.loadData(m, {3, 2});
 }

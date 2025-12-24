@@ -30,13 +30,20 @@ find_package(OpenGL REQUIRED)
 
 add_subdirectory(deps)
 
-add_compile_options(-Wall -Wextra -Wpedantic)
+if (MSVC)
+    add_compile_options(/W4)
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    add_compile_options(-Wall -Wextra -Wpedantic)
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    add_compile_options(-Wall -Wextra -Wpedantic)
 
+endif()
 
 add_executable(learnopengl)
 
 add_subdirectory(Sources/)
-target_link_libraries(learnopengl PRIVATE imgui implot glad glfw OpenGL::GL spdlog::spdlog glm::glm)
+target_link_libraries(learnopengl PUBLIC imgui implot glad glfw OpenGL::GL spdlog::spdlog glm::glm)
+
 
 #copy shaders for run time compile
 file(COPY ${PROJECT_SOURCE_DIR}/Sources/Shaders

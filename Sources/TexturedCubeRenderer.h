@@ -19,8 +19,6 @@ public:
 private:
   Model m_quadModel;
 
-  glm::mat4 m_view;
-  glm::vec3 m_pos;
   bool m_rotating;
   float width = 1;
   float height = 1;

@@ -14,12 +14,13 @@
 #include "Configuration.h"
 #include "Shader.h"
 
-#include "spdlog/spdlog.h"
+#include <spdlog/spdlog.h>
 // #define STB_IMAGE_IMPLEMENTATION
 #include "../deps/imgui/imgui.h"
 #include "../deps/stb_image.h"
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include "utils.h"
 
 void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
   ImGuiIO &io = ImGui::GetIO();
@@ -27,12 +28,12 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
     Scene *scene = static_cast<Scene *>(glfwGetWindowUserPointer(window));
 
     if (!scene->getConfig().mouseFree) {
-      float xoffset = xpos - scene->getCamera().lastX;
+      float xoffset = (float)xpos - scene->getCamera().lastX;
       float yoffset =
           scene->getCamera().lastY -
-          ypos; // reversed since y-coordinates range from bottom to top
-      scene->getCamera().lastX = xpos;
-      scene->getCamera().lastY = ypos;
+          (float)ypos; // reversed since y-coordinates range from bottom to top
+      scene->getCamera().lastX = (float) xpos;
+      scene->getCamera().lastY = (float) ypos;
 
       const float sensitivity = 0.1f;
       xoffset *= sensitivity;
@@ -72,7 +73,7 @@ void error_callback(int error, const char *description) {
 
 void processInput(GLFWwindow *window, Scene &s) {
   static float currentFrame, deltaTime, lastFrame;
-  currentFrame = glfwGetTime();
+  currentFrame = (float) glfwGetTime();
   deltaTime = currentFrame - lastFrame;
   lastFrame = currentFrame;
 
@@ -106,6 +107,8 @@ void processInput(GLFWwindow *window, Scene &s) {
 
 void key_callback(GLFWwindow *window, int key, int scancode, int action,
                   int mods) {
+    UNUSED(mods);
+    UNUSED(scancode);
   Scene *sc_ptr = (Scene *)glfwGetWindowUserPointer(window);
   if (key == GLFW_KEY_Z && action == GLFW_PRESS) {
     // to be fixed : check opengl polygone mode using some sort of app
@@ -135,6 +138,7 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action,
 
 void mouse_button_callback(GLFWwindow *window, int button, int action,
                            int mods) {
+  UNUSED(mods);
   ImGuiIO &io = ImGui::GetIO();
   if (!io.WantCaptureMouse) {
     Scene *sc_ptr = (Scene *)glfwGetWindowUserPointer(window);
@@ -148,9 +152,8 @@ void mouse_button_callback(GLFWwindow *window, int button, int action,
 }
 int main() {
 
-  Configuration conf;
   spdlog::set_level(spdlog::level::debug);
-  Scene scene = {Camera(conf)};
+  Scene scene;
   double lastWindowTime = glfwGetTime();
 
   // ----------------------
@@ -165,7 +168,7 @@ int main() {
 
   glfwSetErrorCallback(error_callback);
 
-  GLFWwindow *window = glfwCreateWindow(conf.windowWidth, conf.windowHeight,
+  GLFWwindow *window = glfwCreateWindow(scene.getConfig().windowWidth, scene.getConfig().windowHeight,
                                         "LearnOpenGL", NULL, NULL);
   if (window == NULL) {
     spdlog::error("Failed to create GLFW window");
@@ -188,8 +191,8 @@ int main() {
   int frameBufferWidth, frameBufferHeight;
   glfwGetFramebufferSize(window, &frameBufferWidth, &frameBufferHeight);
   glViewport(0, 0, frameBufferWidth, frameBufferHeight);
-  conf.windowHeight = frameBufferHeight;
-  conf.windowWidth = frameBufferWidth;
+  scene.getConfig().windowHeight = frameBufferHeight;
+  scene.getConfig().windowWidth = frameBufferWidth;
 
   glfwSwapInterval(0);
 
@@ -219,8 +222,8 @@ int main() {
       }
     }
   }
-  c.setBlockAt(0., 5, 1., CubeAtlas::Grass);
-  c.setBlockAt(0., 4, 2., CubeAtlas::Planks);
+  c.setBlockAt(0, 5, 1, CubeAtlas::Grass);
+  c.setBlockAt(0, 4, 2, CubeAtlas::Planks);
   ChunkRenderer cr(c, glm::vec3(0., 128., 0.));
   ChunkRenderer cr2(c, glm::vec3(32., 128., 0.));
   TexturedCubeRenderer tc;
