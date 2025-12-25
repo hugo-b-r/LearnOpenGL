@@ -209,7 +209,7 @@ int main() {
   // create vertices of what will beglUseProgram(shaderProgram); shown
   // 2. copy our vertices array in a buffer for OpenGL to useChun
 
-  Chunk c;
+  Chunk c, c1, c2;
 
   const int cote = 10;
   for (int i = 0; i < cote; i++) {
@@ -217,14 +217,21 @@ int main() {
       for (int k = 0; k < cote; k++) {
         if (k != j || j != i || i != k) {
           c.setBlockAt(j, k, i, (CubeAtlas)CubeAtlas::Planks);
+          c1.setBlockAt(j, k, i, (CubeAtlas)CubeAtlas::Planks);
+          c2.setBlockAt(j, k, i, (CubeAtlas)CubeAtlas::Planks);
         }
       }
     }
   }
   c.setBlockAt(0, 5, 1, CubeAtlas::Grass);
   c.setBlockAt(0, 4, 2, CubeAtlas::Planks);
+  c1.setBlockAt(0, 5, 1, CubeAtlas::Grass);
+  c1.setBlockAt(0, 4, 2, CubeAtlas::Planks);
+  c2.setBlockAt(0, 5, 1, CubeAtlas::Grass);
+  c2.setBlockAt(0, 4, 2, CubeAtlas::Planks);
   ChunkRenderer cr(c, glm::vec3(0., 128., 0.));
-  ChunkRenderer cr2(c, glm::vec3(32., 128., 0.));
+  ChunkRenderer cr2(c1, glm::vec3(32., 128., 0.));
+  ChunkRenderer cr3(c2, glm::vec3(16., 128., 0.));
   TexturedCubeRenderer tc;
   for (int i = 0; i < 10; i++) {
     tc.add(glm::vec3((float)i, (float)i, (float)i));
@@ -247,6 +254,7 @@ int main() {
     // for (auto& r: c) {
     cr.render(mainShader, scene.getCamera());
     cr2.render(mainShader, scene.getCamera());
+    cr3.render(mainShader, scene.getCamera());
     tc.render(mainShader, scene.getCamera());
     // }
 

@@ -2,7 +2,9 @@
 #include "Chunk.h"
 #include "CubeTexture.h"
 #include "Mesh.h"
+
 #include <spdlog/spdlog.h>
+#include <thread>
 
 
 struct NeighbooringFaces {
@@ -88,67 +90,30 @@ std::vector<GLfloat> ChunkMeshCreator::rearFace(int select, float x, float y, fl
 };
 
 
-ChunkMeshCreator::ChunkMeshCreator(Chunk& c, CubeTexture& tex) : tex_vertical_factor(tex.FactorHeight()), data(c) {
+ChunkMeshCreator::ChunkMeshCreator(Chunk& c, CubeTexture& tex) : tex_vertical_factor(tex.FactorHeight()), data(c), nb_vertices(0), status(ChunkMeshBuildStatus::RUNNING) {
     m_mesh = {{}, {}, {}};
 
 }
 
-int ChunkMeshCreator::buildMesh(Mesh &m) {
-    int nb_vertices = 0;
-  for (int i = 0; i < CHUNK_WIDTH; i++) {
-    for (int j = 0; j < CHUNK_HEIGHT; j++) {
-      for (int k = 0; k < CHUNK_LENGTH; k++) {
-          NeighbooringFaces neighboors;
-          neighboors.update(i, j, k);
-          CubeAtlas block = data.getBlockAt(i, j, k);
-
-          if (block == CubeAtlas::Air) {
-              continue;
-          }
-
-          if (shouldMakeFace(neighboors.up)) {
-              std::vector<GLfloat> temp = upFace((int)block, (float) i, (float) j, (float) k);
-
-              m.vertexPositions.insert(m.vertexPositions.end(), temp.begin(), temp.end());
-              nb_vertices+=6;
-          }
-
-          if (shouldMakeFace(neighboors.down)) {
-              std::vector<GLfloat> temp = downFace((int)block, (float) i, (float) j, (float) k);
-
-              m.vertexPositions.insert(m.vertexPositions.end(), temp.begin(), temp.end());
-              nb_vertices+=6;
-          }
-          if (shouldMakeFace(neighboors.left)) {
-              std::vector<GLfloat> temp = leftFace((int)block, (float) i, (float) j, (float) k);
-
-              m.vertexPositions.insert(m.vertexPositions.end(), temp.begin(), temp.end());
-              nb_vertices+=6;
-          }
-          if (shouldMakeFace(neighboors.right)) {
-              std::vector<GLfloat> temp = rightFace((int)block, (float) i, (float) j, (float) k);
-
-              m.vertexPositions.insert(m.vertexPositions.end(), temp.begin(), temp.end());
-              nb_vertices+=6;
-          }
-          if (shouldMakeFace(neighboors.front)) {
-              std::vector<GLfloat> temp = frontFace((int)block, (float) i, (float) j, (float) k);
-
-              m.vertexPositions.insert(m.vertexPositions.end(), temp.begin(), temp.end());
-              nb_vertices+=6;
-          }
-          if (shouldMakeFace(neighboors.rear)) {
-              std::vector<GLfloat> temp = rearFace((int)block, (float) i, (float) j, (float) k);
-
-              m.vertexPositions.insert(m.vertexPositions.end(), temp.begin(), temp.end());
-              nb_vertices+=6;
-          }
-
-      }
-    }
-  }
-  return nb_vertices;
+void ChunkMeshCreator::buildMesh() {
+    spdlog::debug("launching separate build thread");
+    m_running = std::thread(&ChunkMeshCreator::buildMeshThreadFn, this);
+    m_running.detach();
 }
+
+Mesh ChunkMeshCreator::getMesh() {
+    return m_mesh;
+}
+
+bool ChunkMeshCreator::isFinished() {
+    return status == ChunkMeshBuildStatus::DONE;
+}
+
+int ChunkMeshCreator::nbVertices() {
+    return nb_vertices;
+}
+
+
 
 bool ChunkMeshCreator::shouldMakeFace(glm::ivec3 side_block) {
   if (side_block.x >= CHUNK_WIDTH || side_block.x < 0 ||
@@ -160,4 +125,61 @@ bool ChunkMeshCreator::shouldMakeFace(glm::ivec3 side_block) {
   } else {
     return false;
   }
+}
+
+void ChunkMeshCreator::buildMeshThreadFn() {
+    spdlog::debug("Echo from launched thread");
+    for (int i = 0; i < CHUNK_WIDTH; i++) {
+      for (int j = 0; j < CHUNK_HEIGHT; j++) {
+        for (int k = 0; k < CHUNK_LENGTH; k++) {
+            NeighbooringFaces neighboors;
+            neighboors.update(i, j, k);
+            CubeAtlas block = data.getBlockAt(i, j, k);
+
+            if (block == CubeAtlas::Air) {
+                continue;
+            }
+
+            if (shouldMakeFace(neighboors.up)) {
+                std::vector<GLfloat> temp = upFace((int)block, (float) i, (float) j, (float) k);
+
+                m_mesh.vertexPositions.insert(m_mesh.vertexPositions.end(), temp.begin(), temp.end());
+                nb_vertices+=6;
+            }
+
+            if (shouldMakeFace(neighboors.down)) {
+                std::vector<GLfloat> temp = downFace((int)block, (float) i, (float) j, (float) k);
+
+                m_mesh.vertexPositions.insert(m_mesh.vertexPositions.end(), temp.begin(), temp.end());
+                nb_vertices+=6;
+            }
+            if (shouldMakeFace(neighboors.left)) {
+                std::vector<GLfloat> temp = leftFace((int)block, (float) i, (float) j, (float) k);
+
+                m_mesh.vertexPositions.insert(m_mesh.vertexPositions.end(), temp.begin(), temp.end());
+                nb_vertices+=6;
+            }
+            if (shouldMakeFace(neighboors.right)) {
+                std::vector<GLfloat> temp = rightFace((int)block, (float) i, (float) j, (float) k);
+
+                m_mesh.vertexPositions.insert(m_mesh.vertexPositions.end(), temp.begin(), temp.end());
+                nb_vertices+=6;
+            }
+            if (shouldMakeFace(neighboors.front)) {
+                std::vector<GLfloat> temp = frontFace((int)block, (float) i, (float) j, (float) k);
+
+                m_mesh.vertexPositions.insert(m_mesh.vertexPositions.end(), temp.begin(), temp.end());
+                nb_vertices+=6;
+            }
+            if (shouldMakeFace(neighboors.rear)) {
+                std::vector<GLfloat> temp = rearFace((int)block, (float) i, (float) j, (float) k);
+
+                m_mesh.vertexPositions.insert(m_mesh.vertexPositions.end(), temp.begin(), temp.end());
+                nb_vertices+=6;
+            }
+        }
+      }
+    }
+    status = ChunkMeshBuildStatus::DONE;
+    spdlog::debug("Thread finished");
 }

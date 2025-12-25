@@ -3,6 +3,7 @@
 
 #include "Camera.h"
 #include "Chunk.h"
+#include "ChunkMeshCreator.h"
 #include "CubeTexture.h"
 #include "Model.h"
 #include "Shader.h"
@@ -15,9 +16,11 @@ public:
 private:
   Chunk& m_chunk_data;
   Model m_model;
+  bool m_modelLoaded;
   glm::mat4 m_view_mat;
   int m_nb_vertices;
   CubeTexture m_texture;
+  ChunkMeshCreator m_chunkMeshCreator;
 };
 
 #endif
