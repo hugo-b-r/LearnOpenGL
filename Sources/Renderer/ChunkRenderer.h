@@ -1,12 +1,12 @@
 #ifndef CHUNKRENDERER_H
 #define CHUNKRENDERER_H
 
-#include "Camera.h"
-#include "Chunk.h"
-#include "ChunkMeshCreator.h"
-#include "CubeTexture.h"
-#include "Model.h"
-#include "Shader.h"
+#include <Camera.h>
+#include <World/Chunk.h>
+#include <World/ChunkMeshCreator.h>
+#include <CubeTexture.h>
+#include <Model.h>
+#include <Shader.h>
 
 class ChunkRenderer {
 public:

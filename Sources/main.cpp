@@ -1,12 +1,12 @@
 
-#include "../deps/glad/include/glad/glad.h"
-#include "Chunk.h"
-#include "ChunkRenderer.h"
+#include <glad/glad.h>
+#include "World/Chunk.h"
+#include "Renderer/ChunkRenderer.h"
 #include "CubeTexture.h"
 #include "DebugInfos.h"
-#include "TexturedCubeRenderer.h"
+#include "Renderer/TexturedCubeRenderer.h"
 #define GLM_ENABLE_EXPERIMENTAL
-#include "../deps/glm/glm/gtx/string_cast.hpp"
+#include <glm/gtx/string_cast.hpp>
 
 #include "Scene.h"
 

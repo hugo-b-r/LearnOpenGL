@@ -1,7 +1,7 @@
-#include "ChunkRenderer.h"
-#include "Camera.h"
-#include "Chunk.h"
-#include "ChunkMeshCreator.h"
+#include <Renderer/ChunkRenderer.h>
+#include <Camera.h>
+#include <World/Chunk.h>
+#include <World/ChunkMeshCreator.h>
 #include "CubeTexture.h"
 #include "Shader.h"
 #include <GLFW/glfw3.h>
