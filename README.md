@@ -19,3 +19,12 @@
 - [ ] une interface
 - [ ] des beaux shaders pour l'eau, le ciel etc.
 - [ ] des arbres, des structures aléatoires...
+
+
+## Set-up for dev
+
+Cmake is set to automatically expose `compile_commands.json` in the build directory. You then just configure clangdlike that :
+```
+CompileFlags:
+  CompilationDatabase: "build"
+```
