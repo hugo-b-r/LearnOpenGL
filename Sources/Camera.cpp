@@ -102,3 +102,8 @@ glm::mat4 Camera::makeViewMatrix(const Camera &camera)
 
     return matrix;
 }
+
+
+int Camera::getRenderDistance() const {
+    return m_config.renderDistance;
+}

@@ -30,6 +30,8 @@ class Camera : public Entity {
 
         static glm::mat4 makeViewMatrix(const Camera &camera);
         static glm::mat4 makeModelMatrix(const Entity &entity);
+
+        int getRenderDistance() const;
         float m_pitch;
         float m_yaw;
         float lastX, lastY;
