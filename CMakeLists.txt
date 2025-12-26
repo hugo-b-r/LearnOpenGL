@@ -43,7 +43,9 @@ add_executable(learnopengl)
 
 add_subdirectory(Sources/)
 target_link_libraries(learnopengl PUBLIC imgui implot glad glfw OpenGL::GL spdlog::spdlog glm::glm)
-target_include_directories(learnopengl PUBLIC ./Sources/)
+target_include_directories(learnopengl PUBLIC Sources/)
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 
 #copy shaders for run time compile
