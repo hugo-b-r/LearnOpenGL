@@ -3,8 +3,8 @@
 
 #include "Entity.h"
 #include "Configuration.h"
-#include "../deps/glm/glm/glm.hpp"
-#include "../deps/glm/glm/gtc/matrix_transform.hpp"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include <string>
 
