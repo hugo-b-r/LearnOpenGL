@@ -10,6 +10,7 @@ target_sources(learnopengl PRIVATE
     "Model.cpp"
     "Renderer/NonTexturedCubeRenderer.cpp"
     "Renderer/QuadRenderer.cpp"
-    "Shader.cpp"
     "Renderer/TexturedCubeRenderer.cpp"
+    "Renderer/MainRenderer.cpp"
+    "Shader.cpp"
     "utils.cpp")
