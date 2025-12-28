@@ -8,7 +8,6 @@
 WorldGenerator::WorldGenerator() {}
 
 void WorldGenerator::buildChunk(Chunk &c) {
-    const int CST = 50;
   const int cote = CHUNK_WIDTH;
   for (int i = 0; i < cote; i++) {
       for (int j = 0; j < cote ; j++) {
