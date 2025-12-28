@@ -1,17 +1,20 @@
-# Mon repo qui me permet d'apprendre à coder en OpenGL
+# A repo to Learn OpenGL while creating a minecraft like game
 
-## Semaine 1
+## Week 1
 
 ![Le premier cube de la vie](./Assets/Week1.png)
 
-## Semaine 3
+## Week 3
 ![Les premiers 648 000 cubes de la vie](./Assets/Week3.png)
+
+## Week 5
+![The first dozens of chunks...](./Assets/Week5.png)
 
 ## To-do 
 
-- [ ] dessiner des textures
-- [ ] des textures
-- [ ] des chunks, un renderer de chunk etc...
+- [x] des textures
+- [x] des chunks, un renderer de chunk etc...
+- [ ] des niveaux de détail
 - [ ] configuration : des inputs, des gamemode...
 - [ ] implémenter une classe d'entrée pour faire des entrées propres qui appellent correctement la translation de la camera
 - [ ] un générateur de chunks type bruit de perlin
