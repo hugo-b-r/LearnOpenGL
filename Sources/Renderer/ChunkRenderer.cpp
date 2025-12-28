@@ -7,13 +7,10 @@
 #include <World/Chunk.h>
 #include <World/ChunkMeshCreator.h>
 #include <spdlog/spdlog.h>
-#include <vector>
 #define GLM_ENABLE_EXPERIMENTAL
 #include "../deps/glm/glm/gtx/string_cast.hpp"
 
-#include <iostream>
 
-const int CUBE_NB_VERTICES = 36;
 const glm::mat4 view_mat(1.0f);
 
 ChunkRenderer::ChunkRenderer()

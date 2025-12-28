@@ -1,7 +1,6 @@
 #include "Chunk.h"
 #include "Camera.h"
 #include "CubeTexture.h"
-#include "Shader.h"
 #include "World/ChunkMeshCreator.h"
 
 #include <spdlog/spdlog.h>
