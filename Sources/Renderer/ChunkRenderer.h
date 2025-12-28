@@ -1,26 +1,23 @@
 #ifndef CHUNKRENDERER_H
 #define CHUNKRENDERER_H
 
-#include <Camera.h>
-#include <World/Chunk.h>
+#include "Camera.h"
+#include "World/Chunk.h"
 #include <World/ChunkMeshCreator.h>
 #include <CubeTexture.h>
 #include <Model.h>
 #include <Shader.h>
 
+class Chunk;
+
 class ChunkRenderer {
 public:
-    ChunkRenderer(Chunk& c, glm::vec3 pos);
-    void render(Shader &shader, Camera &cam);
+    ChunkRenderer();
+    void render(Chunk& c, Camera& cam, int nb_vertices);
 
 private:
-  Chunk& m_chunk_data;
-  Model m_model;
-  bool m_modelLoaded;
-  glm::mat4 m_view_mat;
-  int m_nb_vertices;
-  CubeTexture m_texture;
-  ChunkMeshCreator m_chunkMeshCreator;
+    CubeTexture m_texture;
+    Shader m_shader;
 };
 
 #endif

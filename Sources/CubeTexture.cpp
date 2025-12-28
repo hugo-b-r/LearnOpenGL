@@ -11,6 +11,7 @@
 
 
 // textures de cube sont de 16 par 16 pour chaque face donc 16x(16x6)
+// to improve: one texture for the entire game, which is laoded once and given again and again using static
 CubeTexture::CubeTexture(const std::string& path)
 {
     correctlyLoad = false;

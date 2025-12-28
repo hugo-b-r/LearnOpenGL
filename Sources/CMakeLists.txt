@@ -1,8 +1,5 @@
 target_sources(learnopengl PRIVATE
     "Camera.cpp"
-    "World/Chunk.cpp"
-    "World/ChunkMeshCreator.cpp"
-    "Renderer/ChunkRenderer.cpp"
     "CubeTexture.cpp"
     "DebugInfos.cpp"
     "Entity.cpp"
@@ -11,6 +8,11 @@ target_sources(learnopengl PRIVATE
     "Renderer/NonTexturedCubeRenderer.cpp"
     "Renderer/QuadRenderer.cpp"
     "Renderer/TexturedCubeRenderer.cpp"
-    "Renderer/MainRenderer.cpp"
+    "Renderer/ChunkRenderer.cpp"
     "Shader.cpp"
-    "utils.cpp")
+    "utils.cpp"
+    "World/Chunk.cpp"
+    "World/ChunkMeshCreator.cpp"
+    "World/World.cpp"
+    "World/WorldRepository.cpp"
+)

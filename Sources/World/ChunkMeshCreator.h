@@ -1,21 +1,21 @@
 #ifndef CHUNKMESHCREATOR_H
 #define CHUNKMESHCREATOR_H
 
-#include "../deps/glm/glm/glm.hpp"
+#include <glm/glm.hpp>
 
 
 #include "Chunk.h"
 #include "CubeTexture.h"
 #include "Mesh.h"
 
-#include <thread>
+enum class ChunkMeshBuildStatus { NotStarted, Running, DoneNotLoaded, DoneLoaded};
 
-enum class ChunkMeshBuildStatus { RUNNING, DONE};
+class Chunk;
 
 class ChunkMeshCreator {
 public:
   ChunkMeshCreator(Chunk& c, CubeTexture& tex);
-  void buildMesh();
+  int buildMesh();
 
   bool isFinished();
   int nbVertices();
@@ -25,7 +25,7 @@ public:
 protected:
     bool shouldMakeFace(glm::ivec3 side_block);
 
-    void buildMeshThreadFn();
+    int buildMeshThreadFn();
 
     Mesh m_mesh;
     int nb_vertices;
@@ -41,7 +41,6 @@ protected:
     float tex_vertical_factor;
     Chunk& data;
     ChunkMeshBuildStatus status;
-    std::thread m_running;
 
 
 };

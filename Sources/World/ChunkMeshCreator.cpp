@@ -4,7 +4,6 @@
 #include "Mesh.h"
 
 #include <spdlog/spdlog.h>
-#include <thread>
 
 
 struct NeighbooringFaces {
@@ -90,15 +89,13 @@ std::vector<GLfloat> ChunkMeshCreator::rearFace(int select, float x, float y, fl
 };
 
 
-ChunkMeshCreator::ChunkMeshCreator(Chunk& c, CubeTexture& tex) : tex_vertical_factor(tex.FactorHeight()), data(c), nb_vertices(0), status(ChunkMeshBuildStatus::RUNNING) {
+ChunkMeshCreator::ChunkMeshCreator(Chunk& c, CubeTexture& tex) : nb_vertices(0), tex_vertical_factor(tex.FactorHeight()), data(c), status(ChunkMeshBuildStatus::Running) {
     m_mesh = {{}, {}, {}};
 
 }
 
-void ChunkMeshCreator::buildMesh() {
-    spdlog::debug("launching separate build thread");
-    m_running = std::thread(&ChunkMeshCreator::buildMeshThreadFn, this);
-    m_running.detach();
+int ChunkMeshCreator::buildMesh() {
+    return buildMeshThreadFn();
 }
 
 Mesh ChunkMeshCreator::getMesh() {
@@ -106,7 +103,7 @@ Mesh ChunkMeshCreator::getMesh() {
 }
 
 bool ChunkMeshCreator::isFinished() {
-    return status == ChunkMeshBuildStatus::DONE;
+    return status == ChunkMeshBuildStatus::DoneNotLoaded ||status == ChunkMeshBuildStatus::DoneLoaded;
 }
 
 int ChunkMeshCreator::nbVertices() {
@@ -127,8 +124,7 @@ bool ChunkMeshCreator::shouldMakeFace(glm::ivec3 side_block) {
   }
 }
 
-void ChunkMeshCreator::buildMeshThreadFn() {
-    spdlog::debug("Echo from launched thread");
+int ChunkMeshCreator::buildMeshThreadFn() {
     for (int i = 0; i < CHUNK_WIDTH; i++) {
       for (int j = 0; j < CHUNK_HEIGHT; j++) {
         for (int k = 0; k < CHUNK_LENGTH; k++) {
@@ -180,6 +176,6 @@ void ChunkMeshCreator::buildMeshThreadFn() {
         }
       }
     }
-    status = ChunkMeshBuildStatus::DONE;
-    spdlog::debug("Thread finished");
+    status = ChunkMeshBuildStatus::DoneLoaded;
+    return nb_vertices;
 }
