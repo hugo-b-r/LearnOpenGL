@@ -9,6 +9,7 @@
 
 ## Week 5
 ![The first dozens of chunks...](./Assets/Week5.png)
+![the first hundreds of generated chunks](./Assets/Week5-2.png)
 
 ## To-do 
 
@@ -17,7 +18,7 @@
 - [ ] des niveaux de détail
 - [ ] configuration : des inputs, des gamemode...
 - [ ] implémenter une classe d'entrée pour faire des entrées propres qui appellent correctement la translation de la camera
-- [ ] un générateur de chunks type bruit de perlin
+- [x] un générateur de chunks type bruit de perlin
 - [ ] la gravité et la détection des collisions
 - [ ] une interface
 - [ ] des beaux shaders pour l'eau, le ciel etc.

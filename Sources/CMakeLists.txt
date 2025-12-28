@@ -5,14 +5,10 @@ target_sources(learnopengl PRIVATE
     "Entity.cpp"
     "main.cpp"
     "Model.cpp"
-    "Renderer/NonTexturedCubeRenderer.cpp"
-    "Renderer/QuadRenderer.cpp"
-    "Renderer/TexturedCubeRenderer.cpp"
-    "Renderer/ChunkRenderer.cpp"
     "Shader.cpp"
     "utils.cpp"
-    "World/Chunk.cpp"
-    "World/ChunkMeshCreator.cpp"
-    "World/World.cpp"
-    "World/WorldRepository.cpp"
 )
+
+add_subdirectory(World)
+add_subdirectory(Renderer)
+add_subdirectory(Mathematics)

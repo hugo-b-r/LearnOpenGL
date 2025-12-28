@@ -1,8 +1,8 @@
 #include "Chunk.h"
 #include "Camera.h"
 #include "CubeTexture.h"
-#include "Shader.h"
 #include "World/ChunkMeshCreator.h"
+#include "World/WorldGenerator.h"
 
 #include <spdlog/spdlog.h>
 
@@ -44,16 +44,7 @@ void Chunk::load() {
   // for now: fun loading / generation function that does not take into account
   // therest of chunks
   if (m_loadStatus != ChunkDataLoadStatus::FinishedLoaded) {
-
-    const int cote = CHUNK_WIDTH;
-    for (int i = 0; i < cote; i++) {
-      for (int j = 0; j < cote; j++) {
-        for (int k = 0; k < cote; k++) {
-          setBlockAt(j, k + CHUNK_HEIGHT / 2, i,
-                     (CubeAtlas)(1+(i + j + k) % ((int)CubeAtlas::Planks)));
-        }
-      }
-    }
+      WorldGenerator::buildChunk(*this);
   }
   m_loadStatus = ChunkDataLoadStatus::FinishedLoaded;
 }
