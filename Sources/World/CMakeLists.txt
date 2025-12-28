@@ -3,4 +3,5 @@ target_sources(learnopengl PRIVATE
     "ChunkMeshCreator.cpp"
     "World.cpp"
     "WorldRepository.cpp"
+    "WorldGenerator.cpp"
 )

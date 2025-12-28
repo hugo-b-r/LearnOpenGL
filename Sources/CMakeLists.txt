@@ -11,3 +11,4 @@ target_sources(learnopengl PRIVATE
 
 add_subdirectory(World)
 add_subdirectory(Renderer)
+add_subdirectory(Mathematics)
