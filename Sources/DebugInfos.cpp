@@ -65,20 +65,6 @@ void DebugInfos::drawFrame(Scene &scene) {
   ImGui::PopFont();
   ImGui::Text("FPS : %lf", framerate);
 
-  spdlog::debug("start : {}, end : {}", framerates_times[0],
-                framerates_times[framerates_times.size() - 1]);
-  if (ImPlot::BeginPlot("Line Plots")) {
-    ImPlot::SetupAxes("x", "y", ImPlotAxisFlags_AutoFit,
-                      ImPlotAxisFlags_AutoFit);
-    spdlog::debug("start : {}, end : {}", framerates_times[0],
-                  framerates_times[framerates_times.size() - 1]);
-    ImPlot::SetupAxesLimits(framerates_times[0],
-                            framerates_times[framerates_times.size() - 1], 0,
-                            1000, 0);
-    ImPlot::PlotLine("f(x)", framerates_times.data(), framerates_values.data(),
-                     NB_VALUES_FRAMERATE);
-    ImPlot::EndPlot();
-  }
 
   ImGui::Separator();
   ImGui::PushFont(NULL, style.FontSizeBase * title_size);
@@ -89,8 +75,6 @@ void DebugInfos::drawFrame(Scene &scene) {
     if (ImPlot::BeginPlot("Line Plots")) {
       ImPlot::SetupAxes("x", "y", ImPlotAxisFlags_AutoFit,
                         ImPlotAxisFlags_AutoFit);
-      spdlog::debug("start : {}, end : {}", framerates_times[0],
-                    framerates_times[framerates_times.size() - 1]);
       ImPlot::SetupAxesLimits(framerates_times[0],
                               framerates_times[framerates_times.size() - 1], 0,
                               1000, 0);
