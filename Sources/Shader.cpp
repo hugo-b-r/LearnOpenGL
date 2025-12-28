@@ -33,7 +33,7 @@ Shader::Shader(const char *vertexPath, const char *fragmentPath) {
     // convert stream into string
     vertexCode = vShaderStream.str();
     fragmentCode = fShaderStream.str();
-  } catch (std::ifstream::failure e) {
+  } catch (std::ifstream::failure& e) {
     spdlog::error("ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ");
   }
   const char *vShaderCode = vertexCode.c_str();

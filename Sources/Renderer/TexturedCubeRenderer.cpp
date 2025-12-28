@@ -125,9 +125,9 @@ TexturedCubeRenderer::TexturedCubeRenderer(CubeAtlas ca)
 }
 
 void TexturedCubeRenderer::add(glm::vec3 pos, CubeOrientation orientation) {
-    glm::mat4 m_view(1.0f);
+    glm::mat4 view(1.0f);
     glm::mat4 model(1.0f);
-    m_view = glm::translate(m_view, pos);
+    view = glm::translate(view, pos + glm::vec3(0.5f, 0.5f, 0.5f));
     switch (orientation) {
         case CubeOrientation::Up:
         model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0., 0., 1.));
@@ -149,18 +149,18 @@ void TexturedCubeRenderer::add(glm::vec3 pos, CubeOrientation orientation) {
         break;
     }
 
-  cubes.push_back(std::tuple(m_view, model));
+  cubes.push_back(std::tuple(view, model));
 }
 
 void TexturedCubeRenderer::render(Shader &shader, Camera &cam) {
   shader.use();
   m_quadModel.bindVAO();
+  tex.bind();
 
   glm::mat4 projection = glm::mat4(1.0f);
   projection = cam.getProjectionViewMatrix();
 
   for (auto &cube : cubes) {
-
     shader.setMat4("model", std::get<1>(cube));
     shader.setMat4("view", std::get<0>(cube));
     shader.setMat4("projection", projection);

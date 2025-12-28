@@ -4,7 +4,10 @@
 #include "Scene.h"
 
 #include <GLFW/glfw3.h>
+#include <deque>
 
+const int NB_VALUES_FRAMERATE = 100;
+const double FRAMERATE_TIME_INTERVAL = 0.1;
 class DebugInfos {
     public:
         DebugInfos(GLFWwindow * window);
@@ -17,8 +20,12 @@ class DebugInfos {
         // should be called before glfwTerminate
         void terminate();
     private:
-        double lastFrameTime;
-        double framerate;
+        float lastFrameTime;
+        float framerate;
+        std::vector<float> framerates_values;
+        std::vector<float> framerates_times;
+        double time_last_framerate;
+        bool show_fr_plot;
 };
 
 #endif

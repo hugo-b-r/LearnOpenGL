@@ -2,6 +2,7 @@
 #include "Configuration.h"
 
 #include <format>
+#include <spdlog/spdlog.h>
 
 Camera::Camera(Configuration& c) : m_config(c) {
 
@@ -10,7 +11,8 @@ Camera::Camera(Configuration& c) : m_config(c) {
     float fov = (float)m_config.fov;
     m_yaw = 0.;
     m_pitch = 0.;
-    float lastX = c.windowWidth/2., lastY = c.windowHeight/2.;
+    lastX = (float)c.windowWidth/2.f;
+    lastY = (float)c.windowHeight/2.f;
 
     m_projectionMatrix = glm::perspective(glm::radians(fov), x / y, 0.1f, 2000.0f);
     position = glm::vec3(0., 0., -3.5);
@@ -50,7 +52,14 @@ std::string Camera::debug_pos() {
     return res;
 }
 
+std::string Camera::debug_direction() {
+    std::string res = std::format("Direction : x : {:0.2f}; y : {:0.2f}; z : {:0.2f}; ", m_frontPos.x, m_frontPos.y, m_frontPos.z);
+    return res;
+}
+
+
 void Camera::updateProjViewMatrix() {
+    m_projectionMatrix = glm::perspective(glm::radians((float)m_config.fov), (float)m_config.windowWidth / (float)m_config.windowHeight, 0.1f, 2000.0f);
     m_viewMatrix = glm::lookAt(position, position + m_frontPos, m_upVector);
     m_projViewMatrix = m_projectionMatrix * m_viewMatrix;
 }
@@ -92,4 +101,9 @@ glm::mat4 Camera::makeViewMatrix(const Camera &camera)
     matrix = glm::translate(matrix, -camera.position);
 
     return matrix;
+}
+
+
+int Camera::getRenderDistance() const {
+    return m_config.renderDistance;
 }

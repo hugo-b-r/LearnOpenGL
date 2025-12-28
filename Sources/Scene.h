@@ -6,13 +6,19 @@
 
 class Scene {
     public:
-        Scene() : m_config (), m_cam (m_config) {
+        Scene(Configuration c) : m_config (c), m_cam (c) {
 
         }
 
-        Scene(Camera cam) : m_config(), m_cam( cam ) {
+        // avec une camera précédement initialisée avec la configuration
+        Scene(Configuration c, Camera cam) : m_config(c), m_cam( cam ) {
 
         }
+
+        Scene() : m_config(), m_cam(m_config) {
+
+        }
+
 
         Camera& getCamera() {
             return m_cam;

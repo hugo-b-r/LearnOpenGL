@@ -11,6 +11,7 @@
 
 
 // textures de cube sont de 16 par 16 pour chaque face donc 16x(16x6)
+// to improve: one texture for the entire game, which is laoded once and given again and again using static
 CubeTexture::CubeTexture(const std::string& path)
 {
     correctlyLoad = false;
@@ -47,4 +48,13 @@ float CubeTexture::FactorWidth() const
 float CubeTexture::FactorHeight() const
 {
     return usedTextureHeight / realTextureHeight;
+}
+
+
+void CubeTexture::bind() {
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    glBindTexture(GL_TEXTURE_2D, id);
 }

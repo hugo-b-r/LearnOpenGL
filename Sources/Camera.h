@@ -3,8 +3,8 @@
 
 #include "Entity.h"
 #include "Configuration.h"
-#include "../deps/glm/glm/glm.hpp"
-#include "../deps/glm/glm/gtc/matrix_transform.hpp"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include <string>
 
@@ -19,6 +19,7 @@ class Camera : public Entity {
         void translate_left(float how_much);
 
         std::string debug_pos();
+        std::string debug_direction();
 
 
         void updateProjViewMatrix();
@@ -29,6 +30,8 @@ class Camera : public Entity {
 
         static glm::mat4 makeViewMatrix(const Camera &camera);
         static glm::mat4 makeModelMatrix(const Entity &entity);
+
+        int getRenderDistance() const;
         float m_pitch;
         float m_yaw;
         float lastX, lastY;

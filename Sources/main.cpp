@@ -1,10 +1,12 @@
 
-#include "../deps/glad/include/glad/glad.h"
+#include <glad/glad.h>
+#include "World/World.h"
+#include "Renderer/ChunkRenderer.h"
 #include "CubeTexture.h"
 #include "DebugInfos.h"
-#include "TexturedCubeRenderer.h"
+#include "Renderer/TexturedCubeRenderer.h"
 #define GLM_ENABLE_EXPERIMENTAL
-#include "../deps/glm/glm/gtx/string_cast.hpp"
+#include <glm/gtx/string_cast.hpp>
 
 #include "Scene.h"
 
@@ -12,12 +14,13 @@
 #include "Configuration.h"
 #include "Shader.h"
 
-#include "spdlog/spdlog.h"
+#include <spdlog/spdlog.h>
 // #define STB_IMAGE_IMPLEMENTATION
 #include "../deps/imgui/imgui.h"
 #include "../deps/stb_image.h"
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include "utils.h"
 
 void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
   ImGuiIO &io = ImGui::GetIO();
@@ -25,12 +28,12 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
     Scene *scene = static_cast<Scene *>(glfwGetWindowUserPointer(window));
 
     if (!scene->getConfig().mouseFree) {
-      float xoffset = xpos - scene->getCamera().lastX;
+      float xoffset = (float)xpos - scene->getCamera().lastX;
       float yoffset =
           scene->getCamera().lastY -
-          ypos; // reversed since y-coordinates range from bottom to top
-      scene->getCamera().lastX = xpos;
-      scene->getCamera().lastY = ypos;
+          (float)ypos; // reversed since y-coordinates range from bottom to top
+      scene->getCamera().lastX = (float) xpos;
+      scene->getCamera().lastY = (float) ypos;
 
       const float sensitivity = 0.1f;
       xoffset *= sensitivity;
@@ -70,7 +73,7 @@ void error_callback(int error, const char *description) {
 
 void processInput(GLFWwindow *window, Scene &s) {
   static float currentFrame, deltaTime, lastFrame;
-  currentFrame = glfwGetTime();
+  currentFrame = (float) glfwGetTime();
   deltaTime = currentFrame - lastFrame;
   lastFrame = currentFrame;
 
@@ -104,6 +107,8 @@ void processInput(GLFWwindow *window, Scene &s) {
 
 void key_callback(GLFWwindow *window, int key, int scancode, int action,
                   int mods) {
+    UNUSED(mods);
+    UNUSED(scancode);
   Scene *sc_ptr = (Scene *)glfwGetWindowUserPointer(window);
   if (key == GLFW_KEY_Z && action == GLFW_PRESS) {
     // to be fixed : check opengl polygone mode using some sort of app
@@ -133,6 +138,7 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action,
 
 void mouse_button_callback(GLFWwindow *window, int button, int action,
                            int mods) {
+  UNUSED(mods);
   ImGuiIO &io = ImGui::GetIO();
   if (!io.WantCaptureMouse) {
     Scene *sc_ptr = (Scene *)glfwGetWindowUserPointer(window);
@@ -146,11 +152,8 @@ void mouse_button_callback(GLFWwindow *window, int button, int action,
 }
 int main() {
 
-  Configuration conf;
   spdlog::set_level(spdlog::level::debug);
-  Scene scene = {Camera(conf)};
-  double lastWindowTime = glfwGetTime();
-  double framerate = 1.;
+  Scene scene;
 
   // ----------------------
   // Init glfw
@@ -164,7 +167,7 @@ int main() {
 
   glfwSetErrorCallback(error_callback);
 
-  GLFWwindow *window = glfwCreateWindow(conf.windowWidth, conf.windowHeight,
+  GLFWwindow *window = glfwCreateWindow(scene.getConfig().windowWidth, scene.getConfig().windowHeight,
                                         "LearnOpenGL", NULL, NULL);
   if (window == NULL) {
     spdlog::error("Failed to create GLFW window");
@@ -187,8 +190,10 @@ int main() {
   int frameBufferWidth, frameBufferHeight;
   glfwGetFramebufferSize(window, &frameBufferWidth, &frameBufferHeight);
   glViewport(0, 0, frameBufferWidth, frameBufferHeight);
-  conf.windowHeight = frameBufferHeight;
-  conf.windowWidth = frameBufferWidth;
+  scene.getConfig().windowHeight = frameBufferHeight;
+  scene.getConfig().windowWidth = frameBufferWidth;
+
+  glfwSwapInterval(0);
 
   DebugInfos debug_inf(window);
 
@@ -202,52 +207,26 @@ int main() {
 
   // Scene variables
   // create vertices of what will beglUseProgram(shaderProgram); shown
-  // 2. copy our vertices array in a buffer for OpenGL to use
-  TexturedCubeRenderer c (CubeAtlas::Grass);
-    TexturedCubeRenderer c2 (CubeAtlas::Stone);
-    TexturedCubeRenderer c3 (CubeAtlas::Sand);
+  // 2. copy our vertices array in a buffer for OpenGL to useChun
 
-const int cote = 60;
-  for (int i = 0; i < cote; i++) {
-      for (int j =0; j< cote; j++) {
-          for (int k =0; k < cote; k++) {
-              c.add(glm::vec3(j, k, i));
-              c2.add(glm::vec3(j, k, -i));
-              c3.add(glm::vec3(j, k+2*cote, -i));
-          }
-      }
-  }
-
-
-  const CubeOrientation orientations_table[] = {
-      CubeOrientation::Up,    CubeOrientation::Down,  CubeOrientation::Left,
-      CubeOrientation::Right, CubeOrientation::Front, CubeOrientation::Rear};
-
-
-
+  World w;
+  ChunkRenderer cr;
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
   while (!glfwWindowShouldClose(window)) {
-    framerate = 1./(glfwGetTime()-lastWindowTime);
-    lastWindowTime = glfwGetTime();
     glfwPollEvents();
-
-
 
     if (scene.getConfig().showDebugInfos) {
       debug_inf.initFrame();
     }
     processInput(window, scene);
 
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClearColor(0.63f, 0.87f, 1.f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // for (auto& r: c) {
-        c.render(mainShader, scene.getCamera());
-        c2.render(mainShader, scene.getCamera());
-        c3.render(mainShader, scene.getCamera());
-    // }
+
+    w.render(scene.getCamera(), cr);
 
     if (scene.getConfig().showDebugInfos) {
       debug_inf.drawFrame(scene);

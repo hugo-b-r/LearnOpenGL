@@ -25,19 +25,28 @@ endif()
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
 
-find_package(glfw3 REQUIRED)
+add_subdirectory(deps/glfw)
 find_package(OpenGL REQUIRED)
 
-add_subdirectory(deps/glad)
-add_subdirectory(deps/spdlog)
-add_subdirectory(deps/glm)
-add_subdirectory(deps/imgui)
+add_subdirectory(deps)
 
-add_compile_options(-Wall -Wextra -Wpedantic)
+if (MSVC)
+    add_compile_options(/W4)
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    add_compile_options(-Wall -Wextra -Wpedantic)
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    add_compile_options(-Wall -Wextra -Wpedantic)
 
-add_executable(learnopengl "Sources/main.cpp" "Sources/Shader.cpp" "Sources/QuadRenderer.cpp" "Sources/Model.cpp" "Sources/Camera.cpp""Sources/Entity.cpp" "Sources/NonTexturedCubeRenderer.cpp" "Sources/CubeTexture.cpp" "Sources/TexturedCubeRenderer.cpp" "Sources/Shaders/fragment.glsl" "Sources/Shaders/vertex.glsl" "Sources/utils.cpp" "Sources/DebugInfos.cpp")
+endif()
 
-target_link_libraries(learnopengl PRIVATE imgui glad glfw OpenGL::GL spdlog::spdlog glm::glm)
+add_executable(learnopengl)
+
+add_subdirectory(Sources/)
+target_link_libraries(learnopengl PUBLIC imgui implot glad glfw OpenGL::GL spdlog::spdlog glm::glm)
+target_include_directories(learnopengl PUBLIC Sources/)
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 
 #copy shaders for run time compile
 file(COPY ${PROJECT_SOURCE_DIR}/Sources/Shaders

@@ -13,7 +13,6 @@ public:
 private:
   Model m_quadModel;
 
-  glm::mat4 m_view;
   glm::vec3 m_pos;
   bool m_rotating;
 };
