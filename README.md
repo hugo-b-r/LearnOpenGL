@@ -32,3 +32,17 @@ Cmake is set to automatically expose `compile_commands.json` in the build direct
 CompileFlags:
   CompilationDatabase: "build"
 ```
+
+## Test running
+Set-up build directory:
+```bash
+ cmake -B build . -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON -S .
+```
+Build 
+```bash
+ cmake --build build --parallel 12 --target test_learnopengl
+```
+Then 
+```bash
+cd build && ctest
+```

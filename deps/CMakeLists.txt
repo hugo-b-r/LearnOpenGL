@@ -1,6 +1,10 @@
+
 add_subdirectory(glad)
 add_subdirectory(glm)
 add_subdirectory(spdlog)
+add_subdirectory(glfw)
+find_package(OpenGL REQUIRED)
+
 
 # ImGui sources
 set(IMGUI_SOURCES

@@ -1,9 +1,8 @@
-target_sources(learnopengl PRIVATE
+target_sources(${TARGET_NAME} PRIVATE
     "Camera.cpp"
     "CubeTexture.cpp"
     "DebugInfos.cpp"
     "Entity.cpp"
-    "main.cpp"
     "Model.cpp"
     "Shader.cpp"
     "utils.cpp"
@@ -12,3 +11,9 @@ target_sources(learnopengl PRIVATE
 add_subdirectory(World)
 add_subdirectory(Renderer)
 add_subdirectory(Mathematics)
+
+if(NOT BUILD_TESTS)
+    target_sources(${TARGET_NAME} PRIVATE
+    "main.cpp"
+)
+endif()
