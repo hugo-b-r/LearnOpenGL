@@ -2,6 +2,7 @@
 //
 #include <gtest/gtest.h>
 #include <glm/glm.hpp>
+#include <spdlog/spdlog.h>
 #include "utils.h"
 
 TEST(TestUtils, TestfromBlockToChunkCoordinates1) {
@@ -23,6 +24,12 @@ TEST(TestUtils, TestfromBlockToChunkCoordinates3) {
     EXPECT_EQ(glm::ivec2(7, 1), fromBlockToChunkCoordinates(p));
 }
 
+
+TEST(TestUtils, TestfromBlockToChunkCoordinates4) {
+    glm::ivec3 p(-16, 12, -32);
+
+    EXPECT_EQ(glm::ivec2(-1, -2), fromBlockToChunkCoordinates(p));
+}
 
 
 
@@ -69,8 +76,17 @@ TEST(TestUtils, TestfromGlobalToInChunkCoordinates3) {
     EXPECT_EQ(glm::ivec3(13,15, 0), fromGlobalToInChunkCoordinates(p));
 }
 
+TEST(TestUtils, TestfromGlobalToInChunkCoordinates4) {
+    glm::ivec3 p(-16, 0, -32);
 
+    EXPECT_EQ(glm::ivec3(0,0, 0), fromGlobalToInChunkCoordinates(p));
+}
 
+TEST(TestUtils, TestfromGlobalToInChunkCoordinates5) {
+    glm::ivec3 p(-17, 0, -33);
+    spdlog::info("func : {} {} {}", fromGlobalToInChunkCoordinates(p).x, fromGlobalToInChunkCoordinates(p).y, fromGlobalToInChunkCoordinates(p).z);
+    EXPECT_EQ(glm::ivec3(15,0, 15), fromGlobalToInChunkCoordinates(p));
+}
 
 
 TEST(TestUtils, TestfromInChunkToGlobalCoordinates1) {
@@ -93,4 +109,13 @@ TEST(TestUtils, TestfromInChunkToGlobalCoordinates3) {
     glm::ivec2 chunkPos(42, 420);
 
     EXPECT_EQ(glm::ivec3(684,15, 6724), fromInChunkToGlobalCoordinates(p, chunkPos));
+}
+
+
+TEST(TestUtils, TestfromInChunkToGlobalCoordinates4) {
+    glm::ivec3 p(12, 0, 13);
+    glm::ivec2 chunkPos(-1, -2);
+
+    EXPECT_EQ(glm::ivec3(-4, 0, -19), fromInChunkToGlobalCoordinates(p, chunkPos));
+
 }
