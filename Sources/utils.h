@@ -8,4 +8,8 @@
 
 std::string mat4_to_string(const glm::mat4& matrix);
 
+glm::ivec2 fromBlockToChunkCoordinates(glm::ivec3 blockPos);
+glm::ivec3 fromChunkToBlockCoordinates(glm::ivec2 chunkPos, int blockHeight);
+glm::ivec3 fromGlobalToInChunkCoordinates(glm::ivec3 blockPos);
+
 #endif
