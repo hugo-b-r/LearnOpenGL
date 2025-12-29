@@ -2,7 +2,7 @@
 #define UTILS_H
 
 #include <string>
-#include "../deps/glm/glm/glm.hpp"
+#include <glm/glm.hpp>
 
 #define UNUSED(x) (void)x
 

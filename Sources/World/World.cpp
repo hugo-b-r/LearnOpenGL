@@ -1,5 +1,4 @@
 #include "World.h"
-#include "Configuration.h"
 #include "CubeTexture.h"
 #include "Renderer/ChunkRenderer.h"
 #include "utils.h"
