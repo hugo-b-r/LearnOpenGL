@@ -4,6 +4,7 @@
 
 #include <glm/glm.hpp>
 #include "Camera.h"
+#include "Chunk.h"
 #include "CubeTexture.h"
 #include "Renderer/ChunkRenderer.h"
 
@@ -15,6 +16,8 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
 
+class Chunk;
+class ChunkRenderer;
 
 
 class World {
@@ -23,7 +26,7 @@ public:
 
   void render(Camera& cam, ChunkRenderer& renderer);
 
-  CubeAtlas& blockAt(glm::ivec3 pos);
+  CubeAtlas getBlockAt(glm::ivec3 pos);
   void playerLeftClicked(Camera& cam);
   void playerRightClicked(Camera& cam);
 
@@ -31,6 +34,10 @@ public:
   void loadAt(glm::ivec2 pos);
   void unloadAt(glm::ivec2 pos);
   bool isLoadedAt(glm::ivec2 pos);
+  void createAndLoadMeshAt(glm::ivec2 pos);
+  bool isMeshLoadedAt(glm::ivec2 pos);
+
+
 
   Chunk getAt(glm::ivec2 pos);
 

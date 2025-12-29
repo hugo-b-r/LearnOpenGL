@@ -10,7 +10,6 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include "../deps/glm/glm/gtx/string_cast.hpp"
 
-
 const glm::mat4 view_mat(1.0f);
 
 ChunkRenderer::ChunkRenderer()
@@ -19,26 +18,20 @@ ChunkRenderer::ChunkRenderer()
                "Sources/Shaders/textured_cube_fragment.glsl") {}
 
 void ChunkRenderer::render(Chunk &c, Camera &cam, int nb_vertices) {
-  if (!c.isLoaded()) {
-    c.load();
-  }
-  if (!c.hasMesh()) {
-    c.createMesh();
-  }
-  if (!c.hasOnGPUMesh()) {
-    c.loadMeshOnGPU();
-  }
+  if (c.isLoaded() && c.hasMesh() && c.hasOnGPUMesh()) {
 
-  // spdlog::debug(" size : {}", m_chunkMeshCreator.getMesh().vertexPositions);
-  m_shader.use();
-  c.bindModel();
-  m_texture.bind();
-  glm::mat4 projection = cam.getProjectionViewMatrix();
-  glm::mat4 modelMat = glm::mat4(1.f);
-  modelMat = glm::translate(modelMat, c.getChunkPosCenter3());
-  m_shader.setMat4("model", modelMat);
-  m_shader.setMat4("view", view_mat);
-  m_shader.setMat4("projection", projection);
-  // render container
-  glDrawArrays(GL_TRIANGLES, 0, nb_vertices);
+    // spdlog::debug(" size : {}",
+    // m_chunkMeshCreator.getMesh().vertexPositions);
+    m_shader.use();
+    c.bindModel();
+    m_texture.bind();
+    glm::mat4 projection = cam.getProjectionViewMatrix();
+    glm::mat4 modelMat = glm::mat4(1.f);
+    modelMat = glm::translate(modelMat, c.getChunkPosCenter3());
+    m_shader.setMat4("model", modelMat);
+    m_shader.setMat4("view", view_mat);
+    m_shader.setMat4("projection", projection);
+    // render container
+    glDrawArrays(GL_TRIANGLES, 0, nb_vertices);
+  }
 }

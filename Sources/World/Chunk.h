@@ -6,6 +6,7 @@
 #include "Mesh.h"
 #include "Model.h"
 #include "Renderer/ChunkRenderer.h"
+#include "World.h"
 
 #include <glm/glm.hpp>
 #include <vector>
@@ -39,7 +40,7 @@ public:
   void load();
   bool isLoaded();
 
-  void createMesh();
+  void createMesh(World& w);
   bool hasMesh();
 
   void loadMeshOnGPU();
