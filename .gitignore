@@ -1,4 +1,5 @@
 build/
+buildTests/
 .cache
 imgui.ini
 .clangd
