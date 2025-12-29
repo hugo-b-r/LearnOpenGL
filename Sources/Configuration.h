@@ -9,6 +9,7 @@ struct Configuration {
     int fov = 90;
     bool mouseFree = false;
     bool showDebugInfos = false;
+    int camSpeedFactor = 5;
 };
 
 #endif

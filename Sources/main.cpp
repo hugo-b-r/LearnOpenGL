@@ -77,13 +77,12 @@ void processInput(GLFWwindow *window, Scene &s) {
   deltaTime = currentFrame - lastFrame;
   lastFrame = currentFrame;
 
-  const float camera_speed = 5 * deltaTime;
+  const float camera_speed = s.getConfig().camSpeedFactor * deltaTime;
   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
     s.getCamera().translate_forward(camera_speed);
     spdlog::debug("translate forward");
   }
   if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-
     s.getCamera().translate_left(camera_speed);
     spdlog::debug("translate left");
   }
@@ -102,6 +101,11 @@ void processInput(GLFWwindow *window, Scene &s) {
   if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
     s.getCamera().translate(camera_speed * glm::vec3(0., 1., 0.));
     spdlog::debug("translate upwards");
+  }
+  if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
+    s.getConfig().camSpeedFactor = 50;
+  } else {
+      s.getConfig().camSpeedFactor = 5;
   }
 }
 
