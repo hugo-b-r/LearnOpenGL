@@ -3,6 +3,7 @@
 #include "World/Chunk.h"
 
 #include <string>
+#include <spdlog/spdlog.h>
 
 std::string mat4_to_string(const glm::mat4& matrix)
 {
@@ -20,7 +21,11 @@ std::string mat4_to_string(const glm::mat4& matrix)
 }
 
 glm::ivec2 fromBlockToChunkCoordinates(glm::ivec3 blockPos) {
-    return glm::ivec2(blockPos.x/CHUNK_WIDTH, blockPos.z/CHUNK_LENGTH);
+    int rx = blockPos.x % CHUNK_WIDTH;
+    int rz = blockPos.z % CHUNK_WIDTH;
+    int px = blockPos.x < 0 && rx != 0 ? blockPos.x/CHUNK_WIDTH - 1 : blockPos.x/CHUNK_WIDTH;
+    int pz = blockPos.z < 0 && rz != 0 ? blockPos.z/CHUNK_WIDTH - 1 : blockPos.z/CHUNK_WIDTH;
+    return glm::ivec2(px, pz);
 }
 
 glm::ivec3 fromChunkToBlockCoordinates(glm::ivec2 chunkPos, int blockHeight) {

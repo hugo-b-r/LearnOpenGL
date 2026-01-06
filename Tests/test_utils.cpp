@@ -32,6 +32,14 @@ TEST(TestUtils, TestfromBlockToChunkCoordinates4) {
 }
 
 
+TEST(TestUtils, TestfromBlockToChunkCoordinates5) {
+    glm::ivec3 p(-16, 12, -33);
+
+    EXPECT_EQ(glm::ivec2(-1, -3), fromBlockToChunkCoordinates(p));
+}
+
+
+
 
 TEST(TestUtils, TestfromChunkToBlockCoordinates1) {
     glm::ivec2 p(0, 0);
