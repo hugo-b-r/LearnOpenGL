@@ -79,27 +79,21 @@ void processInput(GLFWwindow *window, Scene &s) {
   const float camera_speed = s.getConfig().camSpeedFactor * deltaTime;
   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
     s.getCamera().translate_forward(camera_speed);
-    spdlog::debug("translate forward");
   }
   if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
     s.getCamera().translate_left(camera_speed);
-    spdlog::debug("translate left");
   }
   if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
     s.getCamera().translate_forward(-camera_speed);
-    spdlog::debug("translate backward");
   }
   if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
     s.getCamera().translate_right(camera_speed);
-    spdlog::debug("translate right");
   }
   if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
     s.getCamera().translate(camera_speed * glm::vec3(0., -1., 0.));
-    spdlog::debug("translate downwards");
   }
   if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
     s.getCamera().translate(camera_speed * glm::vec3(0., 1., 0.));
-    spdlog::debug("translate upwards");
   }
   if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
     s.getConfig().camSpeedFactor = 50;
@@ -205,6 +199,7 @@ int main() {
   // Setup Dear ImGui context
 
   glEnable(GL_DEPTH_TEST);
+  glEnable(GL_CULL_FACE);
   Shader mainShader("Sources/Shaders/textured_cube_vertex.glsl",
                     "Sources/Shaders/textured_cube_fragment.glsl");
 
