@@ -35,9 +35,9 @@ find_package(OpenGL REQUIRED)
 if (MSVC)
     add_compile_options(/W4)
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    add_compile_options(-Wall -Wextra -Wpedantic)
+    add_compile_options(-Wall -Wextra -Wpedantic -O3)
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    add_compile_options(-Wall -Wextra -Wpedantic)
+    add_compile_options(-Wall -Wextra -Wpedantic -O3)
 
 endif()
 

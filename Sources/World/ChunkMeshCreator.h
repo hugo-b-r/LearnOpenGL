@@ -32,12 +32,12 @@ protected:
     Mesh m_mesh;
     int nb_vertices;
 
-    std::vector<GLfloat> upFace(int select, float x, float y, float z) const;
-    std::vector<GLfloat> downFace(int select, float x, float y, float z) const;
-    std::vector<GLfloat> leftFace(int select, float x, float y, float z) const;
-    std::vector<GLfloat> rightFace(int select, float x, float y, float z) const;
-    std::vector<GLfloat> frontFace(int select, float x, float y, float z) const;
-    std::vector<GLfloat> rearFace(int select, float x, float y, float z) const;
+    std::array<GLfloat, 30> upFace(int select, float x, float y, float z) const;
+    std::array<GLfloat, 30> downFace(int select, float x, float y, float z) const;
+    std::array<GLfloat, 30> leftFace(int select, float x, float y, float z) const;
+    std::array<GLfloat, 30> rightFace(int select, float x, float y, float z) const;
+    std::array<GLfloat, 30> frontFace(int select, float x, float y, float z) const;
+    std::array<GLfloat, 30> rearFace(int select, float x, float y, float z) const;
 
     const float cube_width = 1 , cube_length = 1, cube_height = 1;
     float tex_vertical_factor;
