@@ -1,6 +1,7 @@
 #include "World.h"
 #include "CubeTexture.h"
 #include "Renderer/ChunkRenderer.h"
+#include "World/Chunk.h"
 #include "utils.h"
 #include <unordered_set>
 
@@ -47,8 +48,10 @@ void World::render(Camera &cam, ChunkRenderer &renderer) {
       if (!isMeshLoadedAt(tmpPos)) {
         createAndLoadMeshAt(tmpPos);
       }
-
-      getAt(tmpPos).draw(cam, renderer);
+      // gain ~ 10% performance by not rendering back chunks
+      glm::ivec3 posCenter = getAt(tmpPos).getChunkPosCenter();
+      if (glm::dot(glm::vec3(posCenter)-cam.position, cam.m_frontPos) >=0)
+          getAt(tmpPos).draw(cam, renderer);
     }
     // for now, we never unload as the data structure is not great for that
     //   }

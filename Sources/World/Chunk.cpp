@@ -3,6 +3,7 @@
 #include "CubeTexture.h"
 #include "World/ChunkMeshCreator.h"
 #include "World/WorldGenerator.h"
+#include "utils.h"
 
 #include <spdlog/spdlog.h>
 
@@ -22,12 +23,12 @@ Chunk::Chunk(glm::ivec2 pos)
 
 glm::ivec2 Chunk::getChunkPos() { return chunkPos; }
 
-glm::ivec2 Chunk::getChunkPosCenter() {
-  return chunkPos + glm::ivec2(CHUNK_WIDTH / 2, CHUNK_LENGTH / 2);
+glm::ivec3 Chunk::getChunkPosCenter() {
+  return fromChunkToBlockCoordinates(chunkPos, CHUNK_HEIGHT/2) + glm::ivec3(CHUNK_WIDTH / 2, 0, CHUNK_LENGTH / 2);
 }
 
 glm::vec3 Chunk::getChunkPosCenter3() {
-  return glm::vec3(chunkPos.x  * CHUNK_WIDTH + CHUNK_WIDTH/2, 0,
+  return glm::vec3(chunkPos.x  * CHUNK_WIDTH + CHUNK_WIDTH/2, CHUNK_HEIGHT/2,
                    chunkPos.y * CHUNK_LENGTH + CHUNK_LENGTH/2);
 }
 

@@ -34,7 +34,7 @@ public:
   void setBlockAt(int x, int y, int z, CubeAtlas ca);
 
   glm::ivec2 getChunkPos();
-  glm::ivec2 getChunkPosCenter();
+  glm::ivec3 getChunkPosCenter();
   glm::vec3 getChunkPosCenter3();
 
   void load();
