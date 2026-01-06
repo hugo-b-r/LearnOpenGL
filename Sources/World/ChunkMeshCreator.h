@@ -7,14 +7,16 @@
 #include "Chunk.h"
 #include "CubeTexture.h"
 #include "Mesh.h"
+#include "World.h"
 
 enum class ChunkMeshBuildStatus { NotStarted, Running, DoneNotLoaded, DoneLoaded};
 
 class Chunk;
+class World;
 
 class ChunkMeshCreator {
 public:
-  ChunkMeshCreator(Chunk& c, CubeTexture& tex);
+  ChunkMeshCreator(Chunk& c, CubeTexture& tex, World& m);
   int buildMesh();
 
   bool isFinished();
@@ -41,6 +43,8 @@ protected:
     float tex_vertical_factor;
     Chunk& data;
     ChunkMeshBuildStatus status;
+
+    World& m_world;
 
 
 };

@@ -2,6 +2,7 @@
 #include "Chunk.h"
 #include "CubeTexture.h"
 #include "Mesh.h"
+#include "utils.h"
 
 #include <spdlog/spdlog.h>
 
@@ -89,7 +90,7 @@ std::vector<GLfloat> ChunkMeshCreator::rearFace(int select, float x, float y, fl
 };
 
 
-ChunkMeshCreator::ChunkMeshCreator(Chunk& c, CubeTexture& tex) : nb_vertices(0), tex_vertical_factor(tex.FactorHeight()), data(c), status(ChunkMeshBuildStatus::Running) {
+ChunkMeshCreator::ChunkMeshCreator(Chunk& c, CubeTexture& tex, World& w) : nb_vertices(0), tex_vertical_factor(tex.FactorHeight()), data(c), status(ChunkMeshBuildStatus::Running), m_world(w) {
     m_mesh = {{}, {}, {}};
 
 }
@@ -113,15 +114,32 @@ int ChunkMeshCreator::nbVertices() {
 
 
 bool ChunkMeshCreator::shouldMakeFace(glm::ivec3 side_block) {
-  if (side_block.x >= CHUNK_WIDTH || side_block.x < 0 ||
-      side_block.y >= CHUNK_HEIGHT || side_block.y < 0 ||
-      side_block.z >= CHUNK_LENGTH || side_block.z < 0 ||
-      data.getBlockAt(side_block.x, side_block.y, side_block.z) ==
-          CubeAtlas::Air) {
-    return true;
-  } else {
-    return false;
-  }
+    int x = side_block.x, y = side_block.y, z = side_block.z;
+    if (y < 0) {
+        // under the sea
+        return false;
+    } else if (
+        x < CHUNK_WIDTH && x >= 0 &&
+        y < CHUNK_HEIGHT &&
+        z < CHUNK_LENGTH && z >= 0
+    ) {
+        // inside the chunk
+        auto block = data.getBlockAt(x, y, z);
+        if (block == CubeAtlas::Air) {
+            return true;
+        } else {
+            return false;
+        }
+    } else if ( y>= CHUNK_HEIGHT) {
+        return true;
+    } else {
+        auto block = m_world.getBlockAt(fromInChunkToGlobalCoordinates(side_block, data.getChunkPos()));
+        if (block == CubeAtlas::Air) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
 
 int ChunkMeshCreator::buildMeshThreadFn() {

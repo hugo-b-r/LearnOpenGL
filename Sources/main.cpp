@@ -2,9 +2,8 @@
 #include <glad/glad.h>
 #include "World/World.h"
 #include "Renderer/ChunkRenderer.h"
-#include "CubeTexture.h"
 #include "DebugInfos.h"
-#include "Renderer/TexturedCubeRenderer.h"
+
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/string_cast.hpp>
 

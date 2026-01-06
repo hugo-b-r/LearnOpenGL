@@ -10,6 +10,7 @@
 ## Week 5
 ![The first dozens of chunks...](./Assets/Week5.png)
 ![the first hundreds of generated chunks](./Assets/Week5-2.png)
+![the first hundreds of generated chunks without duplicates on the borders](./Assets/Week5-3.png)
 
 ## To-do 
 
