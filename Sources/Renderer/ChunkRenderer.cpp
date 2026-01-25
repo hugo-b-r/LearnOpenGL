@@ -10,7 +10,6 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include "../deps/glm/glm/gtx/string_cast.hpp"
 
-const glm::mat4 view_mat(1.0f);
 
 ChunkRenderer::ChunkRenderer()
     : m_texture("./Assets/texture_atlas.jpg"),
@@ -29,9 +28,11 @@ void ChunkRenderer::render(Chunk &c, Camera &cam, int nb_vertices) {
     glm::mat4 modelMat = glm::mat4(1.f);
     modelMat = glm::translate(modelMat, c.getChunkPosCenter3());
     m_shader.setMat4("model", modelMat);
-    m_shader.setMat4("view", view_mat);
-    m_shader.setMat4("projection", projection);
-    // render container
+   // render container
     glDrawArrays(GL_TRIANGLES, 0, nb_vertices);
   }
+}
+
+Shader& ChunkRenderer::getShader() {
+  return m_shader;
 }

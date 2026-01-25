@@ -15,6 +15,8 @@ public:
     ChunkRenderer();
     void render(Chunk& c, Camera& cam, int nb_vertices);
 
+    Shader& getShader();
+
 private:
     CubeTexture m_texture;
     Shader m_shader;

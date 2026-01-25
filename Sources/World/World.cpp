@@ -8,6 +8,9 @@
 #include <glm/glm.hpp>
 #include <spdlog/spdlog.h>
 
+
+const glm::mat4 view_mat(1.0f);
+
 World::World() {}
 
 void World::render(Camera &cam, ChunkRenderer &renderer) {
@@ -37,7 +40,10 @@ void World::render(Camera &cam, ChunkRenderer &renderer) {
 
   std::unordered_set<glm::ivec2> posToUnLoad = getLoadedChunkPos();
   // Draw each chunk
-  for (int i = -cam.getRenderDistance() + camPos.x;
+
+   renderer.getShader().setMat4("view", view_mat);
+   renderer.getShader().setMat4("projection", cam.getProjectionViewMatrix());
+   for (int i = -cam.getRenderDistance() + camPos.x;
        i <= cam.getRenderDistance() + camPos.x; ++i) {
     for (int j = -cam.getRenderDistance() + camPos.y;
          j <= cam.getRenderDistance() + camPos.y; ++j) {
