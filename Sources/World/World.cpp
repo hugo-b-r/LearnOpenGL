@@ -48,10 +48,8 @@ void World::render(Camera &cam, ChunkRenderer &renderer) {
       if (!isMeshLoadedAt(tmpPos)) {
         createAndLoadMeshAt(tmpPos);
       }
-      // gain ~ 10% performance by not rendering back chunks
       glm::ivec3 posCenter = getAt(tmpPos).getChunkPosCenter();
-      if (glm::dot(glm::vec3(posCenter)-cam.position, cam.m_frontPos) >=0)
-          getAt(tmpPos).draw(cam, renderer);
+      getAt(tmpPos).draw(cam, renderer);
     }
     // for now, we never unload as the data structure is not great for that
     //   }
