@@ -21,6 +21,7 @@ Camera::Camera(Configuration& c) : m_config(c) {
 
     m_viewMatrix = makeViewMatrix(*this);
     m_projViewMatrix = m_projectionMatrix * m_viewMatrix;
+    m_frustum = {m_projViewMatrix};
 }
 
 void Camera::translate(glm::vec3 trans) {
@@ -117,20 +118,7 @@ void Camera::updateUpVector() {
 }
 
 void Camera::createFrustum() {
-    glm::mat4 vpt = glm::transpose(m_projViewMatrix);
-    // using outsides normals
-    m_frustum =  {
-        // left, right, bottom, top
-        {
-            (vpt[3] + vpt[0]),
-            (vpt[3] - vpt[0]),
-            (vpt[3] + vpt[1]),
-            (vpt[3] - vpt[1]),
-            // near, far
-            (vpt[3] + vpt[2]),
-            (vpt[3] - vpt[2]),
-        }
-    };
+    m_frustum.updateFrom(m_projViewMatrix);
 }
 
 
