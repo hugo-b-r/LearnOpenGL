@@ -54,7 +54,6 @@ void World::render(Camera &cam, ChunkRenderer &renderer, DebugInfos& inf) {
       // if (posToUnLoad.contains(tmpPos))
       //   posToUnLoad.erase(tmpPos);
       if (!isMeshLoadedAt(tmpPos)) {
-        spdlog::debug("mesh not loadede");
         createAndLoadMeshAt(tmpPos);
       }
       if (f.IsAabbVisible(getAt(tmpPos).getBoundingBox())) {
@@ -94,7 +93,7 @@ void World::update(Camera &cam) {
 void World::loadAt(glm::ivec2 pos) {
   m_chunks.insert({pos, Chunk(pos)});
   m_chunks[pos].load();
-  
+
 }
 
 void World::unloadAt(glm::ivec2 pos) { m_chunks.erase(pos); }
