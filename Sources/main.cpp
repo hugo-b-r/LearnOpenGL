@@ -224,7 +224,7 @@ int main() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
-    w.render(scene.getCamera(), cr);
+    w.render(scene.getCamera(), cr, debug_inf);
 
     if (scene.getConfig().showDebugInfos) {
       debug_inf.drawFrame(scene);

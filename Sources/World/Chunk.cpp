@@ -47,6 +47,7 @@ void Chunk::load() {
   if (m_loadStatus != ChunkDataLoadStatus::FinishedLoaded) {
       WorldGenerator::buildChunk(*this);
   }
+  createBoundingBox();
   m_loadStatus = ChunkDataLoadStatus::FinishedLoaded;
 }
 
@@ -81,4 +82,14 @@ void Chunk::bindModel() { m_model.bindVAO(); }
 
 void Chunk::draw(Camera &cam, ChunkRenderer &renderer) {
   renderer.render(*this, cam, m_mesh.vertexPositions.size());
+}
+
+
+void Chunk::createBoundingBox() {
+    glm::vec3 pos = fromChunkToBlockCoordinates(chunkPos, 0);
+    m_boundingBox = {pos, pos + glm::vec3(CHUNK_WIDTH-1, CHUNK_HEIGHT-1, CHUNK_LENGTH-1)};
+}
+
+AABB& Chunk::getBoundingBox() {
+    return m_boundingBox;
 }

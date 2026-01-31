@@ -37,12 +37,12 @@ void Camera::translate_forward(float how_much) {
 }
 
 void Camera::translate_right(float how_much) {
-    position += glm::normalize(glm::cross(m_frontPos, m_upVector)) * how_much;
+    position += glm::normalize(glm::cross(m_frontPos, glm::vec3(0, 1, 0))) * how_much;
     updateProjViewMatrix();
 
 }
 void Camera::translate_left(float how_much) {
-    position -= glm::normalize(glm::cross(m_frontPos, m_upVector)) * how_much;
+    position -= glm::normalize(glm::cross(m_frontPos, glm::vec3(0, 1, 0))) * how_much;
     updateProjViewMatrix();
 }
 
@@ -60,7 +60,7 @@ std::string Camera::debug_direction() {
 
 void Camera::updateProjViewMatrix() {
     m_projectionMatrix = glm::perspective(glm::radians((float)m_config.fov), (float)m_config.windowWidth / (float)m_config.windowHeight, 0.1f, 2000.0f);
-    m_viewMatrix = glm::lookAt(position, position + m_frontPos, m_upVector);
+    m_viewMatrix = glm::lookAt(position, position + m_frontPos, glm::vec3(0,1,0));
     m_projViewMatrix = m_projectionMatrix * m_viewMatrix;
 }
 
@@ -106,4 +106,34 @@ glm::mat4 Camera::makeViewMatrix(const Camera &camera)
 
 int Camera::getRenderDistance() const {
     return m_config.renderDistance;
+}
+
+void Camera::updateUpVector() {
+    glm::mat4 matrix;
+    matrix = glm::rotate(matrix, glm::radians(rotation.x), {1, 0, 0});
+    matrix = glm::rotate(matrix, glm::radians(rotation.y), {0, 1, 0});
+    matrix = glm::rotate(matrix, glm::radians(rotation.z), {0, 0, 1});
+    m_upVector = glm::vec3(glm::vec4(0, 1, 0, 1) * matrix);
+}
+
+void Camera::createFrustum() {
+    glm::mat4 vpt = glm::transpose(m_projViewMatrix);
+    // using outsides normals
+    m_frustum =  {
+        // left, right, bottom, top
+        {
+            (vpt[3] + vpt[0]),
+            (vpt[3] - vpt[0]),
+            (vpt[3] + vpt[1]),
+            (vpt[3] - vpt[1]),
+            // near, far
+            (vpt[3] + vpt[2]),
+            (vpt[3] - vpt[2]),
+        }
+    };
+}
+
+
+Frustum& Camera::getFrustum() {
+    return m_frustum;
 }

@@ -3,8 +3,29 @@
 
 #include "Camera.h"
 #include "Configuration.h"
+#include "World/Chunk.h"
+#include "World/WorldGenerator.h"
+#include "glm/fwd.hpp"
 #include <spdlog/spdlog.h>
 #include <iostream>
+
+
+
+TEST(TestFrustum, ChunkAABB) {
+    Chunk c (glm::ivec2(0,-1));
+    WorldGenerator wg;
+    wg.buildChunk(c);
+    
+    Configuration conf;
+    Camera cam(conf);
+    cam.createFrustum();
+    Frustum f = cam.getFrustum();
+    
+    
+    EXPECT_EQ(f.IsAabbVisible(bound), true);
+
+    
+}
 
 
 
@@ -14,16 +35,9 @@ TEST(TestFrustum, FrustumNumber) {
     Camera cam(conf);
     cam.createFrustum();
     Frustum f = cam.getFrustum();
-    std::string res = "";
-    for (int i = 0; i < f.planes.size(); ++i) {
-        res = "";
-        for (int j= 0; j < 4; j++) {
-            res += std::to_string(f.planes[i][j]);
-            res += ", ";
-        }
-        std::cout << res << std::endl;
-    }
+    AABB bound = { glm::vec3(16, 0, -31), glm::vec3(31, 255, 16) };
+    
+    EXPECT_EQ(f.IsAabbVisible(bound), true);
 
-    EXPECT_EQ(0, 1);
-
+    
 }

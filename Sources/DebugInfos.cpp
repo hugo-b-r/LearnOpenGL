@@ -15,7 +15,10 @@ DebugInfos::DebugInfos(GLFWwindow *window)
     : lastFrameTime((float)glfwGetTime()),
       framerates_values(NB_VALUES_FRAMERATE, 0),
       framerates_times(NB_VALUES_FRAMERATE, lastFrameTime),
-      show_fr_plot(false) {
+      show_fr_plot(false),
+     drawnChunks (0) {
+
+  drawnChunks = 0;
 
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
@@ -67,7 +70,7 @@ void DebugInfos::drawFrame(Scene &scene) {
 
   ImGui::Separator();
   ImGui::PushFont(NULL, style.FontSizeBase * title_size);
-  ImGui::Text("Camera");
+  ImGui::Text("Frame time");
   ImGui::PopFont();
   ImGui::Checkbox("Show fps plot", &show_fr_plot);
   if (show_fr_plot) {
@@ -93,6 +96,16 @@ void DebugInfos::drawFrame(Scene &scene) {
 
   ImGui::Separator();
 
+  ImGui::PushFont(NULL, style.FontSizeBase * title_size);
+  ImGui::Text("Number of objects drawn:");
+  ImGui::PopFont();
+
+
+  ImGui::Text(std::format("Chunks : {} / {}", drawnChunks, (scene.getConfig().renderDistance * 2+1) *(scene.getConfig().renderDistance * 2+1) ).c_str());
+
+
+  ImGui::Separator();
+
   ImGui::Render();
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
@@ -102,4 +115,9 @@ void DebugInfos::terminate() {
   ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplGlfw_Shutdown();
   ImGui::DestroyContext();
+}
+
+
+void DebugInfos::updateDrawnChunks(int nb) {
+    drawnChunks = nb;
 }

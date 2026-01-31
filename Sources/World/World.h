@@ -6,6 +6,7 @@
 #include "Camera.h"
 #include "Chunk.h"
 #include "CubeTexture.h"
+#include "DebugInfos.h"
 #include "Renderer/ChunkRenderer.h"
 
 
@@ -24,7 +25,7 @@ class World {
 public:
   World();
 
-  void render(Camera& cam, ChunkRenderer& renderer);
+  void render(Camera& cam, ChunkRenderer& renderer, DebugInfos& inf);
 
   CubeAtlas getBlockAt(glm::ivec3 pos);
   void playerLeftClicked(Camera& cam);

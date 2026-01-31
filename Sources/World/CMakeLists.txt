@@ -10,7 +10,6 @@ if(BUILD_TESTS)
         "Chunk.cpp"
         "ChunkMeshCreator.cpp"
         "World.cpp"
-        "WorldRepository.cpp"
         "WorldGenerator.cpp"
     )
 else()

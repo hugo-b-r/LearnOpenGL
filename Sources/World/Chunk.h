@@ -7,6 +7,7 @@
 #include "Model.h"
 #include "Renderer/ChunkRenderer.h"
 #include "World.h"
+#include "Mathematics/AABB.h"
 
 #include <glm/glm.hpp>
 #include <vector>
@@ -29,6 +30,7 @@ enum class ChunkMeshBuildStatus;
 class Chunk {
 public:
   Chunk();
+  // creates a chunk at pos pos in chunk coordinates among other chunks
   Chunk(glm::ivec2 pos);
   CubeAtlas getBlockAt(int x, int y, int z);
   void setBlockAt(int x, int y, int z, CubeAtlas ca);
@@ -50,6 +52,10 @@ public:
 
   void draw(Camera &cam, ChunkRenderer &renderer);
 
+  void createBoundingBox();
+
+  AABB& getBoundingBox();
+
 protected:
   std::vector<CubeAtlas> blocks;
   ChunkDataLoadStatus m_loadStatus;
@@ -60,6 +66,7 @@ protected:
   glm::mat4 m_modelMat;
   glm::mat4 m_viewMat;
   int m_numberVertices;
+  AABB m_boundingBox;
 };
 
 #endif

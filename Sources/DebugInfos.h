@@ -4,7 +4,6 @@
 #include "Scene.h"
 
 #include <GLFW/glfw3.h>
-#include <deque>
 
 const int NB_VALUES_FRAMERATE = 100;
 const double FRAMERATE_TIME_INTERVAL = 0.1;
@@ -19,6 +18,7 @@ class DebugInfos {
         void drawFrame(Scene& scene);
         // should be called before glfwTerminate
         void terminate();
+        void updateDrawnChunks(int nb);
     private:
         float lastFrameTime;
         float framerate;
@@ -26,6 +26,7 @@ class DebugInfos {
         std::vector<float> framerates_times;
         double time_last_framerate;
         bool show_fr_plot;
+        int drawnChunks;
 };
 
 #endif

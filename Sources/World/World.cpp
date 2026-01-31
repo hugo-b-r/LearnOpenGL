@@ -4,16 +4,16 @@
 #include "World/Chunk.h"
 #include "utils.h"
 #include <unordered_set>
+#include "DebugInfos.h"
 
 #include <glm/glm.hpp>
 #include <spdlog/spdlog.h>
-
 
 const glm::mat4 view_mat(1.0f);
 
 World::World() {}
 
-void World::render(Camera &cam, ChunkRenderer &renderer) {
+void World::render(Camera &cam, ChunkRenderer &renderer, DebugInfos& inf) {
   /*
    * Logic :
    * updates the world to unload unused chunks, load used chunks
@@ -22,8 +22,9 @@ void World::render(Camera &cam, ChunkRenderer &renderer) {
    */
   // Update the world
   update(cam);
-
+  renderer.bindTextureAndShader();
   glm::ivec2 camPos = cam.chunkPosition();
+  Frustum &f = cam.getFrustum();
   // loading terrain
   for (int i = -cam.getRenderDistance() - 1 + camPos.x;
        i <= cam.getRenderDistance() + 1 + camPos.x; ++i) {
@@ -38,12 +39,13 @@ void World::render(Camera &cam, ChunkRenderer &renderer) {
     }
   }
 
-  std::unordered_set<glm::ivec2> posToUnLoad = getLoadedChunkPos();
+  //std::unordered_set<glm::ivec2> posToUnLoad = getLoadedChunkPos();
   // Draw each chunk
 
-   renderer.getShader().setMat4("view", view_mat);
-   renderer.getShader().setMat4("projection", cam.getProjectionViewMatrix());
-   for (int i = -cam.getRenderDistance() + camPos.x;
+  int total_drawn = 0;
+  renderer.getShader().setMat4("view", view_mat);
+  renderer.getShader().setMat4("projection", cam.getProjectionViewMatrix());
+  for (int i = -cam.getRenderDistance() + camPos.x;
        i <= cam.getRenderDistance() + camPos.x; ++i) {
     for (int j = -cam.getRenderDistance() + camPos.y;
          j <= cam.getRenderDistance() + camPos.y; ++j) {
@@ -52,10 +54,13 @@ void World::render(Camera &cam, ChunkRenderer &renderer) {
       // if (posToUnLoad.contains(tmpPos))
       //   posToUnLoad.erase(tmpPos);
       if (!isMeshLoadedAt(tmpPos)) {
+        spdlog::debug("mesh not loadede");
         createAndLoadMeshAt(tmpPos);
       }
-      glm::ivec3 posCenter = getAt(tmpPos).getChunkPosCenter();
-      getAt(tmpPos).draw(cam, renderer);
+      if (f.IsAabbVisible(getAt(tmpPos).getBoundingBox())) {
+        getAt(tmpPos).draw(cam, renderer);
+        ++total_drawn;
+      }
     }
     // for now, we never unload as the data structure is not great for that
     //   }
@@ -64,26 +69,32 @@ void World::render(Camera &cam, ChunkRenderer &renderer) {
     //     spdlog::debug("unloading at : {}, {}", posChunk.x, posChunk.y);
 
     // }
+
+     inf.updateDrawnChunks(total_drawn);
+
   }
 }
 
 CubeAtlas World::getBlockAt(glm::ivec3 pos) {
-    auto chunkCoord = fromBlockToChunkCoordinates(pos);
-    if (existsAt(chunkCoord)) {
-        auto blockInChunkPos = fromGlobalToInChunkCoordinates(pos);
-        int a = blockInChunkPos.x, b = blockInChunkPos.y, c = blockInChunkPos.z;
-        return m_chunks[chunkCoord].getBlockAt(a, b, c);
-    } else {
-        return CubeAtlas::Air;
-    }
+  auto chunkCoord = fromBlockToChunkCoordinates(pos);
+  if (existsAt(chunkCoord)) {
+    auto blockInChunkPos = fromGlobalToInChunkCoordinates(pos);
+    int a = blockInChunkPos.x, b = blockInChunkPos.y, c = blockInChunkPos.z;
+    return m_chunks[chunkCoord].getBlockAt(a, b, c);
+  } else {
+    return CubeAtlas::Air;
+  }
 }
 
-
-void World::update(Camera &cam) {}
+void World::update(Camera &cam) {
+    cam.updateUpVector();
+    cam.createFrustum();
+}
 
 void World::loadAt(glm::ivec2 pos) {
   m_chunks.insert({pos, Chunk(pos)});
   m_chunks[pos].load();
+  
 }
 
 void World::unloadAt(glm::ivec2 pos) { m_chunks.erase(pos); }

@@ -16,15 +16,16 @@ ChunkRenderer::ChunkRenderer()
       m_shader("Sources/Shaders/textured_cube_vertex.glsl",
                "Sources/Shaders/textured_cube_fragment.glsl") {}
 
-void ChunkRenderer::render(Chunk &c, Camera &cam, int nb_vertices) {
+void ChunkRenderer::render(Chunk &c, Camera &cam, int nb_vertices, bool bindShader, bool bindTexture) {
   if (c.isLoaded() && c.hasMesh() && c.hasOnGPUMesh()) {
 
     // spdlog::debug(" size : {}",
     // m_chunkMeshCreator.getMesh().vertexPositions);
-    m_shader.use();
+    if (bindShader)
+        m_shader.use();
     c.bindModel();
-    m_texture.bind();
-    glm::mat4 projection = cam.getProjectionViewMatrix();
+    if (bindTexture)
+        m_texture.bind();
     glm::mat4 modelMat = glm::mat4(1.f);
     modelMat = glm::translate(modelMat, c.getChunkPosCenter3());
     m_shader.setMat4("model", modelMat);
@@ -35,4 +36,10 @@ void ChunkRenderer::render(Chunk &c, Camera &cam, int nb_vertices) {
 
 Shader& ChunkRenderer::getShader() {
   return m_shader;
+}
+
+
+void ChunkRenderer::bindTextureAndShader() {
+    m_texture.bind();
+    m_shader.use();
 }

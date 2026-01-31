@@ -13,9 +13,10 @@ class Chunk;
 class ChunkRenderer {
 public:
     ChunkRenderer();
-    void render(Chunk& c, Camera& cam, int nb_vertices);
+    void render(Chunk& c, Camera& cam, int nb_vertices, bool bindShader = false, bool bindTexture = false);
 
     Shader& getShader();
+    void bindTextureAndShader();
 
 private:
     CubeTexture m_texture;
