@@ -1,50 +1,60 @@
 #include "Camera.h"
 #include "Configuration.h"
+#include "Scene.h"
 
 #include <format>
 #include <spdlog/spdlog.h>
 
-Camera::Camera(Configuration& c) : m_config(c) {
+Camera::Camera(Scene& s) : m_scene(s) {
 
-    float x = (float)m_config.windowWidth;
-    float y = (float)m_config.windowHeight;
-    float fov = (float)m_config.fov;
     m_yaw = 0.;
     m_pitch = 0.;
-    lastX = (float)c.windowWidth/2.f;
-    lastY = (float)c.windowHeight/2.f;
+    lastX = (float)s.getConfig().windowWidth/2.f;
+    lastY = (float)s.getConfig().windowHeight/2.f;
 
-    m_projectionMatrix = glm::perspective(glm::radians(fov), x / y, 0.1f, 2000.0f);
     position = glm::vec3(0., 0., -3.5);
+
     m_frontPos = position - glm::vec3(0.0f, 0.0f, 4.0f);
     m_upVector = glm::vec3(0.0f, 1.0f,  0.0f);
 
-    m_viewMatrix = makeViewMatrix(*this);
-    m_projViewMatrix = m_projectionMatrix * m_viewMatrix;
-    m_frustum = {m_projViewMatrix};
+    updateProjViewMatrix();
+
+    createFrustum();
+    updateAabb();
+}
+
+void Camera::update() {
+    updateProjViewMatrix();
+    updateAabb();
+    updateUpVector();
+    createFrustum();
+    if (!m_scene.getConfig().isFlying) {
+        // get down
+    }
 }
 
 void Camera::translate(glm::vec3 trans) {
+    // for now, just translate without collision detection
     position += trans;
     //m_viewMatrix = glm::translate(m_viewMatrix, trans);
-    updateProjViewMatrix();
+    update();
 }
 
 void Camera::translate_forward(float how_much) {
     glm::vec3 t = m_frontPos;
     t[1] = 0;
-    position += glm::normalize(t) * how_much;
-    updateProjViewMatrix();
+    translate(glm::normalize(t) * how_much);
+    update();
 }
 
 void Camera::translate_right(float how_much) {
-    position += glm::normalize(glm::cross(m_frontPos, glm::vec3(0, 1, 0))) * how_much;
-    updateProjViewMatrix();
+    translate(glm::normalize(glm::cross(m_frontPos, glm::vec3(0, 1, 0))) * how_much);
+    update();
 
 }
 void Camera::translate_left(float how_much) {
-    position -= glm::normalize(glm::cross(m_frontPos, glm::vec3(0, 1, 0))) * how_much;
-    updateProjViewMatrix();
+    translate(-glm::normalize(glm::cross(m_frontPos, glm::vec3(0, 1, 0))) * how_much);
+    update();
 }
 
 
@@ -60,7 +70,7 @@ std::string Camera::debug_direction() {
 
 
 void Camera::updateProjViewMatrix() {
-    m_projectionMatrix = glm::perspective(glm::radians((float)m_config.fov), (float)m_config.windowWidth / (float)m_config.windowHeight, 0.1f, 2000.0f);
+    m_projectionMatrix = glm::perspective(glm::radians((float)m_scene.getConfig().fov), (float)m_scene.getConfig().windowWidth / (float)m_scene.getConfig().windowHeight, 0.1f, 2000.0f);
     m_viewMatrix = glm::lookAt(position, position + m_frontPos, glm::vec3(0,1,0));
     m_projViewMatrix = m_projectionMatrix * m_viewMatrix;
 }
@@ -106,7 +116,7 @@ glm::mat4 Camera::makeViewMatrix(const Camera &camera)
 
 
 int Camera::getRenderDistance() const {
-    return m_config.renderDistance;
+    return m_scene.getConfig().renderDistance;
 }
 
 void Camera::updateUpVector() {
@@ -124,4 +134,12 @@ void Camera::createFrustum() {
 
 Frustum& Camera::getFrustum() {
     return m_frustum;
+}
+
+
+void Camera::updateAabb() {
+    // AABB:
+    //  w : 0.7, h : 1.8, l : 0.7
+    m_boundingBox.getVmin() = position - glm::vec3(0.35, 1.65, 0.35);
+    m_boundingBox.getVmax() = position + glm::vec3(0.35, 0.15, 0.35);
 }

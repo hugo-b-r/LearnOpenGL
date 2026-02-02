@@ -39,25 +39,25 @@ bool Frustum::IsAabbVisible(AABB const & box )
     for( int i=0; i<6; i++ )
     {
         int out = 0;
-        out += ((dot( m_planes[i], glm::vec4(box.vmin.x, box.vmin.y, box.vmin.z, 1.0f) ) < 0.0 )?1:0);
-        out += ((dot( m_planes[i], glm::vec4(box.vmax.x, box.vmin.y, box.vmin.z, 1.0f) ) < 0.0 )?1:0);
-        out += ((dot( m_planes[i], glm::vec4(box.vmin.x, box.vmax.y, box.vmin.z, 1.0f) ) < 0.0 )?1:0);
-        out += ((dot( m_planes[i], glm::vec4(box.vmax.x, box.vmax.y, box.vmin.z, 1.0f) ) < 0.0 )?1:0);
-        out += ((dot( m_planes[i], glm::vec4(box.vmin.x, box.vmin.y, box.vmax.z, 1.0f) ) < 0.0 )?1:0);
-        out += ((dot( m_planes[i], glm::vec4(box.vmax.x, box.vmin.y, box.vmax.z, 1.0f) ) < 0.0 )?1:0);
-        out += ((dot( m_planes[i], glm::vec4(box.vmin.x, box.vmax.y, box.vmax.z, 1.0f) ) < 0.0 )?1:0);
-        out += ((dot( m_planes[i], glm::vec4(box.vmax.x, box.vmax.y, box.vmax.z, 1.0f) ) < 0.0 )?1:0);
+        out += ((dot( m_planes[i], glm::vec4(box.getVmin().x, box.getVmin().y, box.getVmin().z, 1.0f) ) < 0.0 )?1:0);
+        out += ((dot( m_planes[i], glm::vec4(box.getVmax().x, box.getVmin().y, box.getVmin().z, 1.0f) ) < 0.0 )?1:0);
+        out += ((dot( m_planes[i], glm::vec4(box.getVmin().x, box.getVmax().y, box.getVmin().z, 1.0f) ) < 0.0 )?1:0);
+        out += ((dot( m_planes[i], glm::vec4(box.getVmax().x, box.getVmax().y, box.getVmin().z, 1.0f) ) < 0.0 )?1:0);
+        out += ((dot( m_planes[i], glm::vec4(box.getVmin().x, box.getVmin().y, box.getVmax().z, 1.0f) ) < 0.0 )?1:0);
+        out += ((dot( m_planes[i], glm::vec4(box.getVmax().x, box.getVmin().y, box.getVmax().z, 1.0f) ) < 0.0 )?1:0);
+        out += ((dot( m_planes[i], glm::vec4(box.getVmin().x, box.getVmax().y, box.getVmax().z, 1.0f) ) < 0.0 )?1:0);
+        out += ((dot( m_planes[i], glm::vec4(box.getVmax().x, box.getVmax().y, box.getVmax().z, 1.0f) ) < 0.0 )?1:0);
         if( out==8 ) return false;
     }
 
     // // check frustum outside/inside box
     // int out;
-    // out=0; for( int i=0; i<8; i++ ) out += ((fru.mPoints[i].x > box.vmax.x)?1:0); if( out==8 ) return false;
-    // out=0; for( int i=0; i<8; i++ ) out += ((fru.mPoints[i].x < box.vmin.x)?1:0); if( out==8 ) return false;
-    // out=0; for( int i=0; i<8; i++ ) out += ((fru.mPoints[i].y > box.vmax.y)?1:0); if( out==8 ) return false;
-    // out=0; for( int i=0; i<8; i++ ) out += ((fru.mPoints[i].y < box.vmin.y)?1:0); if( out==8 ) return false;
-    // out=0; for( int i=0; i<8; i++ ) out += ((fru.mPoints[i].z > box.vmax.z)?1:0); if( out==8 ) return false;
-    // out=0; for( int i=0; i<8; i++ ) out += ((fru.mPoints[i].z < box.vmin.z)?1:0); if( out==8 ) return false;
+    // out=0; for( int i=0; i<8; i++ ) out += ((fru.mPoints[i].x > box.getVmax().x)?1:0); if( out==8 ) return false;
+    // out=0; for( int i=0; i<8; i++ ) out += ((fru.mPoints[i].x < box.getVmin().x)?1:0); if( out==8 ) return false;
+    // out=0; for( int i=0; i<8; i++ ) out += ((fru.mPoints[i].y > box.getVmax().y)?1:0); if( out==8 ) return false;
+    // out=0; for( int i=0; i<8; i++ ) out += ((fru.mPoints[i].y < box.getVmin().y)?1:0); if( out==8 ) return false;
+    // out=0; for( int i=0; i<8; i++ ) out += ((fru.mPoints[i].z > box.getVmax().z)?1:0); if( out==8 ) return false;
+    // out=0; for( int i=0; i<8; i++ ) out += ((fru.mPoints[i].z < box.getVmin().z)?1:0); if( out==8 ) return false;
 
     return true;
 }

@@ -9,6 +9,7 @@
 #include <spdlog/spdlog.h>
 #define GLM_ENABLE_EXPERIMENTAL
 #include "../deps/glm/glm/gtx/string_cast.hpp"
+#include "Camera.h"
 
 
 ChunkRenderer::ChunkRenderer()

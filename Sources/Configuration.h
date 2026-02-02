@@ -10,6 +10,8 @@ struct Configuration {
     bool mouseFree = false;
     bool showDebugInfos = false;
     int camSpeedFactor = 5;
+    bool isFlying = true;
+    bool checkCollisions = true;
 };
 
 #endif

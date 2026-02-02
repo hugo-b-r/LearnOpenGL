@@ -1,3 +1,4 @@
+#include "Camera.h"
 #include "World.h"
 #include "CubeTexture.h"
 #include "Renderer/ChunkRenderer.h"
@@ -5,6 +6,7 @@
 #include "utils.h"
 #include <unordered_set>
 #include "DebugInfos.h"
+
 
 #include <glm/glm.hpp>
 #include <spdlog/spdlog.h>
@@ -20,8 +22,7 @@ void World::render(Camera &cam, ChunkRenderer &renderer, DebugInfos& inf) {
    * for each chunk in the repository : draw it
    *
    */
-  // Update the world
-  update(cam);
+  update();
   renderer.bindTextureAndShader();
   glm::ivec2 camPos = cam.chunkPosition();
   Frustum &f = cam.getFrustum();
@@ -85,9 +86,7 @@ CubeAtlas World::getBlockAt(glm::ivec3 pos) {
   }
 }
 
-void World::update(Camera &cam) {
-    cam.updateUpVector();
-    cam.createFrustum();
+void World::update() {
 }
 
 void World::loadAt(glm::ivec2 pos) {

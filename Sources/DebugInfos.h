@@ -2,8 +2,11 @@
 #define DEBUG_INFOS
 
 #include "Scene.h"
+#include <vector>
 
 #include <GLFW/glfw3.h>
+
+class Scene;
 
 const int NB_VALUES_FRAMERATE = 100;
 const double FRAMERATE_TIME_INTERVAL = 0.1;

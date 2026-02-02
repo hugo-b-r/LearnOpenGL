@@ -1,15 +1,15 @@
 
+#include <cstdlib>
 #include <glad/glad.h>
-#include "World/World.h"
+#include "Scene.h"
 #include "Renderer/ChunkRenderer.h"
 #include "DebugInfos.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/string_cast.hpp>
 
-#include "Scene.h"
 
-#include "Camera.h"
+
 #include "Configuration.h"
 #include "Shader.h"
 
@@ -53,7 +53,7 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
       direction.z = sin(glm::radians(scene->getCamera().m_yaw)) *
                     cos(glm::radians(scene->getCamera().m_pitch));
       scene->getCamera().m_frontPos = glm::normalize(direction);
-      scene->getCamera().updateProjViewMatrix();
+      scene->getCamera().update();
     }
   }
 }
@@ -207,7 +207,6 @@ int main() {
   // create vertices of what will beglUseProgram(shaderProgram); shown
   // 2. copy our vertices array in a buffer for OpenGL to useChun
 
-  World w;
   ChunkRenderer cr;
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -224,7 +223,7 @@ int main() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
-    w.render(scene.getCamera(), cr, debug_inf);
+    scene.getWorld().render(scene.getCamera(), cr, debug_inf);
 
     if (scene.getConfig().showDebugInfos) {
       debug_inf.drawFrame(scene);
@@ -236,5 +235,5 @@ int main() {
   // needed to delete before glfw terminate
   debug_inf.terminate();
   glfwTerminate();
-  return 0;
+  return EXIT_SUCCESS;
 }

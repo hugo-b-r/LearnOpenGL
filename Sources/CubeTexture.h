@@ -6,6 +6,7 @@
 enum class CubeAtlas { Air = 0, Grass = 1, Sand = 2, Stone = 3, Planks = 4 };
 
 
+
 class CubeTexture
 {
 

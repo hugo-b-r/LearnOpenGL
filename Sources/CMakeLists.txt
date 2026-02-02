@@ -1,4 +1,5 @@
 target_sources(${TARGET_NAME} PRIVATE
+    "Scene.cpp"
     "Camera.cpp"
     "CubeTexture.cpp"
     "DebugInfos.cpp"

@@ -2,7 +2,6 @@
 #define CAMERA_H
 
 #include "Entity.h"
-#include "Configuration.h"
 #include "Mathematics/Frustum.h"
 
 #include <glm/glm.hpp>
@@ -10,13 +9,11 @@
 
 #include <string>
 
-
-
-
+class Scene;
 
 class Camera : public Entity {
     public:
-        Camera(Configuration& c);
+        Camera(Scene& s);
         void update();
 
         void translate(glm::vec3 trans);
@@ -47,14 +44,17 @@ class Camera : public Entity {
         float lastX, lastY;
         glm::vec3 m_frontPos;
     private:
+        void updateAabb();
+
         glm::mat4 m_projectionMatrix{1.0f};
         glm::mat4 m_viewMatrix{1.0f};
         glm::mat4 m_projViewMatrix{1.0f};
         // the place the camera is pointing at
         glm::vec3 m_upVector;
 
-        Configuration& m_config;
+        Scene& m_scene;
         Frustum m_frustum;
+        AABB m_boundingBox;
 };
 
 #endif // CAMERA_H

@@ -1,36 +1,30 @@
 #ifndef SCENE_H
 #define SCENE_H
 
-#include "Camera.h"
 #include "Configuration.h"
+#include "Camera.h"
+#include "World/World.h"
 
 class Scene {
-    public:
-        Scene(Configuration c) : m_config (c), m_cam (c) {
+public:
+  Scene(Configuration &c);
 
-        }
+  // avec une camera précédement initialisée avec la configuration
+  Scene(Configuration &c, Camera &cam);
 
-        // avec une camera précédement initialisée avec la configuration
-        Scene(Configuration c, Camera cam) : m_config(c), m_cam( cam ) {
+  // avec une camera précédement initialisée avec la configuration
+  Scene(Configuration &c, Camera &cam, World &world);
 
-        }
+  Scene();
 
-        Scene() : m_config(), m_cam(m_config) {
+  Camera &getCamera();
+  Configuration &getConfig();
+  World &getWorld();
 
-        }
-
-
-        Camera& getCamera() {
-            return m_cam;
-        }
-        Configuration& getConfig() {
-            return m_config;
-        }
-    private:
-        Configuration m_config;
-        Camera m_cam;
-
+private:
+  Configuration m_config;
+  Camera m_cam;
+  World m_world;
 };
-
 
 #endif
