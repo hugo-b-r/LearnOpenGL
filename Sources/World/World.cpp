@@ -23,6 +23,9 @@ void World::render(Camera &cam, ChunkRenderer &renderer, DebugInfos& inf) {
    *
    */
   update();
+
+  renderer.getShader().setVec3("lightPos", glm::vec3(0, 300, 0));
+  renderer.getShader().setVec3("viewPos", cam.position);
   renderer.bindTextureAndShader();
   glm::ivec2 camPos = cam.chunkPosition();
   Frustum &f = cam.getFrustum();
@@ -87,6 +90,7 @@ CubeAtlas World::getBlockAt(glm::ivec3 pos) {
 }
 
 void World::update() {
+
 }
 
 void World::loadAt(glm::ivec2 pos) {

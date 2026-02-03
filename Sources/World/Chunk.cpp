@@ -70,7 +70,7 @@ bool Chunk::hasMesh() {
 }
 
 void Chunk::loadMeshOnGPU() {
-  m_model.loadData(m_mesh, {3, 2});
+  m_model.loadData(m_mesh, {3, 2, 3});
   m_meshBuildStatus = ChunkMeshBuildStatus::DoneLoaded;
 }
 

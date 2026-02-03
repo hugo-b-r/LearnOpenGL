@@ -27,66 +27,66 @@ struct NeighbooringFaces {
 };
 
 
-std::array<GLfloat, 30> ChunkMeshCreator::upFace(int select, float x, float y, float z) const {
-   return std::array<GLfloat, 30>( {
-    (x - (float)CHUNK_WIDTH/2.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f + 1.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f) * cube_length, 0.0f, (1.0f + select) * tex_vertical_factor ,
-    (x - (float)CHUNK_WIDTH/2.f + 1.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f + 1.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f +1.f) * cube_length, 0.166667f, (0.0f + select) * tex_vertical_factor ,
-    (x - (float)CHUNK_WIDTH/2.f + 1.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f + 1.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f) * cube_length, 0.166667f, (1.0f  + select) * tex_vertical_factor ,
-    (x - (float)CHUNK_WIDTH/2.f + 1.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f + 1.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f +1.f) * cube_length, 0.166667f, (0.0f + select) * tex_vertical_factor ,
-    (x - (float)CHUNK_WIDTH/2.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f + 1.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f) * cube_length, 0.0f, (1.0f + select) * tex_vertical_factor,
-    (x - (float)CHUNK_WIDTH/2.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f + 1.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f +1.f) * cube_length, 0.0f, (0.0f + select) * tex_vertical_factor ,
+std::array<GLfloat, 48> ChunkMeshCreator::upFace(int select, float x, float y, float z) const {
+   return std::array<GLfloat, 48>( {
+    (x - (float)CHUNK_WIDTH/2.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f + 1.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f) * cube_length, 0.0f, (1.0f + select) * tex_vertical_factor,  0, 1, 0,
+    (x - (float)CHUNK_WIDTH/2.f + 1.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f + 1.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f +1.f) * cube_length, 0.166667f, (0.0f + select) * tex_vertical_factor,  0, 1, 0,
+    (x - (float)CHUNK_WIDTH/2.f + 1.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f + 1.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f) * cube_length, 0.166667f, (1.0f  + select) * tex_vertical_factor, 0, 1, 0,
+    (x - (float)CHUNK_WIDTH/2.f + 1.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f + 1.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f +1.f) * cube_length, 0.166667f, (0.0f + select) * tex_vertical_factor, 0, 1, 0,
+    (x - (float)CHUNK_WIDTH/2.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f + 1.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f) * cube_length, 0.0f, (1.0f + select) * tex_vertical_factor, 0, 1, 0,
+    (x - (float)CHUNK_WIDTH/2.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f + 1.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f +1.f) * cube_length, 0.0f, (0.0f + select) * tex_vertical_factor , 0, 1, 0,
 
    });
 }
-std::array<GLfloat, 30> ChunkMeshCreator::downFace(int select, float x, float y, float z) const {
-   return std::array<GLfloat, 30>({
-       (x - (float)CHUNK_WIDTH/2.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f +1.f) * cube_length, 0.833333f, (0.0f + select) * tex_vertical_factor , // Ordre de coins ajusté
-       (x - (float)CHUNK_WIDTH/2.f + 1.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f +1.f) * cube_length, 1.0f, (0.0f + select) * tex_vertical_factor ,
-       (x - (float)CHUNK_WIDTH/2.f + 1.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f) * cube_length, 1.0f, (1.0f + select) * tex_vertical_factor ,
-       (x - (float)CHUNK_WIDTH/2.f + 1.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f) * cube_length, 1.0f, (1.0f + select) * tex_vertical_factor ,
-       (x - (float)CHUNK_WIDTH/2.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f) * cube_length, 0.833333f, (1.0f + select) * tex_vertical_factor ,
-       (x - (float)CHUNK_WIDTH/2.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f +1.f) * cube_length, 0.833333f, (0.0f + select)  * tex_vertical_factor
+std::array<GLfloat, 48> ChunkMeshCreator::downFace(int select, float x, float y, float z) const {
+   return std::array<GLfloat, 48>({
+       (x - (float)CHUNK_WIDTH/2.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f +1.f) * cube_length, 0.833333f, (0.0f + select) * tex_vertical_factor, 0, -1, 0,  // Ordre de coins ajusté
+       (x - (float)CHUNK_WIDTH/2.f + 1.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f +1.f) * cube_length, 1.0f, (0.0f + select) * tex_vertical_factor, 0, -1, 0,
+       (x - (float)CHUNK_WIDTH/2.f + 1.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f) * cube_length, 1.0f, (1.0f + select) * tex_vertical_factor , 0, -1, 0,
+       (x - (float)CHUNK_WIDTH/2.f + 1.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f) * cube_length, 1.0f, (1.0f + select) * tex_vertical_factor , 0, -1, 0,
+       (x - (float)CHUNK_WIDTH/2.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f) * cube_length, 0.833333f, (1.0f + select) * tex_vertical_factor , 0, -1, 0,
+       (x - (float)CHUNK_WIDTH/2.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f +1.f) * cube_length, 0.833333f, (0.0f + select)  * tex_vertical_factor, 0, -1, 0,
    });
 }
-std::array<GLfloat, 30> ChunkMeshCreator::leftFace(int select, float x, float y, float z) const {
-   return std::array<GLfloat, 30>( {
-       (x - (float)CHUNK_WIDTH/2.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f) * cube_length, 0.5f, (1.0f + select) * tex_vertical_factor ,
-       (x - (float)CHUNK_WIDTH/2.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f +1.f) * cube_length, 0.333333f, (1.0f + select) * tex_vertical_factor ,
-       (x - (float)CHUNK_WIDTH/2.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f + 1.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f) * cube_length, 0.5f, (0.0f + select) * tex_vertical_factor ,
-       (x - (float)CHUNK_WIDTH/2.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f + 1.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f +1.f) * cube_length, 0.333333f, (0.0f + select) * tex_vertical_factor ,
-       (x - (float)CHUNK_WIDTH/2.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f + 1.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f) * cube_length, 0.5f, (0.0f + select) * tex_vertical_factor ,
-       (x - (float)CHUNK_WIDTH/2.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f +1.f) * cube_length, 0.333333f, (1.0f + select) * tex_vertical_factor
+std::array<GLfloat, 48> ChunkMeshCreator::leftFace(int select, float x, float y, float z) const {
+   return std::array<GLfloat, 48>( {
+       (x - (float)CHUNK_WIDTH/2.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f) * cube_length, 0.5f, (1.0f + select) * tex_vertical_factor, -1, 0, 0,
+       (x - (float)CHUNK_WIDTH/2.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f +1.f) * cube_length, 0.333333f, (1.0f + select) * tex_vertical_factor, -1, 0, 0,
+       (x - (float)CHUNK_WIDTH/2.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f + 1.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f) * cube_length, 0.5f, (0.0f + select) * tex_vertical_factor, -1, 0, 0,
+       (x - (float)CHUNK_WIDTH/2.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f + 1.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f +1.f) * cube_length, 0.333333f, (0.0f + select) * tex_vertical_factor, -1, 0, 0,
+       (x - (float)CHUNK_WIDTH/2.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f + 1.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f) * cube_length, 0.5f, (0.0f + select) * tex_vertical_factor, -1, 0, 0,
+       (x - (float)CHUNK_WIDTH/2.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f +1.f) * cube_length, 0.333333f, (1.0f + select) * tex_vertical_factor, -1, 0, 0,
 
    });
 };
-std::array<GLfloat, 30> ChunkMeshCreator::rightFace(int select, float x, float y, float z) const {
-   return std::array<GLfloat, 30>( {
-       (x - (float)CHUNK_WIDTH/2.f + 1.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f) * cube_length, 0.833333f, (1.0f + select) * tex_vertical_factor , // Ordre de coins ajusté pour l'orientation
-       (x - (float)CHUNK_WIDTH/2.f + 1.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f + 1.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f +1.f) * cube_length, 0.666667f, (0.0f + select) * tex_vertical_factor ,
-       (x - (float)CHUNK_WIDTH/2.f + 1.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f +1.f) * cube_length, 0.666667f, (1.0f + select) * tex_vertical_factor ,
-       (x - (float)CHUNK_WIDTH/2.f + 1.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f + 1.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f +1.f) * cube_length, 0.666667f, (0.0f + select) * tex_vertical_factor ,
-       (x - (float)CHUNK_WIDTH/2.f + 1.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f) * cube_length, 0.833333f, (1.0f + select) * tex_vertical_factor ,
-       (x - (float)CHUNK_WIDTH/2.f + 1.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f + 1.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f) * cube_length, 0.833333f, (0.0f + select) * tex_vertical_factor ,
+std::array<GLfloat, 48> ChunkMeshCreator::rightFace(int select, float x, float y, float z) const {
+   return std::array<GLfloat, 48>( {
+       (x - (float)CHUNK_WIDTH/2.f + 1.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f) * cube_length, 0.833333f, (1.0f + select) * tex_vertical_factor, 1, 0, 0, // Ordre de coins ajusté pour l'orientation
+       (x - (float)CHUNK_WIDTH/2.f + 1.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f + 1.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f +1.f) * cube_length, 0.666667f, (0.0f + select) * tex_vertical_factor, 1, 0, 0,
+       (x - (float)CHUNK_WIDTH/2.f + 1.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f +1.f) * cube_length, 0.666667f, (1.0f + select) * tex_vertical_factor, 1, 0, 0,
+       (x - (float)CHUNK_WIDTH/2.f + 1.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f + 1.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f +1.f) * cube_length, 0.666667f, (0.0f + select) * tex_vertical_factor, 1, 0, 0,
+       (x - (float)CHUNK_WIDTH/2.f + 1.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f) * cube_length, 0.833333f, (1.0f + select) * tex_vertical_factor, 1, 0, 0,
+       (x - (float)CHUNK_WIDTH/2.f + 1.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f + 1.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f) * cube_length, 0.833333f, (0.0f + select) * tex_vertical_factor, 1, 0, 0,
    });
 };
-std::array<GLfloat, 30> ChunkMeshCreator::frontFace(int select, float x, float y, float z) const {
-   return std::array<GLfloat, 30>( {
-       (x - (float)CHUNK_WIDTH/2.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f +1.f) * cube_length, 0.166667f, (1.0f + select) * tex_vertical_factor ,
-       (x - (float)CHUNK_WIDTH/2.f + 1.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f +1.f) * cube_length, 0.333333f, (1.0f + select) * tex_vertical_factor ,
-       (x - (float)CHUNK_WIDTH/2.f + 1.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f + 1.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f +1.f) * cube_length, 0.333333f, (0.0f + select) * tex_vertical_factor ,
-       (x - (float)CHUNK_WIDTH/2.f + 1.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f + 1.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f +1.f) * cube_length, 0.333333f, (0.0f + select) * tex_vertical_factor ,
-       (x - (float)CHUNK_WIDTH/2.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f + 1.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f +1.f) * cube_length, 0.166667f, (0.0f + select) * tex_vertical_factor ,
-       (x - (float)CHUNK_WIDTH/2.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f +1.f) * cube_length, 0.166667f, (1.0f + select) * tex_vertical_factor
+std::array<GLfloat, 48> ChunkMeshCreator::frontFace(int select, float x, float y, float z) const {
+   return std::array<GLfloat, 48>( {
+       (x - (float)CHUNK_WIDTH/2.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f +1.f) * cube_length, 0.166667f, (1.0f + select) * tex_vertical_factor, 0, 0, -1,
+       (x - (float)CHUNK_WIDTH/2.f + 1.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f +1.f) * cube_length, 0.333333f, (1.0f + select) * tex_vertical_factor, 0, 0, -1,
+       (x - (float)CHUNK_WIDTH/2.f + 1.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f + 1.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f +1.f) * cube_length, 0.333333f, (0.0f + select) * tex_vertical_factor, 0, 0, -1,
+       (x - (float)CHUNK_WIDTH/2.f + 1.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f + 1.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f +1.f) * cube_length, 0.333333f, (0.0f + select) * tex_vertical_factor, 0, 0, -1,
+       (x - (float)CHUNK_WIDTH/2.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f + 1.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f +1.f) * cube_length, 0.166667f, (0.0f + select) * tex_vertical_factor, 0, 0, -1,
+       (x - (float)CHUNK_WIDTH/2.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f +1.f) * cube_length, 0.166667f, (1.0f + select) * tex_vertical_factor, 0, 0, -1,
    });
 };
-std::array<GLfloat, 30> ChunkMeshCreator::rearFace(int select, float x, float y, float z) const {
-   return std::array<GLfloat, 30>( {
-       (x - (float)CHUNK_WIDTH/2.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f) * cube_length, 0.666667f, (1.0f + select) * tex_vertical_factor , // Ordre de coins inversé pour l'orientation
-       (x - (float)CHUNK_WIDTH/2.f + 1.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f + 1.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f) * cube_length, 0.5f, (0.0f + select) * tex_vertical_factor ,
-       (x - (float)CHUNK_WIDTH/2.f + 1.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f) * cube_length, 0.5f, (1.0f + select) * tex_vertical_factor ,
-       (x - (float)CHUNK_WIDTH/2.f + 1.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f + 1.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f) * cube_length, 0.5f, (0.0f + select) * tex_vertical_factor ,
-       (x - (float)CHUNK_WIDTH/2.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f) * cube_length, 0.666667f, (1.0f + select) * tex_vertical_factor ,
-       (x - (float)CHUNK_WIDTH/2.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f + 1.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f) * cube_length, 0.666667f, (0.0f + select) * tex_vertical_factor ,
+std::array<GLfloat, 48> ChunkMeshCreator::rearFace(int select, float x, float y, float z) const {
+   return std::array<GLfloat, 48>( {
+       (x - (float)CHUNK_WIDTH/2.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f) * cube_length, 0.666667f, (1.0f + select) * tex_vertical_factor, 0, 0, 1, // Ordre de coins inversé pour l'orientation
+       (x - (float)CHUNK_WIDTH/2.f + 1.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f + 1.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f) * cube_length, 0.5f, (0.0f + select) * tex_vertical_factor, 0, 0, 1,
+       (x - (float)CHUNK_WIDTH/2.f + 1.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f) * cube_length, 0.5f, (1.0f + select) * tex_vertical_factor, 0, 0, 1,
+       (x - (float)CHUNK_WIDTH/2.f + 1.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f + 1.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f) * cube_length, 0.5f, (0.0f + select) * tex_vertical_factor, 0, 0, 1,
+       (x - (float)CHUNK_WIDTH/2.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f) * cube_length, 0.666667f, (1.0f + select) * tex_vertical_factor, 0, 0, 1,
+       (x - (float)CHUNK_WIDTH/2.f) * cube_width, (y - (float)CHUNK_HEIGHT/2.f + 1.f) * cube_height, (z - (float)CHUNK_LENGTH/2.f) * cube_length, 0.666667f, (0.0f + select) * tex_vertical_factor, 0, 0, 1,
 
    });
 };
@@ -157,38 +157,38 @@ int ChunkMeshCreator::buildMeshThreadFn() {
             }
 
             if (shouldMakeFace(neighboors.up)) {
-                std::array<GLfloat, 30> temp = upFace((int)block, (float) i, (float) j, (float) k);
+                std::array<GLfloat, 48> temp = upFace((int)block, (float) i, (float) j, (float) k);
 
                 m_mesh.vertexPositions.insert(m_mesh.vertexPositions.end(), temp.begin(), temp.end());
                 nb_vertices+=6;
             }
 
             if (shouldMakeFace(neighboors.down)) {
-                std::array<GLfloat, 30> temp = downFace((int)block, (float) i, (float) j, (float) k);
+                std::array<GLfloat, 48> temp = downFace((int)block, (float) i, (float) j, (float) k);
 
                 m_mesh.vertexPositions.insert(m_mesh.vertexPositions.end(), temp.begin(), temp.end());
                 nb_vertices+=6;
             }
             if (shouldMakeFace(neighboors.left)) {
-                std::array<GLfloat, 30> temp = leftFace((int)block, (float) i, (float) j, (float) k);
+                std::array<GLfloat, 48> temp = leftFace((int)block, (float) i, (float) j, (float) k);
 
                 m_mesh.vertexPositions.insert(m_mesh.vertexPositions.end(), temp.begin(), temp.end());
                 nb_vertices+=6;
             }
             if (shouldMakeFace(neighboors.right)) {
-                std::array<GLfloat, 30> temp = rightFace((int)block, (float) i, (float) j, (float) k);
+                std::array<GLfloat, 48> temp = rightFace((int)block, (float) i, (float) j, (float) k);
 
                 m_mesh.vertexPositions.insert(m_mesh.vertexPositions.end(), temp.begin(), temp.end());
                 nb_vertices+=6;
             }
             if (shouldMakeFace(neighboors.front)) {
-                std::array<GLfloat, 30> temp = frontFace((int)block, (float) i, (float) j, (float) k);
+                std::array<GLfloat, 48> temp = frontFace((int)block, (float) i, (float) j, (float) k);
 
                 m_mesh.vertexPositions.insert(m_mesh.vertexPositions.end(), temp.begin(), temp.end());
                 nb_vertices+=6;
             }
             if (shouldMakeFace(neighboors.rear)) {
-                std::array<GLfloat, 30> temp = rearFace((int)block, (float) i, (float) j, (float) k);
+                std::array<GLfloat, 48> temp = rearFace((int)block, (float) i, (float) j, (float) k);
 
                 m_mesh.vertexPositions.insert(m_mesh.vertexPositions.end(), temp.begin(), temp.end());
                 nb_vertices+=6;
