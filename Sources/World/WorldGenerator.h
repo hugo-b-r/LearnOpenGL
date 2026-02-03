@@ -8,6 +8,8 @@ public:
   WorldGenerator();
   static void buildChunk(Chunk &c);
 
+  static int soilHeightAt(glm::vec2);
+
 protected:
 };
 

@@ -1,5 +1,6 @@
 
 #include <cstdlib>
+#include "World/WorldGenerator.h"
 #include <glad/glad.h>
 #include "Scene.h"
 #include "Renderer/ChunkRenderer.h"
@@ -151,6 +152,8 @@ int main() {
 
   spdlog::set_level(spdlog::level::debug);
   Scene scene;
+  scene.getCamera().position.y = WorldGenerator::soilHeightAt(glm::vec2(0, 0)) + 1 + 1.8;
+  scene.getCamera().update();
 
   // ----------------------
   // Init glfw
@@ -210,6 +213,7 @@ int main() {
   ChunkRenderer cr;
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
 
   while (!glfwWindowShouldClose(window)) {
     glfwPollEvents();
