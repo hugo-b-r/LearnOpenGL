@@ -20,7 +20,7 @@ void WorldGenerator::buildChunk(Chunk &c) {
       for (int k = 0; k < height-DIRT_HEIGHT; k++) {
         c.setBlockAt(i, k, j, CubeAtlas::Stone);
       }
-      for (int k = 0; k < DIRT_HEIGHT; k++) {
+      for (int k = height-DIRT_HEIGHT; k < height; k++) {
         c.setBlockAt(i, k, j, CubeAtlas::Grass);
       }
     }
