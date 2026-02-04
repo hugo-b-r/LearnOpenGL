@@ -128,18 +128,29 @@ bool ChunkMeshCreator::shouldMakeFace(glm::ivec3 side_block) {
     ) {
         // inside the chunk
         auto block = data.getBlockAt(x, y, z);
-        if (block == CubeAtlas::Air) {
+        switch (block) {
+            case CubeAtlas::Air:
             return true;
-        } else {
+            case CubeAtlas::Leaves:
+            return true;
+            default:
             return false;
         }
+        // if (block == CubeAtlas::Air ) {
+        //     return true;
+        // } else {
+        //     return false;
+        // }
     } else if ( y>= CHUNK_HEIGHT) {
         return true;
     } else {
         auto block = m_world.getBlockAt(fromInChunkToGlobalCoordinates(side_block, data.getChunkPos()));
-        if (block == CubeAtlas::Air) {
+        switch (block) {
+            case CubeAtlas::Air:
             return true;
-        } else {
+            case CubeAtlas::Leaves:
+            return true;
+            default:
             return false;
         }
     }

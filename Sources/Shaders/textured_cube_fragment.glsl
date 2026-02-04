@@ -24,4 +24,6 @@ void main() {
 
     //FragColor = vec4(1.0, 0.0, 0.0, 1.0);
     FragColor = (diff + ambient + specularStrength * spec) * texture(ourTexture, TexCoord);
+    if (FragColor.a < 0.1)
+        discard;
 }
