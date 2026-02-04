@@ -39,7 +39,7 @@ public:
   glm::ivec3 getChunkPosCenter();
   glm::vec3 getChunkPosCenter3();
 
-  void load();
+  void load(World& w);
   bool isLoaded();
 
   void createMesh(World& w);

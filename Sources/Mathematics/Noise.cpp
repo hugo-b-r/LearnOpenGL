@@ -75,7 +75,7 @@ static int permutation[] = { 151,160,137,91,90,15,
 
 
 
-  static float ridged( glm::vec2 p) {
+  float Noise::ridged( glm::vec2 p) {
       return 2.0 * (0.5 - glm::abs(0.5 - Noise::perlin(p.x, p.y, 1.f)));
   }
 
@@ -85,7 +85,7 @@ static int permutation[] = { 151,160,137,91,90,15,
       float res = .0;
       float f = fbase;
       for (i = 0; i < noctave; i++) {
-          res = res + amplitude * ridged(f * p);
+          res = res + amplitude * Noise::ridged(f * p);
           amplitude = amplitude * attenuation;
           f = f * 2.;
       }

@@ -89,13 +89,23 @@ CubeAtlas World::getBlockAt(glm::ivec3 pos) {
   }
 }
 
+void World::setBlockAt(glm::ivec3 pos, CubeAtlas cube) {
+      auto chunkCoord = fromBlockToChunkCoordinates(pos);
+      if (existsAt(chunkCoord)) {
+        auto blockInChunkPos = fromGlobalToInChunkCoordinates(pos);
+        int a = blockInChunkPos.x, b = blockInChunkPos.y, c = blockInChunkPos.z;
+        m_chunks[chunkCoord].setBlockAt(a, b, c, cube);
+      }
+}
+
+
 void World::update() {
 
 }
 
 void World::loadAt(glm::ivec2 pos) {
   m_chunks.insert({pos, Chunk(pos)});
-  m_chunks[pos].load();
+  m_chunks[pos].load(*this);
 
 }
 

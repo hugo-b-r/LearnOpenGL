@@ -33,19 +33,22 @@ glm::vec3 Chunk::getChunkPosCenter3() {
 }
 
 CubeAtlas Chunk::getBlockAt(int x, int y, int z) {
-  return blocks[x * CHUNK_HEIGHT * CHUNK_LENGTH + z * CHUNK_HEIGHT + y];
+    if (x >= 0 && x < CHUNK_WIDTH && y >= 0 && y < CHUNK_HEIGHT && z >= 0 && z < CHUNK_LENGTH )
+        return blocks[x * CHUNK_HEIGHT * CHUNK_LENGTH + z * CHUNK_HEIGHT + y];
+    return CubeAtlas::Air;
 }
 
 void Chunk::setBlockAt(int x, int y, int z, CubeAtlas ca) {
-  blocks[x * CHUNK_HEIGHT * CHUNK_LENGTH + z * CHUNK_HEIGHT + y] = ca;
+    if (x >= 0 && x < CHUNK_WIDTH && y >= 0 && y < CHUNK_HEIGHT && z >= 0 && z < CHUNK_LENGTH )
+        blocks[x * CHUNK_HEIGHT * CHUNK_LENGTH + z * CHUNK_HEIGHT + y] = ca;
 }
 
-void Chunk::load() {
+void Chunk::load(World& w) {
   // generate the chunk if not laoaded
   // for now: fun loading / generation function that does not take into account
   // therest of chunks
   if (m_loadStatus != ChunkDataLoadStatus::FinishedLoaded) {
-      WorldGenerator::buildChunk(*this);
+      WorldGenerator::buildChunk(*this, w);
   }
   createBoundingBox();
   m_loadStatus = ChunkDataLoadStatus::FinishedLoaded;

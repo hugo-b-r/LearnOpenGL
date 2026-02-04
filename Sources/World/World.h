@@ -24,6 +24,8 @@ public:
   void render(Camera &cam, ChunkRenderer &renderer, DebugInfos &inf);
 
   CubeAtlas getBlockAt(glm::ivec3 pos);
+  void setBlockAt(glm::ivec3 pos, CubeAtlas cube);
+
   void playerLeftClicked(Camera &cam);
   void playerRightClicked(Camera &cam);
 
