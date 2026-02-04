@@ -56,7 +56,7 @@ bool Chunk::isLoaded() {
 }
 
 void Chunk::createMesh(World& w) {
-  CubeTexture ct("./Assets/texture_atlas.jpg");
+  CubeTexture ct("./Assets/texture_atlas.png");
   ChunkMeshCreator builder(*this, ct, w);
 
   m_numberVertices = builder.buildMesh();

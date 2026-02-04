@@ -13,7 +13,7 @@
 
 
 ChunkRenderer::ChunkRenderer()
-    : m_texture("./Assets/texture_atlas.jpg"),
+    : m_texture("./Assets/texture_atlas.png"),
       m_shader("Sources/Shaders/textured_cube_vertex.glsl",
                "Sources/Shaders/textured_cube_fragment.glsl") {}
 

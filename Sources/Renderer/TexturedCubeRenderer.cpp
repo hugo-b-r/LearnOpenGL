@@ -11,7 +11,7 @@
 const int CUBE_NB_VERTICES = 36;
 
 TexturedCubeRenderer::TexturedCubeRenderer(CubeAtlas ca)
-    : tex("./Assets/texture_atlas.jpg") {
+    : tex("./Assets/texture_atlas.png") {
 
   float &w = width;
   float &h = height;

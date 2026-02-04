@@ -3,7 +3,7 @@
 
 #include <string>
 
-enum class CubeAtlas { Air = 0, Grass = 1, Sand = 2, Stone = 3, Planks = 4 };
+enum class CubeAtlas { Air = 0, Grass = 1, Dirt = 2, Sand = 3, Stone = 4, Planks = 5, Wood = 6, Leaves = 7 };
 
 
 
