@@ -116,7 +116,7 @@ int ChunkMeshCreator::nbVertices() {
 
 
 
-bool ChunkMeshCreator::shouldMakeFace(glm::ivec3 side_block) {
+inline bool ChunkMeshCreator::shouldMakeFace(glm::ivec3 side_block) {
     int x = side_block.x, y = side_block.y, z = side_block.z;
     if (y < 0) {
         // under the sea

@@ -25,7 +25,7 @@ public:
   Mesh getMesh();
 
 protected:
-    bool shouldMakeFace(glm::ivec3 side_block);
+    inline bool shouldMakeFace(glm::ivec3 side_block);
 
     int buildMeshThreadFn();
 
