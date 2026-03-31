@@ -195,7 +195,7 @@ int main() {
 
   glfwSwapInterval(0);
 
-  DebugInfos debug_inf(window);
+  DebugInfos debug_inf(window, scene);
 
   // ----------------------
   // Init imgui

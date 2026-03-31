@@ -12,7 +12,7 @@ const int NB_VALUES_FRAMERATE = 100;
 const double FRAMERATE_TIME_INTERVAL = 0.1;
 class DebugInfos {
     public:
-        DebugInfos(GLFWwindow * window);
+        DebugInfos(GLFWwindow * window, Scene& s);
         ~DebugInfos();
 
         // after glfwpollevents but before gl draw
@@ -30,6 +30,10 @@ class DebugInfos {
         double time_last_framerate;
         bool show_fr_plot;
         int drawnChunks;
+
+        bool checkColTerrain;
+        bool oldCheckColTerrain;
+        Scene &m_scene;
 };
 
 #endif

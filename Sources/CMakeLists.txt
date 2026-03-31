@@ -7,6 +7,7 @@ target_sources(${TARGET_NAME} PRIVATE
     "Model.cpp"
     "Shader.cpp"
     "utils.cpp"
+    "Configuration.cpp"
 )
 
 add_subdirectory(World)

@@ -12,8 +12,8 @@
 class Scene;
 
 class Camera : public Entity {
-    public:
-        Camera(Scene& s);
+      public:
+        Camera(Scene &s);
         void update();
 
         void translate(glm::vec3 trans);
@@ -24,12 +24,11 @@ class Camera : public Entity {
         std::string debug_pos();
         std::string debug_direction();
 
-
         void updateProjViewMatrix();
 
-        const glm::mat4& getViewMatrix() const;
-        const glm::mat4& getProjMatrix() const;
-        const glm::mat4& getProjectionViewMatrix() const;
+        const glm::mat4 &getViewMatrix() const;
+        const glm::mat4 &getProjMatrix() const;
+        const glm::mat4 &getProjectionViewMatrix() const;
 
         static glm::mat4 makeViewMatrix(const Camera &camera);
         static glm::mat4 makeModelMatrix(const Entity &entity);
@@ -37,14 +36,19 @@ class Camera : public Entity {
         void updateUpVector();
         void createFrustum();
 
+        void updateTranslateFunc(bool checkCol);
+
         int getRenderDistance() const;
-        Frustum& getFrustum();
+        Frustum &getFrustum();
         float m_pitch;
         float m_yaw;
         float lastX, lastY;
         glm::vec3 m_frontPos;
-    private:
+
+      private:
         void updateAabb();
+        void translate_with_collisions(glm::vec3 trans);
+        void translate_no_collisions(glm::vec3 trans);
 
         glm::mat4 m_projectionMatrix{1.0f};
         glm::mat4 m_viewMatrix{1.0f};
@@ -52,9 +56,11 @@ class Camera : public Entity {
         // the place the camera is pointing at
         glm::vec3 m_upVector;
 
-        Scene& m_scene;
+        Scene &m_scene;
         Frustum m_frustum;
         AABB m_boundingBox;
+
+        void (Camera::*translate_func)(const glm::vec3 trans);
 };
 
 #endif // CAMERA_H

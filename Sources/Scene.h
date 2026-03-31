@@ -21,6 +21,8 @@ public:
   Configuration &getConfig();
   World &getWorld();
 
+  void updateCollisionWithTerrainCheck(bool checkColTerrain);
+
 private:
   Configuration m_config;
   Camera m_cam;
