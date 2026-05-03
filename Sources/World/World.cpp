@@ -61,32 +61,27 @@ void World::render(Camera &cam, ChunkRenderer &renderer, DebugInfos &inf) {
         // we knwo that if it didn't move, we don't need to look for every chunk
         // to rebuild or not&
         if (posDiff != varNull) {
-                std::cout << posDiff.x << " " << posDiff.y << std::endl;
+                // reset else there will be a fun thing happening
+                lastChunkPlayerPos = camPos;
                 if (posDiff.x > 0) {
 
                         for (int x  = 0; x < posDiff.x; ++x) {
-                                std::cout << "move chunk xm" << std::endl;
                                 moveChunkXM();
                         }
                 } else if (posDiff.x < 0) {
                         for (int x  = 0; x > posDiff.x; --x) {
-                                std::cout << "move chunk xp" << std::endl;
                                 moveChunkXP();
                         }
                 }
                 if (posDiff.y > 0) {
                         for (int y = 0; y < posDiff.y; ++y) {
-                                std::cout << "move chunk ym" << std::endl;
                                 moveChunkYM();
                         }
                 } else if (posDiff.y < 0) {
                         for (int y = 0; y > posDiff.y; --y) {
-                                std::cout << "move chunk yp" << std::endl;
                                 moveChunkYP();
                         }
                 }
-                // reset else there will be a fun thing happening
-                lastChunkPlayerPos = camPos;
         }
         // do the rendering
         renderer.getShader().setVec3("lightPos", glm::vec3(0, 300, 0));
@@ -195,14 +190,12 @@ void World::moveChunkXM() {
 
                 // -> we remove them
                 delete getRelativeToPlayerAt(-limit, y);
-                printWorldContent();
         }
         // all the other that are left, we move them x +
         for (int x = -limit+1; x <= limit; ++x) {
                 // line per line
                 for (int y = -limit; y <= limit; ++y) {
                         setRelativeToPlayerAt(x-1, y, getRelativeToPlayerAt(x, y));
-                        printWorldContent();
                 }
         }
         // we can now manage the last row/column that needs to be built.
@@ -212,7 +205,6 @@ void World::moveChunkXM() {
                 // add it to the queue of loading (future)
                 // -> for now : load it directly
                 getRelativeToPlayerAt(limit, y)->load(*this);
-                printWorldContent();
         }
         // and finally create the mesh for chunks already loaded but without a mesh
         for (int y = -limit+1; y <= limit-1; ++y) {
