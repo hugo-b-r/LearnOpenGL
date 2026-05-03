@@ -123,9 +123,9 @@ bool ChunkMeshCreator::shouldMakeFace(glm::ivec3 side_block) {
         // under the sea
         return false;
     } else if (
-        abs(x) < CHUNK_WIDTH &&
+        x < CHUNK_WIDTH && x >=0 &&
         y < CHUNK_HEIGHT &&
-        abs(z) < CHUNK_LENGTH
+        z < CHUNK_LENGTH && z >= 0
     ) {
         // inside the chunk
         auto block = data.getBlockAt(x, y, z);

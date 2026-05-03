@@ -13,9 +13,11 @@
 const glm::mat4 view_mat(1.0f);
 
 World::World(Camera &cam)
-    : chunkWidth((2 * cam.getRenderDistance() + 1)),
+    : chunkWidth((2 * (cam.getRenderDistance() + 1) + 1)),
       chunksNb(chunkWidth * chunkWidth), chunks(chunksNb), camera(cam),
       lastChunkPlayerPos(cam.chunkPosition()) {
+        // chunkWidth include a border of chunks needed to build the other
+        // chunks so that explains : (2 * (cam.getRenderDistance() + 1) + 1)
         chunks.reserve(chunksNb);
 }
 
@@ -27,8 +29,9 @@ World::~World() {
 
 void World::load() {
         // load all the chunks in a default state
-        for (int x = -(chunkWidth - 1) / 2; x <= (chunkWidth - 1) / 2; ++x) {
-                for (int y = -(chunkWidth - 1) / 2; y <= (chunkWidth - 1) / 2;
+        int worldLimits = (chunkWidth - 1) / 2;
+        for (int x = -worldLimits; x <= worldLimits; ++x) {
+                for (int y = -worldLimits; y <= worldLimits;
                      ++y) {
                         setRelativeToPlayerAt(
                             x, y,
@@ -38,17 +41,11 @@ void World::load() {
                 }
         }
         // need a second pass because we need other chunk data to compute
-        // correct models
-        for (int x = -(chunkWidth - 1) / 2; x <= (chunkWidth - 1) / 2; ++x) {
-                for (int y = -(chunkWidth - 1) / 2; y <= (chunkWidth - 1) / 2;
-                     ++y) {
-
-                        getRelativeToPlayerAt(x, y)->createMesh(*this);
-                        getRelativeToPlayerAt(x, y)->loadMeshOnGPU();
-                }
-        }
-        for (int x = -(chunkWidth - 1) / 2; x <= (chunkWidth - 1) / 2; ++x) {
-                for (int y = -(chunkWidth - 1) / 2; y <= (chunkWidth - 1) / 2;
+        // correct models, but we don't pass on the border, we don't want it to
+        // be seen
+        int border = (chunkWidth - 1) / 2 - 1;
+        for (int x = -border; x <= border; ++x) {
+                for (int y = -border; y <= border;
                      ++y) {
 
                         getRelativeToPlayerAt(x, y)->createMesh(*this);
@@ -83,10 +80,10 @@ void World::render(Camera &cam, ChunkRenderer &renderer, DebugInfos &inf) {
         renderer.getShader().setMat4("view", view_mat);
         renderer.getShader().setMat4("projection",
                                      cam.getProjectionViewMatrix());
-        for (int i = -cam.getRenderDistance(); i <= cam.getRenderDistance();
-             ++i) {
-                for (int j = -cam.getRenderDistance();
-                     j <= cam.getRenderDistance(); ++j) {
+        // we don't pass on the border as we don't want to render it
+        int border = (chunkWidth - 1) / 2 - 1;
+        for (int i = -border; i <= border; ++i) {
+                for (int j = -border; j <= border; ++j) {
                         // remove rendererd chunks
                         auto tmpPos = glm::ivec2(i, j);
                         // if (posToUnLoad.contains(tmpPos))
