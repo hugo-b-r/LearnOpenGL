@@ -70,6 +70,7 @@ void WorldGenerator::addTreeAt(int i, int j, int k, World& world) {
       for (int m = 0; m < 2; m++) {
         if (world.getBlockAt(glm::ivec3(a, j + 2+m, b)) == CubeAtlas::Air)
           world.setBlockAt(glm::ivec3(a, j + 2+m, b), CubeAtlas::Leaves);
+
       }
     }
   }
@@ -77,7 +78,6 @@ void WorldGenerator::addTreeAt(int i, int j, int k, World& world) {
     for (int b = k - 1; b <= k + 1; b++) {
         if (world.getBlockAt(glm::ivec3(a, j + 4, b)) == CubeAtlas::Air)
           world.setBlockAt(glm::ivec3(a, j + 4, b), CubeAtlas::Leaves);
-
     }
   }
 }

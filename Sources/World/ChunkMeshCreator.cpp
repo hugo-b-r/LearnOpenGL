@@ -6,6 +6,7 @@
 
 #include <spdlog/spdlog.h>
 #include <array>
+#include <iostream>
 
 
 struct NeighbooringFaces {
@@ -116,15 +117,15 @@ int ChunkMeshCreator::nbVertices() {
 
 
 
-inline bool ChunkMeshCreator::shouldMakeFace(glm::ivec3 side_block) {
+bool ChunkMeshCreator::shouldMakeFace(glm::ivec3 side_block) {
     int x = side_block.x, y = side_block.y, z = side_block.z;
     if (y < 0) {
         // under the sea
         return false;
     } else if (
-        x < CHUNK_WIDTH && x >= 0 &&
+        abs(x) < CHUNK_WIDTH &&
         y < CHUNK_HEIGHT &&
-        z < CHUNK_LENGTH && z >= 0
+        abs(z) < CHUNK_LENGTH
     ) {
         // inside the chunk
         auto block = data.getBlockAt(x, y, z);
@@ -163,7 +164,6 @@ int ChunkMeshCreator::buildMeshThreadFn() {
             NeighbooringFaces neighboors;
             neighboors.update(i, j, k);
             CubeAtlas block = data.getBlockAt(i, j, k);
-
             if (block == CubeAtlas::Air) {
                 continue;
             }

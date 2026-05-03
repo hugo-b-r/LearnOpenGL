@@ -16,7 +16,7 @@ Camera::Camera(Scene &s) : m_scene(s) {
         lastX = (float)s.getConfig().windowWidth / 2.f;
         lastY = (float)s.getConfig().windowHeight / 2.f;
 
-        position = glm::vec3(0., 0., -3.5);
+        position = glm::vec3(0., 0., 0);
 
         m_frontPos = position - glm::vec3(0.0f, 0.0f, 4.0f);
         m_upVector = glm::vec3(0.0f, 1.0f, 0.0f);

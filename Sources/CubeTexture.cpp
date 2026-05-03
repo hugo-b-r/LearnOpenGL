@@ -6,6 +6,7 @@
 #include "../deps/glad/include/glad/glad.h"
 #include <spdlog/spdlog.h>
 #include <GLFW/glfw3.h>
+#include <iostream>
 
 
 
@@ -18,7 +19,6 @@ CubeTexture::CubeTexture(const std::string& path)
     unsigned char *data = stbi_load(path.c_str(), &realTextureWidth, &realTextureHeight, &nbChannels, 0);
     glGenTextures(1, &id);
     glBindTexture(GL_TEXTURE_2D, id);
-
 
     if (data)
     {

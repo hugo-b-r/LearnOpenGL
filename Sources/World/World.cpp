@@ -1,156 +1,223 @@
-#include "Camera.h"
 #include "World.h"
+#include "Camera.h"
 #include "CubeTexture.h"
+#include "DebugInfos.h"
 #include "Renderer/ChunkRenderer.h"
 #include "World/Chunk.h"
 #include "utils.h"
-#include <unordered_set>
-#include "DebugInfos.h"
-
+#include <iostream>
 
 #include <glm/glm.hpp>
 #include <spdlog/spdlog.h>
 
 const glm::mat4 view_mat(1.0f);
 
-World::World() {}
+World::World(Camera &cam)
+    : chunkWidth((2 * cam.getRenderDistance() + 1)),
+      chunksNb(chunkWidth * chunkWidth), chunks(chunksNb), camera(cam),
+      lastChunkPlayerPos(cam.chunkPosition()) {
+        chunks.reserve(chunksNb);
+}
 
-void World::render(Camera &cam, ChunkRenderer &renderer, DebugInfos& inf) {
-  /*
-   * Logic :
-   * updates the world to unload unused chunks, load used chunks
-   * for each chunk in the repository : draw it
-   *
-   */
-  update();
+World::~World() {
+        for (int i = 0; i < chunksNb; i++) {
+                delete chunks[i];
+        }
+}
 
-  renderer.getShader().setVec3("lightPos", glm::vec3(0, 300, 0));
-  renderer.getShader().setVec3("viewPos", cam.position);
-  renderer.bindTextureAndShader();
-  glm::ivec2 camPos = cam.chunkPosition();
-  Frustum &f = cam.getFrustum();
-  // loading terrain
-  for (int i = -cam.getRenderDistance() - 1 + camPos.x;
-       i <= cam.getRenderDistance() + 1 + camPos.x; ++i) {
-    for (int j = -cam.getRenderDistance() - 1 + camPos.y;
-         j <= cam.getRenderDistance() + 1 + camPos.y; ++j) {
-      // remove rendererd chunks
-      auto tmpPos = glm::ivec2(i, j);
-      if (!isLoadedAt(tmpPos)) {
-        spdlog::debug("loading at : {}, {}", tmpPos.x, tmpPos.y);
-        loadAt(tmpPos);
-      }
-    }
-  }
+void World::load() {
+        // load all the chunks in a default state
+        for (int x = -(chunkWidth - 1) / 2; x <= (chunkWidth - 1) / 2; ++x) {
+                for (int y = -(chunkWidth - 1) / 2; y <= (chunkWidth - 1) / 2;
+                     ++y) {
+                        setRelativeToPlayerAt(
+                            x, y,
+                            new Chunk(glm::ivec2(x + lastChunkPlayerPos.x,
+                                                 y + lastChunkPlayerPos.y)));
+                        getRelativeToPlayerAt(x, y)->load(*this);
+                }
+        }
+        // need a second pass because we need other chunk data to compute
+        // correct models
+        for (int x = -(chunkWidth - 1) / 2; x <= (chunkWidth - 1) / 2; ++x) {
+                for (int y = -(chunkWidth - 1) / 2; y <= (chunkWidth - 1) / 2;
+                     ++y) {
 
-  //std::unordered_set<glm::ivec2> posToUnLoad = getLoadedChunkPos();
-  // Draw each chunk
+                        getRelativeToPlayerAt(x, y)->createMesh(*this);
+                        getRelativeToPlayerAt(x, y)->loadMeshOnGPU();
+                }
+        }
+        for (int x = -(chunkWidth - 1) / 2; x <= (chunkWidth - 1) / 2; ++x) {
+                for (int y = -(chunkWidth - 1) / 2; y <= (chunkWidth - 1) / 2;
+                     ++y) {
 
-  int total_drawn = 0;
-  renderer.getShader().setMat4("view", view_mat);
-  renderer.getShader().setMat4("projection", cam.getProjectionViewMatrix());
-  for (int i = -cam.getRenderDistance() + camPos.x;
-       i <= cam.getRenderDistance() + camPos.x; ++i) {
-    for (int j = -cam.getRenderDistance() + camPos.y;
-         j <= cam.getRenderDistance() + camPos.y; ++j) {
-      // remove rendererd chunks
-      auto tmpPos = glm::ivec2(i, j);
-      // if (posToUnLoad.contains(tmpPos))
-      //   posToUnLoad.erase(tmpPos);
-      if (!isMeshLoadedAt(tmpPos)) {
-        createAndLoadMeshAt(tmpPos);
-      }
-      if (f.IsAabbVisible(getAt(tmpPos).getBoundingBox())) {
-        getAt(tmpPos).draw(cam, renderer);
-        ++total_drawn;
-      }
-    }
-    // for now, we never unload as the data structure is not great for that
-    //   }
-    // for (auto& posChunk: posToUnLoad) {
-    //     unloadAt(posChunk);
-    //     spdlog::debug("unloading at : {}, {}", posChunk.x, posChunk.y);
+                        getRelativeToPlayerAt(x, y)->createMesh(*this);
+                        getRelativeToPlayerAt(x, y)->loadMeshOnGPU();
+                }
+        }
+}
 
-    // }
+void World::render(Camera &cam, ChunkRenderer &renderer, DebugInfos &inf) {
+        glm::ivec2 camPos = cam.chunkPosition();
+        glm::ivec2 posDiff = camPos - lastChunkPlayerPos;
 
-     inf.updateDrawnChunks(total_drawn);
+        constexpr glm::ivec2 varNull = glm::ivec2(0, 0);
+        // we knwo that if it didn't move, we don't need to look for every chunk
+        // to rebuild or not&
+        if (posDiff != varNull) {
+                // // need to update
+                // loadAt(glm::ivec2(i, j));
+                // if (!isMeshLoadedAt(tmpPos)) {
+                //         createAndLoadMeshAt(tmpPos);
+                // }
+                // lastChunkPlayerPos = camPos;
+        }
+        // do the rendering
+        renderer.getShader().setVec3("lightPos", glm::vec3(0, 300, 0));
+        renderer.getShader().setVec3("viewPos", cam.position);
+        renderer.bindTextureAndShader();
+        Frustum &f = cam.getFrustum();
 
-  }
+        //  Draw each chunk
+        int total_drawn = 0;
+        renderer.getShader().setMat4("view", view_mat);
+        renderer.getShader().setMat4("projection",
+                                     cam.getProjectionViewMatrix());
+        for (int i = -cam.getRenderDistance(); i <= cam.getRenderDistance();
+             ++i) {
+                for (int j = -cam.getRenderDistance();
+                     j <= cam.getRenderDistance(); ++j) {
+                        // remove rendererd chunks
+                        auto tmpPos = glm::ivec2(i, j);
+                        // if (posToUnLoad.contains(tmpPos))
+                        //   posToUnLoad.erase(tmpPos);
+                        if (getRelativeToPlayerAt(tmpPos) != nullptr &&
+                            f.IsAabbVisible(getRelativeToPlayerAt(tmpPos)
+                                                ->getBoundingBox())) {
+                                getRelativeToPlayerAt(tmpPos)->draw(cam,
+                                                                    renderer);
+                                ++total_drawn;
+                        }
+                }
+
+                inf.updateDrawnChunks(total_drawn);
+        }
 }
 
 CubeAtlas World::getBlockAt(glm::ivec3 pos) {
-  auto chunkCoord = fromBlockToChunkCoordinates(pos);
-  if (existsAt(chunkCoord)) {
-    auto blockInChunkPos = fromGlobalToInChunkCoordinates(pos);
-    int a = blockInChunkPos.x, b = blockInChunkPos.y, c = blockInChunkPos.z;
-    return m_chunks[chunkCoord].getBlockAt(a, b, c);
-  } else {
-    return CubeAtlas::Air;
-  }
+        glm::ivec2 chunkCoord = fromBlockToChunkCoordinates(pos);
+        if (existsAt(chunkCoord)) {
+                auto blockInChunkPos = fromGlobalToInChunkCoordinates(pos);
+                int a = blockInChunkPos.x;
+                int b = blockInChunkPos.y;
+                int c = blockInChunkPos.z;
+                return getAbsoluteAt(chunkCoord) == nullptr
+                           ? CubeAtlas::Air
+                           : getAbsoluteAt(chunkCoord)->getBlockAt(a, b, c);
+        } else {
+                return CubeAtlas::Air;
+        }
 }
 
 void World::setBlockAt(glm::ivec3 pos, CubeAtlas cube) {
-      auto chunkCoord = fromBlockToChunkCoordinates(pos);
-      if (existsAt(chunkCoord)) {
-        auto blockInChunkPos = fromGlobalToInChunkCoordinates(pos);
-        int a = blockInChunkPos.x, b = blockInChunkPos.y, c = blockInChunkPos.z;
-        m_chunks[chunkCoord].setBlockAt(a, b, c, cube);
-      }
+
+        auto chunkCoord = fromBlockToChunkCoordinates(pos);
+
+        if (existsAt(chunkCoord)) {
+                auto blockInChunkPos = fromGlobalToInChunkCoordinates(pos);
+                int a = blockInChunkPos.x, b = blockInChunkPos.y,
+                    c = blockInChunkPos.z;
+                if (getAbsoluteAt(chunkCoord) != nullptr)
+                        getAbsoluteAt(chunkCoord)->setBlockAt(a, b, c, cube);
+        }
 }
 
-
-void World::update() {
-
+void World::moveChunkXP() {
+        // for (int x = )
 }
 
-void World::loadAt(glm::ivec2 pos) {
-  m_chunks.insert({pos, Chunk(pos)});
-  m_chunks[pos].load(*this);
+void World::moveChunkXM() {}
 
-}
+void World::moveChunkYP() {}
 
-void World::unloadAt(glm::ivec2 pos) { m_chunks.erase(pos); }
+void World::moveChunkYM() {}
+
+// tests wether the chunk exitsts at this position
 
 bool World::isLoadedAt(glm::ivec2 pos) {
-  if (!existsAt(pos)) {
-    return false;
-  }
-  return m_chunks[pos].isLoaded();
+        if (!existsAt(pos)) {
+                return false;
+        }
+        return getRelativeToPlayerAt(pos)->isLoaded();
 }
 
 void World::createAndLoadMeshAt(glm::ivec2 pos) {
-  if (existsAt(pos)) {
-    m_chunks[pos].createMesh(*this);
-    m_chunks[pos].loadMeshOnGPU();
-  }
+        if (existsAt(pos)) {
+                getRelativeToPlayerAt(pos)->createMesh(*this);
+                getRelativeToPlayerAt(pos)->loadMeshOnGPU();
+        }
 }
 
 bool World::isMeshLoadedAt(glm::ivec2 pos) {
-  if (existsAt(pos)) {
-    return m_chunks[pos].hasOnGPUMesh();
-  } else {
-    return false;
-  }
+        if (existsAt(pos)) {
+                return getRelativeToPlayerAt(pos)->hasOnGPUMesh();
+        } else {
+                return false;
+        }
 }
 
-Chunk World::getAt(glm::ivec2 pos) {
-  if (existsAt(pos)) {
-    return m_chunks.at(pos);
-  } else {
-    return Chunk(pos);
-  }
+Chunk *World::getRelativeToPlayerAt(glm::ivec2 pos) {
+        int x = pos.x + (chunkWidth - 1) / 2;
+        int y = pos.y + (chunkWidth - 1) / 2;
+
+        assert(x + y * chunkWidth >= 0);
+        assert(x + y * chunkWidth < static_cast<int>(chunks.size()));
+        return chunks[x + y * chunkWidth];
 }
 
-std::unordered_set<glm::ivec2> World::getLoadedChunkPos() {
-  std::unordered_set<glm::ivec2> res;
-  for (auto &c : m_chunks) {
-    res.insert(std::get<0>(c));
-  }
-  return res;
+Chunk *World::getRelativeToPlayerAt(int ox, int oy) {
+        int x = ox + (chunkWidth - 1) / 2;
+        int y = oy + (chunkWidth - 1) / 2;
+
+        assert(x + y * chunkWidth >= 0);
+        assert(x + y * chunkWidth < static_cast<int>(chunks.size()));
+
+        return chunks[x + y * chunkWidth];
 }
 
-std::unordered_map<glm::ivec2, Chunk> World::getChunks() { return m_chunks; }
+Chunk *World::getAbsoluteAt(glm::ivec2 pos) {
+        glm::ivec2 diff = pos - lastChunkPlayerPos;
+        return getRelativeToPlayerAt(diff);
+}
+
+Chunk *World::getAbsoluteAt(int x, int y) {
+        int xrel = x - lastChunkPlayerPos.x;
+        int yrel = y - lastChunkPlayerPos.y;
+        return getRelativeToPlayerAt(xrel, yrel);
+}
+
+void World::setRelativeToPlayerAt(glm::ivec2 pos, Chunk *c) {
+        int x = pos.x + (chunkWidth - 1) / 2;
+        int y = pos.y + (chunkWidth - 1) / 2;
+
+        assert(x + y * chunkWidth >= 0);
+        assert(x + y * chunkWidth < static_cast<int>(chunks.size()));
+
+        chunks[x + y * chunkWidth] = c;
+}
+
+void World::setRelativeToPlayerAt(int ox, int oy, Chunk *c) {
+        int x = ox + (chunkWidth - 1) / 2;
+        int y = oy + (chunkWidth - 1) / 2;
+
+        assert(x + y * chunkWidth >= 0);
+        assert(x + y * chunkWidth < static_cast<int>(chunks.size()));
+
+        chunks[x + y * chunkWidth] = c;
+}
 
 bool World::existsAt(glm::ivec2 pos) {
-  return m_chunks.find(pos) != m_chunks.end();
+        glm::ivec2 diff = pos - lastChunkPlayerPos;
+        return (abs(diff.x) <= (chunkWidth - 1) / 2 &&
+                abs(diff.y) <= (chunkWidth - 1) / 2);
 }

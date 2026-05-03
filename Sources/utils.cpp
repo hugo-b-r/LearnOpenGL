@@ -52,3 +52,7 @@ glm::ivec3 fromInChunkToGlobalCoordinates(glm::ivec3 inChunkPos, glm::ivec2 chun
 glm::ivec3 fromFloatToBlockCoordinates(glm::vec3 point) {
     return glm::ivec3(floor(point.x), floor(point.y), floor(point.z));
 }
+
+glm::ivec2 fromFloatToChunkCoordinates(glm::vec3 pos) {
+        return fromGlobalToInChunkCoordinates(fromFloatToBlockCoordinates(pos));
+}

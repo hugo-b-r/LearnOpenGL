@@ -11,7 +11,7 @@ class Configuration {
         int windowWidth = 1000;
         int windowHeight = 600;
         bool isFullScreen = false;
-        int renderDistance = 8;
+        int renderDistance = 3;
         int fov = 90;
         bool mouseFree = false;
         bool showDebugInfos = false;
