@@ -105,6 +105,8 @@ class World {
         // moved or not, and to compute the relative position of some chunks to
         // the actual player's position.
         glm::ivec2 lastChunkPlayerPos;
+
+        void printWorldContent();
 };
 
 #endif

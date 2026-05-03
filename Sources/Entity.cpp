@@ -1,5 +1,6 @@
 #include "Entity.h"
 #include "utils.h"
+#include <iostream>
 
 Entity::Entity() : position(glm::vec3(0.f)), rotation(glm::vec3(0.f)), velocity(glm::vec3(0.f)) {}
 

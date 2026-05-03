@@ -54,5 +54,5 @@ glm::ivec3 fromFloatToBlockCoordinates(glm::vec3 point) {
 }
 
 glm::ivec2 fromFloatToChunkCoordinates(glm::vec3 pos) {
-        return fromGlobalToInChunkCoordinates(fromFloatToBlockCoordinates(pos));
+        return fromBlockToChunkCoordinates(fromFloatToBlockCoordinates(pos));
 }

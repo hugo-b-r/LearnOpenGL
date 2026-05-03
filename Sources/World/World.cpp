@@ -57,17 +57,36 @@ void World::load() {
 void World::render(Camera &cam, ChunkRenderer &renderer, DebugInfos &inf) {
         glm::ivec2 camPos = cam.chunkPosition();
         glm::ivec2 posDiff = camPos - lastChunkPlayerPos;
-
         constexpr glm::ivec2 varNull = glm::ivec2(0, 0);
         // we knwo that if it didn't move, we don't need to look for every chunk
         // to rebuild or not&
         if (posDiff != varNull) {
-                // // need to update
-                // loadAt(glm::ivec2(i, j));
-                // if (!isMeshLoadedAt(tmpPos)) {
-                //         createAndLoadMeshAt(tmpPos);
-                // }
-                // lastChunkPlayerPos = camPos;
+                std::cout << posDiff.x << " " << posDiff.y << std::endl;
+                if (posDiff.x > 0) {
+
+                        for (int x  = 0; x < posDiff.x; ++x) {
+                                std::cout << "move chunk xm" << std::endl;
+                                moveChunkXM();
+                        }
+                } else if (posDiff.x < 0) {
+                        for (int x  = 0; x > posDiff.x; --x) {
+                                std::cout << "move chunk xp" << std::endl;
+                                moveChunkXP();
+                        }
+                }
+                if (posDiff.y > 0) {
+                        for (int y = 0; y < posDiff.y; ++y) {
+                                std::cout << "move chunk ym" << std::endl;
+                                moveChunkYM();
+                        }
+                } else if (posDiff.y < 0) {
+                        for (int y = 0; y > posDiff.y; --y) {
+                                std::cout << "move chunk yp" << std::endl;
+                                moveChunkYP();
+                        }
+                }
+                // reset else there will be a fun thing happening
+                lastChunkPlayerPos = camPos;
         }
         // do the rendering
         renderer.getShader().setVec3("lightPos", glm::vec3(0, 300, 0));
@@ -129,15 +148,146 @@ void World::setBlockAt(glm::ivec3 pos, CubeAtlas cube) {
         }
 }
 
+
+/// move all the map one Chunk in x + direction
 void World::moveChunkXP() {
-        // for (int x = )
+        // the limit in length to player's position to managed chunks
+        int limit = (chunkWidth-1)/2;
+        for (int y = -limit; y <= limit; ++y) {
+                // managing all the chunks that would get out of the bounds
+
+                // -> we check that these are stored correctly on disk (coming)
+
+                // -> we remove them
+                delete getRelativeToPlayerAt(limit, y);
+        }
+        // all the other that are left, we move them x +
+        for (int x = limit-1; x >= -limit; --x) {
+                // line per line
+                for (int y = -limit; y <= limit; ++y) {
+                        setRelativeToPlayerAt(x+1, y, getRelativeToPlayerAt(x, y));
+                }
+        }
+        // we can now manage the last row/column that needs to be built.
+        for (int y = -limit; y <= limit; ++y) {
+                // allocate a new chunk
+                setRelativeToPlayerAt(-limit, y, new Chunk(lastChunkPlayerPos + glm::ivec2(-limit, y)));
+                // add it to the queue of loading (future)
+                // -> for now : load it directly
+                getRelativeToPlayerAt(-limit, y)->load(*this);
+        }
+        // and finally create the mesh for chunks already loaded but without a mesh
+        for (int y = -limit+1; y <= limit-1; ++y) {
+                getRelativeToPlayerAt(-limit+1, y)->createMesh(*this);
+                getRelativeToPlayerAt(-limit+1, y)->loadMeshOnGPU();
+
+        }
 }
 
-void World::moveChunkXM() {}
+/// move all the map one Chunk in x - direction
+void World::moveChunkXM() {
+        // the limit in length to player's position to managed chunks
+        int limit = (chunkWidth-1)/2;
+        for (int y = -limit; y <= limit; ++y) {
+                // managing all the chunks that would get out of the bounds
 
-void World::moveChunkYP() {}
+                // -> we check that these are stored correctly on disk (coming)
 
-void World::moveChunkYM() {}
+                // -> we remove them
+                delete getRelativeToPlayerAt(-limit, y);
+                printWorldContent();
+        }
+        // all the other that are left, we move them x +
+        for (int x = -limit+1; x <= limit; ++x) {
+                // line per line
+                for (int y = -limit; y <= limit; ++y) {
+                        setRelativeToPlayerAt(x-1, y, getRelativeToPlayerAt(x, y));
+                        printWorldContent();
+                }
+        }
+        // we can now manage the last row/column that needs to be built.
+        for (int y = -limit; y <= limit; ++y) {
+                // allocate a new chunk
+                setRelativeToPlayerAt(limit, y, new Chunk(lastChunkPlayerPos + glm::ivec2(limit, y)));
+                // add it to the queue of loading (future)
+                // -> for now : load it directly
+                getRelativeToPlayerAt(limit, y)->load(*this);
+                printWorldContent();
+        }
+        // and finally create the mesh for chunks already loaded but without a mesh
+        for (int y = -limit+1; y <= limit-1; ++y) {
+                getRelativeToPlayerAt(limit-1, y)->createMesh(*this);
+                getRelativeToPlayerAt(limit-1, y)->loadMeshOnGPU();
+        }
+}
+
+/// move all the map one Chunk in y + direction
+void World::moveChunkYP() {
+        // the limit in length to player's position to managed chunks
+        int limit = (chunkWidth-1)/2;
+        for (int x = -limit; x <= limit; ++x) {
+                // managing all the chunks that would get out of the bounds
+
+                // -> we check that these are stored correctly on disk (coming)
+
+                // -> we remove them
+                delete getRelativeToPlayerAt(x, limit);
+        }
+        // all the other that are left, we move them x +
+        for (int y = limit-1; y >= -limit; --y) {
+                // line per line
+                for (int x = -limit; x <= limit; ++x) {
+                        setRelativeToPlayerAt(x, y+1, getRelativeToPlayerAt(x, y));
+                }
+        }
+        // we can now manage the last row/column that needs to be built.
+        for (int x = -limit; x <= limit; ++x) {
+                // allocate a new chunk
+                setRelativeToPlayerAt(x, -limit, new Chunk(lastChunkPlayerPos + glm::ivec2(x, -limit)));
+                // add it to the queue of loading (future)
+                // -> for now : load it directly
+                getRelativeToPlayerAt(x, -limit)->load(*this);
+        }
+        // and finally create the mesh for chunks already loaded but without a mesh
+        for (int x = -limit+1; x <= limit-1; ++x) {
+                getRelativeToPlayerAt(x, -limit+1)->createMesh(*this);
+                getRelativeToPlayerAt(x, -limit+1)->loadMeshOnGPU();
+        }
+}
+
+/// move all the map one Chunk in y - direction
+void World::moveChunkYM() {
+        // the limit in length to player's position to managed chunks
+        int limit = (chunkWidth-1)/2;
+        for (int x = -limit; x <= limit; ++x) {
+                // managing all the chunks that would get out of the bounds
+
+                // -> we check that these are stored correctly on disk (coming)
+
+                // -> we remove them
+                delete getRelativeToPlayerAt(x, -limit);
+        }
+        // all the other that are left, we move them x +
+        for (int y = -limit+1; y <= limit; ++y) {
+                // line per line
+                for (int x = -limit; x <= limit; ++x) {
+                        setRelativeToPlayerAt(x, y-1, getRelativeToPlayerAt(x, y));
+                }
+        }
+        // we can now manage the last row/column that needs to be built.
+        for (int x = -limit; x <= limit; ++x) {
+                // allocate a new chunk
+                setRelativeToPlayerAt(x, limit, new Chunk(lastChunkPlayerPos + glm::ivec2(x, limit)));
+                // add it to the queue of loading (future)
+                // -> for now : load it directly
+                getRelativeToPlayerAt(x, limit)->load(*this);
+        }
+        // and finally create the mesh for chunks already loaded but without a mesh
+        for (int x = -limit+1; x <= limit-1; ++x) {
+                getRelativeToPlayerAt(x, limit-1)->createMesh(*this);
+                getRelativeToPlayerAt(x, limit-1)->loadMeshOnGPU();
+        }
+}
 
 // tests wether the chunk exitsts at this position
 
@@ -217,4 +367,15 @@ bool World::existsAt(glm::ivec2 pos) {
         glm::ivec2 diff = pos - lastChunkPlayerPos;
         return (abs(diff.x) <= (chunkWidth - 1) / 2 &&
                 abs(diff.y) <= (chunkWidth - 1) / 2);
+}
+
+void World::printWorldContent() {
+        int limit = (chunkWidth-1)/2;
+        for (int i  = -limit; i <= limit; i++) {
+                for (int j = -limit; j <= limit; j++) {
+                        std::cout << getRelativeToPlayerAt(j, i) << " ";
+                }
+                std::cout << std::endl;
+        }
+        std::cout << "----------------------" << std::endl;
 }
