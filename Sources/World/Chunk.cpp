@@ -22,6 +22,13 @@ Chunk::Chunk(glm::ivec2 pos)
       m_model(), chunkPos(pos), m_modelMat(1.f), m_viewMat(1.f),
       m_numberVertices(0) {}
 
+Chunk::Chunk(int x, int y)
+          : blocks(CHUNK_HEIGHT * CHUNK_LENGTH * CHUNK_WIDTH, CubeAtlas::Air),
+            m_loadStatus(ChunkDataLoadStatus::None),
+            m_meshBuildStatus(ChunkMeshBuildStatus::NotStarted), m_mesh({{}, {}, {}}),
+            m_model(), chunkPos(glm::ivec2(x, y)), m_modelMat(1.f), m_viewMat(1.f),
+            m_numberVertices(0) {}
+
 glm::ivec2 Chunk::getChunkPos() { return chunkPos; }
 
 glm::ivec3 Chunk::getChunkPosCenter() {

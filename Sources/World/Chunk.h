@@ -32,6 +32,8 @@ public:
   Chunk();
   // creates a chunk at pos pos in chunk coordinates among other chunks
   Chunk(glm::ivec2 pos);
+  // creates a chunk at pos (x, y) in chunk coordinates among other chunks
+  Chunk(int x, int y);
   CubeAtlas getBlockAt(int x, int y, int z);
   void setBlockAt(int x, int y, int z, CubeAtlas ca);
 
