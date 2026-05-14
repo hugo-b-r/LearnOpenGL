@@ -72,17 +72,8 @@ void WorldQueueOperation::executeCreateMesh(World &world) {
         world.get_mutex().unlock();
 
         if (actual_chunk_ptr != nullptr) {
-                std::cout << "execution create meshe because no null at"
-                          << abs_pos.x << " " << abs_pos.y << std::endl;
-                // l_chunk.unlock();
                 actual_chunk_ptr->createMesh(world);
                 world.addChunkMeshToLoad(abs_pos);
-                // actual_chunk_ptr->loadMeshOnGPU();
-                // l_chunk.lock();
-
-                std::cout << "end execution create meshe because no null : has "
-                             "mesh gpu "
-                          << actual_chunk_ptr->hasOnGPUMesh() << std::endl;
         }
         l_chunk.unlock();
 }

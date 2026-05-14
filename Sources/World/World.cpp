@@ -55,7 +55,6 @@ void World::load() {
                 setRelativeToPlayerAt(0, y, chunk_ptr);
                 thread_pool_manager->pushBackOperation(
                     WorldQueueOperation(chunk_pos, WldQOperationType::kLoad));
-                std::cout << "pos " << chunk_pos.x <<" " << chunk_pos.y << std::endl;
         }
 
         for (int x = 1; x <= worldLimits; ++x) {
@@ -88,8 +87,7 @@ void World::load() {
 
         glm::ivec2 chunk_pos(0, 0);
         thread_pool_manager->pushBackOperation(
-            WorldQueueOperation(
-                chunk_pos, WldQOperationType::kCreateMesh));
+            WorldQueueOperation(chunk_pos, WldQOperationType::kCreateMesh));
         for (int a = 1; a <= border; ++a) {
                 int x = -a;
                 int y = -a;
@@ -112,7 +110,7 @@ void World::load() {
                 }
                 y--;
                 while (x >= -a) {
-                        
+
                         glm::ivec2 chunk_pos(x, y);
                         thread_pool_manager->pushBackOperation(
                             WorldQueueOperation(
@@ -121,7 +119,7 @@ void World::load() {
                 }
                 x++;
                 while (y >= -a) {
-                        
+
                         glm::ivec2 chunk_pos(x, y);
                         thread_pool_manager->pushBackOperation(
                             WorldQueueOperation(
