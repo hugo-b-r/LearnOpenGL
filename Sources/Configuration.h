@@ -11,7 +11,7 @@ class Configuration {
         int windowWidth = 1000;
         int windowHeight = 600;
         bool isFullScreen = false;
-        int renderDistance = 3;
+        int renderDistance = 8;
         int fov = 90;
         bool mouseFree = false;
         bool showDebugInfos = false;
@@ -21,6 +21,7 @@ class Configuration {
         // to be called by Scene !!!
         bool getCheckCollisions();
         bool setCheckCollisions(bool val);
+
       private:
 };
 

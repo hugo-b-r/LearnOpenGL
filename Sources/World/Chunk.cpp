@@ -23,11 +23,11 @@ Chunk::Chunk(glm::ivec2 pos)
       m_numberVertices(0) {}
 
 Chunk::Chunk(int x, int y)
-          : blocks(CHUNK_HEIGHT * CHUNK_LENGTH * CHUNK_WIDTH, CubeAtlas::Air),
-            m_loadStatus(ChunkDataLoadStatus::None),
-            m_meshBuildStatus(ChunkMeshBuildStatus::NotStarted), m_mesh({{}, {}, {}}),
-            m_model(), chunkPos(glm::ivec2(x, y)), m_modelMat(1.f), m_viewMat(1.f),
-            m_numberVertices(0) {}
+    : blocks(CHUNK_HEIGHT * CHUNK_LENGTH * CHUNK_WIDTH, CubeAtlas::Air),
+      m_loadStatus(ChunkDataLoadStatus::None),
+      m_meshBuildStatus(ChunkMeshBuildStatus::NotStarted), m_mesh({{}, {}, {}}),
+      m_model(), chunkPos(glm::ivec2(x, y)), m_modelMat(1.f), m_viewMat(1.f),
+      m_numberVertices(0) {}
 
 glm::ivec2 Chunk::getChunkPos() { return chunkPos; }
 
@@ -51,7 +51,7 @@ CubeAtlas Chunk::getBlockAt(int x, int y, int z) {
                 assert(x * CHUNK_HEIGHT * CHUNK_LENGTH + z * CHUNK_HEIGHT + y <
                        static_cast<int>(blocks.size()));
                 res = blocks[x * CHUNK_HEIGHT * CHUNK_LENGTH +
-                              z * CHUNK_HEIGHT + y];
+                             z * CHUNK_HEIGHT + y];
         }
         return res;
 }
@@ -70,13 +70,14 @@ void Chunk::setBlockAt(int x, int y, int z, CubeAtlas ca) {
 
 void Chunk::load(World &w) {
         // generate the chunk if not loaded
-        // for now: fun loading / generation function that does not take into
-        // account therest of chunks
+        spdlog::debug("Loading chunk at pos : {}, {}", chunkPos.x, chunkPos.y);
         if (m_loadStatus != ChunkDataLoadStatus::FinishedLoaded) {
                 WorldGenerator::buildChunk(*this, w);
         }
         createBoundingBox();
         m_loadStatus = ChunkDataLoadStatus::FinishedLoaded;
+        spdlog::debug("Finished loading chunk at pos : {}, {}", chunkPos.x,
+                      chunkPos.y);
 }
 
 bool Chunk::isLoaded() {
@@ -84,11 +85,15 @@ bool Chunk::isLoaded() {
 }
 
 void Chunk::createMesh(World &w) {
+        spdlog::debug("Creating mesh for chunk : {}, {}", chunkPos.x,
+                      chunkPos.y);
         CubeTexture ct("./Assets/texture_atlas.png");
         ChunkMeshCreator builder(*this, ct, w);
         m_numberVertices = builder.buildMesh();
         m_mesh = builder.getMesh();
         m_meshBuildStatus = ChunkMeshBuildStatus::DoneNotLoaded;
+        spdlog::debug(" End creating mesh for chunk : {}, {}", chunkPos.x,
+                      chunkPos.y);
 }
 
 bool Chunk::hasMesh() {
@@ -97,8 +102,12 @@ bool Chunk::hasMesh() {
 }
 
 void Chunk::loadMeshOnGPU() {
+        spdlog::debug("Loading mesh for chunk : {}, {}", chunkPos.x,
+                      chunkPos.y);
         m_model.loadData(m_mesh, {3, 2, 3});
         m_meshBuildStatus = ChunkMeshBuildStatus::DoneLoaded;
+        spdlog::debug("Finished loading mesh for chunk : {}, {}", chunkPos.x,
+                      chunkPos.y);
 }
 
 bool Chunk::hasOnGPUMesh() {

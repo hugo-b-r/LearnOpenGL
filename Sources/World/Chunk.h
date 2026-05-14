@@ -3,11 +3,11 @@
 
 #include "ChunkMeshCreator.h"
 #include "CubeTexture.h"
+#include "Mathematics/AABB.h"
 #include "Mesh.h"
 #include "Model.h"
 #include "Renderer/ChunkRenderer.h"
 #include "World.h"
-#include "Mathematics/AABB.h"
 
 #include <glm/glm.hpp>
 #include <vector>
@@ -17,10 +17,10 @@ const int CHUNK_HEIGHT = 256;
 const int CHUNK_LENGTH = 16;
 
 enum class ChunkDataLoadStatus {
-  None,
-  Running,
-  FinishedNotLoaded,
-  FinishedLoaded
+        None,
+        Running,
+        FinishedNotLoaded,
+        FinishedLoaded
 };
 
 class ChunkMeshCreator;
@@ -28,47 +28,47 @@ class ChunkRenderer;
 enum class ChunkMeshBuildStatus;
 
 class Chunk {
-public:
-  Chunk();
-  // creates a chunk at pos pos in chunk coordinates among other chunks
-  Chunk(glm::ivec2 pos);
-  // creates a chunk at pos (x, y) in chunk coordinates among other chunks
-  Chunk(int x, int y);
-  CubeAtlas getBlockAt(int x, int y, int z);
-  void setBlockAt(int x, int y, int z, CubeAtlas ca);
+      public:
+        Chunk();
+        // creates a chunk at pos pos in chunk coordinates among other chunks
+        Chunk(glm::ivec2 pos);
+        // creates a chunk at pos (x, y) in chunk coordinates among other chunks
+        Chunk(int x, int y);
+        CubeAtlas getBlockAt(int x, int y, int z);
+        void setBlockAt(int x, int y, int z, CubeAtlas ca);
 
-  glm::ivec2 getChunkPos();
-  glm::ivec3 getChunkPosCenter();
-  glm::vec3 getChunkPosCenter3();
+        glm::ivec2 getChunkPos();
+        glm::ivec3 getChunkPosCenter();
+        glm::vec3 getChunkPosCenter3();
 
-  void load(World& w);
-  bool isLoaded();
+        void load(World &w);
+        bool isLoaded();
 
-  void createMesh(World& w);
-  bool hasMesh();
+        void createMesh(World &w);
+        bool hasMesh();
 
-  void loadMeshOnGPU();
-  bool hasOnGPUMesh();
+        void loadMeshOnGPU();
+        bool hasOnGPUMesh();
 
-  void bindModel();
+        void bindModel();
 
-  void draw(Camera &cam, ChunkRenderer &renderer);
+        void draw(Camera &cam, ChunkRenderer &renderer);
 
-  void createBoundingBox();
+        void createBoundingBox();
 
-  AABB& getBoundingBox();
+        AABB &getBoundingBox();
 
-protected:
-  std::vector<CubeAtlas> blocks;
-  ChunkDataLoadStatus m_loadStatus;
-  ChunkMeshBuildStatus m_meshBuildStatus;
-  Mesh m_mesh;
-  Model m_model;
-  glm::ivec2 chunkPos;
-  glm::mat4 m_modelMat;
-  glm::mat4 m_viewMat;
-  int m_numberVertices;
-  AABB m_boundingBox;
+      protected:
+        std::vector<CubeAtlas> blocks;
+        ChunkDataLoadStatus m_loadStatus;
+        ChunkMeshBuildStatus m_meshBuildStatus;
+        Mesh m_mesh;
+        Model m_model;
+        glm::ivec2 chunkPos;
+        glm::mat4 m_modelMat;
+        glm::mat4 m_viewMat;
+        int m_numberVertices;
+        AABB m_boundingBox;
 };
 
 #endif

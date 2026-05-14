@@ -1,9 +1,7 @@
-#ifndef WORLDQUEUEOPERATION
-#define WORLDQUEUEOPERATION
+#ifndef WORLDQUEUEOPERATION_H
+#define WORLDQUEUEOPERATION_H
 
 #include <glm/glm.hpp>
-
-#include "World.h"
 
 /* World queue operation
  *
@@ -12,31 +10,30 @@
 
 enum class WldQOperationType { kCreate, kLoad, kCreateAndLoad, kCreateMesh };
 
+class World;
+
 class WorldQueueOperation {
       public:
         // builds a World queue operation that will do type operation at chunk
         // of pos absolute_pos
-        WorldQueueOperation(glm::ivec2 absolute_pos, WldQOperationType type,
-                            World &world);
+        WorldQueueOperation(glm::ivec2 absolute_pos, WldQOperationType type);
         virtual ~WorldQueueOperation();
 
-        void execute();
+        void execute(World &world);
 
       protected:
         // the absolute position of the thread that we will manage
         glm::ivec2 abs_pos;
         // the type of operation to apply to it.
         WldQOperationType type;
-        // the world, what else ?
-        World &world;
 
-        void executeCreate();
+        void executeCreate(World &world);
 
-        void executeLoad();
+        void executeLoad(World &world);
 
-        void executeCreateAndLoad();
+        void executeCreateAndLoad(World &world);
 
-        void executeCreateMesh();
-}
+        void executeCreateMesh(World &world);
+};
 
 #endif

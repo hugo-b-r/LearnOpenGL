@@ -1,13 +1,18 @@
 #ifndef WORLD_H
 #define WORLD_H
 
+#include "LockableChunk.h"
+#include "WorldParallelOperationsManager.h"
+#include "WorldQueueOperation.h"
+#include "glm/fwd.hpp"
 #include <glm/glm.hpp>
-#include <unordered_map>
-#include <unordered_set>
-#include <vector>
+#include <queue>
+#include <utility>
 // in order to have the ability to hash the type for unordered map
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
+#include <mutex>
+#include <vector>
 
 #include "Chunk.h"
 #include "CubeTexture.h"
@@ -17,10 +22,14 @@ class Camera;
 class Chunk;
 class ChunkRenderer;
 class DebugInfos;
+class WorldQueueOperation;
+class WorldParallelOperationsManager;
+class LockableChunk;
 
 class World {
       public:
         World(Camera &cam);
+        World(const World &w);
         ~World();
 
         /// procedure to load the world correctly
@@ -48,19 +57,28 @@ class World {
         bool isMeshLoadedAt(glm::ivec2 pos);
 
         /// returns chunk at the position pos
-        Chunk *getRelativeToPlayerAt(glm::ivec2 pos);
+        LockableChunk getRelativeToPlayerAt(glm::ivec2 pos);
         /// returns chunk at the position pos
-        Chunk *getRelativeToPlayerAt(int x, int y);
+        LockableChunk getRelativeToPlayerAt(int x, int y);
 
-        /// returns the chunk present at a pos diff to player's pos
-        Chunk *getAbsoluteAt(glm::ivec2 pos);
-        /// returns the chunk present at a pos diff to player's pos
-        Chunk *getAbsoluteAt(int x, int y);
+        /// returns the chunk present at a pos absolute
+        LockableChunk getAbsoluteAt(glm::ivec2 pos);
+        /// returns the chunk present at a pos absolute
+        LockableChunk getAbsoluteAt(int x, int y);
 
         /// set the chunk present at a pos diff to player's pos
         void setRelativeToPlayerAt(glm::ivec2 pos, Chunk *c);
         /// set the chunk present at a pos diff to player's pos
         void setRelativeToPlayerAt(int x, int y, Chunk *c);
+        /// set the chunk present at a pos absolute
+        void setAbsoluteAt(glm::ivec2 pos, Chunk *c);
+        /// set the chunk present at a pos absolute
+        void setAbsoluteAt(int x, int y, Chunk *c);
+
+        /// returns the mutex for the world
+        std::mutex &get_mutex();
+
+        void addChunkMeshToLoad(glm::ivec2 abs_chunk_pos);
 
       protected:
         /// move all the map one Chunk in x + direction
@@ -75,6 +93,9 @@ class World {
         /// tests wether the chunk is in the boundaries of managed chunks at
         /// position pos (absolute position)
         bool existsAt(glm::ivec2 pos);
+
+        /// take a pos out of the queue and load it on the gpu if exists
+        void loadAChunkMeshOnGPU();
 
         /// The width of the managed zone, i.e., if the render distance is x, it
         /// is 2*(x+1)+1 : there is for each side of the player, a render
@@ -96,7 +117,20 @@ class World {
         /// number of operations needed to move chunks, as we only move at most
         /// something like 8 bytes x nbChunks which is much less than 256 x 16 x
         /// 16 x nbChunks.
-        std::vector<Chunk *> chunks;
+        std::vector<LockableChunk> chunks;
+
+        /// lock for the chunks
+        std::mutex chunks_mutex;
+
+        /// We create a queue for chunks that needs their meshg to be loaded on
+        /// the gpu. At maximum, one is executed per frame. It is used to
+        /// maintain a synchronous use of opengl.
+        std::queue<glm::ivec2> chunks_meshes_to_load;
+        /// and we maintain a mutex for it
+        std::mutex chunks_meshes_to_load_locker;
+
+        /// Queue that stores the operations on the chunks
+        WorldParallelOperationsManager *thread_pool_manager;
 
         // The world is existing according to a camera. This is used to know
         // where to load chunks for example, but also what to render.

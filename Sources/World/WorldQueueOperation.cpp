@@ -1,55 +1,88 @@
+#include <spdlog/spdlog.h>
+
+#include "Chunk.h"
+#include "World/LockableChunk.h"
 #include "WorldQueueOperation.h"
-#include <filesystem>
+
+#include <iostream>
+#include <thread>
+
+using namespace std::chrono_literals;
 
 WorldQueueOperation::WorldQueueOperation(glm::ivec2 absolute_pos,
-                                         WldQOperationType type, World &world)
-    : abs_pos(absolute_pos), type(type), world(world) {}
+                                         WldQOperationType type)
+    : abs_pos(absolute_pos), type(type) {}
 
 // empty destructor as no emory management
 WorldQueueOperation::~WorldQueueOperation() {}
 
-
 // exeuctes the operations of the type
-void WorldQueueOperation::execute() {
+void WorldQueueOperation::execute(World &world) {
         switch (type) {
         case WldQOperationType::kCreate:
-                return executeCreate();
+                return executeCreate(world);
                 break;
         case WldQOperationType::kLoad:
-                return executeLoad();
+                return executeLoad(world);
                 break;
         case WldQOperationType::kCreateAndLoad:
-                return executeCreateAndLoad();
+                return executeCreateAndLoad(world);
                 break;
         case WldQOperationType::kCreateMesh:
-                return executeCreateMesh();
+                return executeCreateMesh(world);
                 break;
         }
+        spdlog::info("end of execution !");
 }
 
-void WorldQueueOperation::executeCreate() {
-        Chunk* chunk_ptr = new Chunk(abs_pos);
-        if (world.getAbsoluteAt(abs_pos) == nullptr) {
+void WorldQueueOperation::executeCreate(World &world) {
+        world.get_mutex().lock();
+        LockableChunk l_chunk = world.getAbsoluteAt(abs_pos);
+        Chunk *actual_chunk_ptr = l_chunk.lock();
+        if (actual_chunk_ptr == nullptr) {
+                Chunk *chunk_ptr = new Chunk(abs_pos);
                 world.setAbsoluteAt(abs_pos, chunk_ptr);
         }
+        world.getAbsoluteAt(abs_pos).unlock();
+        world.get_mutex().unlock();
 }
 
-void WorldQueueOperation::executeLoad() {
-       if (world.getAbsoluteAt(abs_pos) != nullptr) {
-                Chunk* chunk_ptr = world.getAbsoluteAt(abs_pos);
-                chunk_ptr->load(world);
+void WorldQueueOperation::executeLoad(World &world) {
+        world.get_mutex().lock();
+        LockableChunk l_chunk = world.getAbsoluteAt(abs_pos);
+        Chunk *actual_chunk_ptr = l_chunk.lock();
+        world.get_mutex().unlock();
+        if (actual_chunk_ptr != nullptr) {
+                actual_chunk_ptr->load(world);
         }
+        l_chunk.unlock();
 }
 
-void WorldQueueOperation::executeCreateAndLoad() {
-        executeCreate();
-        executeLoad();
+void WorldQueueOperation::executeCreateAndLoad(World &world) {
+        executeCreate(world);
+        executeLoad(world);
 }
 
-void WorldQueueOperation::executeCreateMesh() {
-       if (world.getAbsoluteAt(abs_pos) != nullptr) {
-                Chunk* chunk_ptr = world.getAbsoluteAt(abs_pos);
-                chunk_ptr->createMesh(world);
-                chunk_ptr->loadMeshOnGPU();
+void WorldQueueOperation::executeCreateMesh(World &world) {
+        // std::this_thread::sleep_for(1000ms);
+        world.get_mutex().lock();
+        LockableChunk l_chunk = world.getAbsoluteAt(abs_pos);
+        Chunk *actual_chunk_ptr = l_chunk.lock();
+
+        world.get_mutex().unlock();
+
+        if (actual_chunk_ptr != nullptr) {
+                std::cout << "execution create meshe because no null at"
+                          << abs_pos.x << " " << abs_pos.y << std::endl;
+                // l_chunk.unlock();
+                actual_chunk_ptr->createMesh(world);
+                world.addChunkMeshToLoad(abs_pos);
+                // actual_chunk_ptr->loadMeshOnGPU();
+                // l_chunk.lock();
+
+                std::cout << "end execution create meshe because no null : has "
+                             "mesh gpu "
+                          << actual_chunk_ptr->hasOnGPUMesh() << std::endl;
         }
+        l_chunk.unlock();
 }
