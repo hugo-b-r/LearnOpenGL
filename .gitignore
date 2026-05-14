@@ -4,3 +4,5 @@ buildTests/
 imgui.ini
 .clangd
 compile_commands.json
+.zed
+.vscode
