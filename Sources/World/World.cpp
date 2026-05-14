@@ -47,14 +47,36 @@ void World::load() {
         // load all the chunks in a default state
         chunks_mutex.lock();
         int worldLimits = (chunkWidth - 1) / 2;
-        for (int x = -worldLimits; x <= worldLimits; ++x) {
+
+        for (int y = -worldLimits; y <= worldLimits; ++y) {
+                glm::ivec2 chunk_pos = glm::ivec2(0 + lastChunkPlayerPos.x,
+                                                  y + lastChunkPlayerPos.y);
+                Chunk *chunk_ptr = new Chunk(chunk_pos);
+                setRelativeToPlayerAt(0, y, chunk_ptr);
+                thread_pool_manager->pushBackOperation(
+                    WorldQueueOperation(chunk_pos, WldQOperationType::kLoad));
+                std::cout << "pos " << chunk_pos.x <<" " << chunk_pos.y << std::endl;
+        }
+
+        for (int x = 1; x <= worldLimits; ++x) {
                 for (int y = -worldLimits; y <= worldLimits; ++y) {
-                        Chunk *chunk_ptr =
-                            new Chunk(glm::ivec2(x + lastChunkPlayerPos.x,
-                                                 y + lastChunkPlayerPos.y));
+                        glm::ivec2 chunk_pos = glm::ivec2(
+                            x + lastChunkPlayerPos.x, y + lastChunkPlayerPos.y);
+                        Chunk *chunk_ptr = new Chunk(chunk_pos);
                         setRelativeToPlayerAt(x, y, chunk_ptr);
-                        getRelativeToPlayerAt(x, y).lock()->load(*this);
-                        getRelativeToPlayerAt(x, y).unlock();
+
+                        thread_pool_manager->pushBackOperation(
+                            WorldQueueOperation(chunk_pos,
+                                                WldQOperationType::kLoad));
+
+                        chunk_pos = glm::ivec2(-x + lastChunkPlayerPos.x,
+                                               y + lastChunkPlayerPos.y);
+                        chunk_ptr = new Chunk(chunk_pos);
+                        setRelativeToPlayerAt(-x, y, chunk_ptr);
+
+                        thread_pool_manager->pushBackOperation(
+                            WorldQueueOperation(chunk_pos,
+                                                WldQOperationType::kLoad));
                 }
         }
         spdlog::debug("Finished loading the world");
@@ -63,14 +85,50 @@ void World::load() {
         // correct models, but we don't pass on the border, we don't want it to
         // be seen
         int border = (chunkWidth - 1) / 2 - 1;
-        for (int x = -border; x <= border; ++x) {
-                for (int y = -border; y <= border; ++y) {
-                        LockableChunk l_chunk = getRelativeToPlayerAt(x, y);
-                        Chunk *chunk_ptr = l_chunk.lock();
-                        chunk_ptr->createMesh(*this);
-                        chunk_ptr->loadMeshOnGPU();
-                        l_chunk.unlock();
+
+        glm::ivec2 chunk_pos(0, 0);
+        thread_pool_manager->pushBackOperation(
+            WorldQueueOperation(
+                chunk_pos, WldQOperationType::kCreateMesh));
+        for (int a = 1; a <= border; ++a) {
+                int x = -a;
+                int y = -a;
+                while (x <= a) {
+
+                        glm::ivec2 chunk_pos(x, y);
+                        thread_pool_manager->pushBackOperation(
+                            WorldQueueOperation(
+                                chunk_pos, WldQOperationType::kCreateMesh));
+                        x++;
                 }
+                x--;
+                while (y <= a) {
+
+                        glm::ivec2 chunk_pos(x, y);
+                        thread_pool_manager->pushBackOperation(
+                            WorldQueueOperation(
+                                chunk_pos, WldQOperationType::kCreateMesh));
+                        y++;
+                }
+                y--;
+                while (x >= -a) {
+                        
+                        glm::ivec2 chunk_pos(x, y);
+                        thread_pool_manager->pushBackOperation(
+                            WorldQueueOperation(
+                                chunk_pos, WldQOperationType::kCreateMesh));
+                        x--;
+                }
+                x++;
+                while (y >= -a) {
+                        
+                        glm::ivec2 chunk_pos(x, y);
+                        thread_pool_manager->pushBackOperation(
+                            WorldQueueOperation(
+                                chunk_pos, WldQOperationType::kCreateMesh));
+                        y--;
+                }
+                y++;
         }
         chunks_mutex.unlock();
         spdlog::debug("Finished loading the world.");
@@ -110,7 +168,8 @@ void World::render(Camera &cam, ChunkRenderer &renderer, DebugInfos &inf) {
                 }
         }
 
-        // if there is one chunk that needs to be uploaded on the gpu, then do it
+        // if there is one chunk that needs to be uploaded on the gpu, then do
+        // it
         loadAChunkMeshOnGPU();
 
         // do the rendering
