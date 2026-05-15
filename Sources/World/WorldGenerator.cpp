@@ -111,7 +111,7 @@ void WorldGenerator::addTreeAt(int i, int j, int k, World &world) {
 }
 
 int WorldGenerator::sand_height(glm::ivec2 pos) {
-        int n_value = floor(Noise::turbulence(pos, 2., 0.00005, 0.85, 10))+4;
+        int n_value = floor(Noise::turbulence(pos, 3., 0.0001, 0.85, 10))+10;
         if (n_value > 0)
                 return n_value;
         else
