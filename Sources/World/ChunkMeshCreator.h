@@ -29,6 +29,9 @@ protected:
 
     int buildMeshThreadFn();
 
+    /// push to m_mesh the mesh of a block, checking if it needs to build or not
+    void addBlockMesh(int i, int j, int k);
+
     Mesh m_mesh;
     int nb_vertices;
 

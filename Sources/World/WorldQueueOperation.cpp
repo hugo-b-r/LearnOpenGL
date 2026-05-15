@@ -37,18 +37,32 @@ void WorldQueueOperation::execute(World &world) {
 
 void WorldQueueOperation::executeCreate(World &world) {
         world.get_mutex().lock();
+        if (!world.existsAt(abs_pos)) {
+                world.get_mutex().unlock();
+                return;
+        }
         LockableChunk l_chunk = world.getAbsoluteAt(abs_pos);
         Chunk *actual_chunk_ptr = l_chunk.lock();
         if (actual_chunk_ptr == nullptr) {
                 Chunk *chunk_ptr = new Chunk(abs_pos);
+                if (!world.existsAt(abs_pos)) {
+                        l_chunk.unlock();
+                        world.get_mutex().unlock();
+                        return;
+                }
                 world.setAbsoluteAt(abs_pos, chunk_ptr);
         }
-        world.getAbsoluteAt(abs_pos).unlock();
+
+        l_chunk.unlock();
         world.get_mutex().unlock();
 }
 
 void WorldQueueOperation::executeLoad(World &world) {
         world.get_mutex().lock();
+        if (!world.existsAt(abs_pos)) {
+                world.get_mutex().unlock();
+                return;
+        }
         LockableChunk l_chunk = world.getAbsoluteAt(abs_pos);
         Chunk *actual_chunk_ptr = l_chunk.lock();
         world.get_mutex().unlock();
@@ -72,7 +86,9 @@ void WorldQueueOperation::executeCreateMesh(World &world) {
         world.get_mutex().unlock();
 
         if (actual_chunk_ptr != nullptr) {
+                // creating the mesh
                 actual_chunk_ptr->createMesh(world);
+                // ask the main thread to be loaded on the gpu
                 world.addChunkMeshToLoad(abs_pos);
         }
         l_chunk.unlock();

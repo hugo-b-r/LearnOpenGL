@@ -232,6 +232,26 @@ CubeAtlas World::getBlockAt(glm::ivec3 pos) {
         }
 }
 
+
+// std::optional<CubeAtlas> World::getBlockAtWithChecks(glm::ivec3 pos) {
+//         glm::ivec2 chunkCoord = fromBlockToChunkCoordinates(pos);
+//         if (existsAt(chunkCoord)) {
+//                 auto blockInChunkPos = fromGlobalToInChunkCoordinates(pos);
+//                 int a = blockInChunkPos.x;
+//                 int b = blockInChunkPos.y;
+//                 int c = blockInChunkPos.z;
+//                 LockableChunk l_chunk = getAbsoluteAt(chunkCoord);
+//                 Chunk *chunk_ptr = l_chunk.lock();
+//                 CubeAtlas res = chunk_ptr == nullptr
+//                                     ? CubeAtlas::Air
+//                                     : chunk_ptr->getBlockAt(a, b, c);
+//                 l_chunk.unlock();
+//                 return res;
+//         } else {
+//                 return CubeAtlas::Air;
+//         }
+// }
+
 void World::setBlockAt(glm::ivec3 pos, CubeAtlas cube) {
 
         auto chunkCoord = fromBlockToChunkCoordinates(pos);
@@ -579,12 +599,15 @@ void World::loadAChunkMeshOnGPU() {
                 chunks_meshes_to_load.pop();
                 chunks_meshes_to_load_locker.unlock();
 
-                LockableChunk l_chunk = getAbsoluteAt(chunk_position);
-                Chunk *chunk_ptr = l_chunk.lock();
+                if (existsAt(chunk_position)) {
 
-                chunk_ptr->loadMeshOnGPU();
+                        LockableChunk l_chunk = getAbsoluteAt(chunk_position);
+                        Chunk *chunk_ptr = l_chunk.lock();
 
-                l_chunk.unlock();
+                        chunk_ptr->loadMeshOnGPU();
+
+                        l_chunk.unlock();
+                }
         } else {
                 chunks_meshes_to_load_locker.unlock();
         }

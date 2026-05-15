@@ -49,7 +49,7 @@ CubeAtlas Chunk::getBlockAt(int x, int y, int z) {
                 assert(x * CHUNK_HEIGHT * CHUNK_LENGTH + z * CHUNK_HEIGHT + y >=
                        0);
                 assert(x * CHUNK_HEIGHT * CHUNK_LENGTH + z * CHUNK_HEIGHT + y <
-                       static_cast<int>(blocks.size()));
+                       CHUNK_HEIGHT * CHUNK_LENGTH * CHUNK_WIDTH);
                 res = blocks[x * CHUNK_HEIGHT * CHUNK_LENGTH +
                              z * CHUNK_HEIGHT + y];
         }
@@ -62,7 +62,7 @@ void Chunk::setBlockAt(int x, int y, int z, CubeAtlas ca) {
                 assert(x * CHUNK_HEIGHT * CHUNK_LENGTH + z * CHUNK_HEIGHT + y >=
                        0);
                 assert(x * CHUNK_HEIGHT * CHUNK_LENGTH + z * CHUNK_HEIGHT + y <
-                       static_cast<int>(blocks.size()));
+                       CHUNK_HEIGHT * CHUNK_LENGTH * CHUNK_WIDTH);
                 blocks[x * CHUNK_HEIGHT * CHUNK_LENGTH + z * CHUNK_HEIGHT + y] =
                     ca;
         }

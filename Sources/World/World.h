@@ -42,6 +42,11 @@ class World {
         /// returns the block present at the coord pos (assuming they are
         /// absolute) if exists
         CubeAtlas getBlockAt(glm::ivec3 pos);
+
+        /// returns the block present at the coord pos (assuming they are
+        /// absolute) if exists
+        // std::optional<CubeAtlas> getBlockAtWithChecks(glm::ivec3 pos);
+
         /// sets the value for the block present at the coord pos (assuming they
         /// are absolute) if exists
         void setBlockAt(glm::ivec3 pos, CubeAtlas cube);
@@ -80,6 +85,11 @@ class World {
 
         void addChunkMeshToLoad(glm::ivec2 abs_chunk_pos);
 
+
+        /// tests wether the chunk is in the boundaries of managed chunks at
+        /// position pos (absolute position)
+        bool existsAt(glm::ivec2 pos);
+
       protected:
         /// move all the map one Chunk in x + direction
         void moveChunkXP();
@@ -90,9 +100,6 @@ class World {
         /// move all the map one Chunk in y - direction
         void moveChunkYM();
 
-        /// tests wether the chunk is in the boundaries of managed chunks at
-        /// position pos (absolute position)
-        bool existsAt(glm::ivec2 pos);
 
         /// take a pos out of the queue and load it on the gpu if exists
         void loadAChunkMeshOnGPU();

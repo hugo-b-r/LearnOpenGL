@@ -410,10 +410,10 @@ int ChunkMeshCreator::buildMeshThreadFn() {
               m_world.existsAt(data.getChunkPos() + glm::ivec2(-1, 0)) &&
               m_world.existsAt(data.getChunkPos() + glm::ivec2(0, -1)) &&
               m_world.existsAt(data.getChunkPos() + glm::ivec2(0, 1)))) {
-                      m_world.get_mutex().unlock();
+                m_world.get_mutex().unlock();
 
                 return 0;
-        } else {        
+        } else {
                 m_world.get_mutex().unlock();
                 for (int i = 0; i < CHUNK_WIDTH; i++) {
                         for (int j = 0; j < CHUNK_HEIGHT; j++) {
