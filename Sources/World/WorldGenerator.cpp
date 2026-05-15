@@ -14,6 +14,7 @@ const int DIRT_HEIGHT = 3;
 const int GRASS_HEIGHT = 1;
 const int WATER_ALTITUDE = 64;
 const int AVG_SAND_HEIGHT = 4;
+const int TREES_LOW_MARGIN = 5;
 
 WorldGenerator::WorldGenerator() {}
 
@@ -69,7 +70,7 @@ void WorldGenerator::buildChunk(Chunk &c, World &world) {
                                       blockPosGlobal.z * factor + offsetZ),
                             1, 0.1, 0.65, 10);
 
-                        if (tree_noise >= 1.55 && height >= 70) {
+                        if (tree_noise >= 1.55 && height >= WATER_ALTITUDE+sand_h+TREES_LOW_MARGIN) {
                                 addTreeAt(blockPosGlobal.x, height,
                                           blockPosGlobal.z, world);
                         }
