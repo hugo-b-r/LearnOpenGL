@@ -12,6 +12,8 @@
 
 const int DIRT_HEIGHT = 3;
 const int GRASS_HEIGHT = 1;
+const int WATER_ALTITUDE = 64;
+const int AVG_SAND_HEIGHT = 4;
 
 WorldGenerator::WorldGenerator() {}
 
@@ -26,36 +28,48 @@ void WorldGenerator::buildChunk(Chunk &c, World &world) {
                             fromInChunkToGlobalCoordinates(glm::vec3(i, 0, j),
                                                            c.getChunkPos());
 
-                        // int height = (int)(5.f * Noise::perlin((float)
-                        // (i+c.getChunkPos().x)/CST,
-                        // (float)(j+c.getChunkPos().y)/CST, 1.)) +
-                        // 128+(int)(10.f *
-                        // Noise::perlin(2.f*(float)(i+c.getChunkPos().x)/CST, 2.f*(float)(j+c.getChunkPos().y)/CST,
-                        // 1.));
-                        int height = soilHeightAt(
-                            glm::vec2(blockPosGlobal.x, blockPosGlobal.z));
-
+                        glm::ivec2 x_z_pos =
+                            glm::vec2(blockPosGlobal.x, blockPosGlobal.z);
+                        int height = soilHeightAt(x_z_pos);
+                        int sand_h = sand_height(x_z_pos);
                         blockPosGlobal.y = height;
 
-                        for (int k = 0; k < height - DIRT_HEIGHT - GRASS_HEIGHT;
-                             k++) {
-                                c.setBlockAt(i, k, j, CubeAtlas::Stone);
-                        }
-                        for (int k = height - DIRT_HEIGHT - GRASS_HEIGHT;
-                             k < height - GRASS_HEIGHT; k++) {
-                                c.setBlockAt(i, k, j, CubeAtlas::Dirt);
-                        }
-                        for (int k = height - GRASS_HEIGHT; k < height; k++) {
-                                c.setBlockAt(i, k, j, CubeAtlas::Grass);
+                        if (height <=
+                            WATER_ALTITUDE + AVG_SAND_HEIGHT + sand_h) {
+                                // end with sand
+                                for (int k = 0; k < height - sand_h; k++) {
+                                        c.setBlockAt(i, k, j, CubeAtlas::Stone);
+                                }
+                                for (int k = height - sand_h; k <= height; k++) {
+                                        c.setBlockAt(i, k, j, CubeAtlas::Sand);
+                                }
+                        } else {
+
+                                for (int k = 0;
+                                     k < height - DIRT_HEIGHT - GRASS_HEIGHT;
+                                     k++) {
+                                        c.setBlockAt(i, k, j, CubeAtlas::Stone);
+                                }
+                                for (int k =
+                                         height - DIRT_HEIGHT - GRASS_HEIGHT;
+                                     k < height - GRASS_HEIGHT; k++) {
+                                        c.setBlockAt(i, k, j, CubeAtlas::Dirt);
+                                }
+                                for (int k = height - GRASS_HEIGHT; k <= height;
+                                     k++) {
+                                        c.setBlockAt(i, k, j, CubeAtlas::Grass);
+                                }
                         }
                         const int factor = 42;
                         const int offsetX = 120;
                         const int offsetZ = -130;
 
-                        if (Noise::turbulence(
-                                glm::vec2(blockPosGlobal.x * factor + offsetX,
-                                          blockPosGlobal.z * factor + offsetZ),
-                                1, 0.1, 0.65, 10) >= 1.55) {
+                        float tree_noise = Noise::turbulence(
+                            glm::vec2(blockPosGlobal.x * factor + offsetX,
+                                      blockPosGlobal.z * factor + offsetZ),
+                            1, 0.1, 0.65, 10);
+
+                        if (tree_noise >= 1.55 && height >= 70) {
                                 addTreeAt(blockPosGlobal.x, height,
                                           blockPosGlobal.z, world);
                         }
@@ -66,7 +80,7 @@ void WorldGenerator::buildChunk(Chunk &c, World &world) {
 }
 
 int WorldGenerator::soilHeightAt(glm::vec2 pos) {
-        return Noise::turbulence(pos, 60., 0.00005, 0.85, 10) + 128;
+        return Noise::turbulence(pos, 45., 0.00005, 0.85, 10) + 128;
 }
 
 void WorldGenerator::addTreeAt(int i, int j, int k, World &world) {
@@ -94,4 +108,12 @@ void WorldGenerator::addTreeAt(int i, int j, int k, World &world) {
                                                  CubeAtlas::Leaves);
                 }
         }
+}
+
+int WorldGenerator::sand_height(glm::ivec2 pos) {
+        int n_value = floor(Noise::turbulence(pos, 2., 0.00005, 0.85, 10))+4;
+        if (n_value > 0)
+                return n_value;
+        else
+                return 0;
 }
