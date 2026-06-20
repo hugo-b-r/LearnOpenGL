@@ -29,4 +29,8 @@ glm::ivec3 fromInChunkToGlobalCoordinates(glm::ivec3 inChunkPos, glm::ivec2 chun
 // global but granular -> discrete coordinates (blocks)
 glm::ivec3 fromFloatToBlockCoordinates(glm::vec3 point);
 
+// global but granular -> chunk coordinates
+// returns the chunk pos is in
+glm::ivec2 fromFloatToChunkCoordinates(glm::vec3 pos);
+
 #endif

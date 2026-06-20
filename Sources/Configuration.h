@@ -21,6 +21,7 @@ class Configuration {
         // to be called by Scene !!!
         bool getCheckCollisions();
         bool setCheckCollisions(bool val);
+
       private:
 };
 

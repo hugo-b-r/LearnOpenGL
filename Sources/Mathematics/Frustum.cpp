@@ -1,4 +1,5 @@
 #include "Frustum.h"
+#include <iostream>
 
 Frustum::Frustum() {};
 
@@ -38,6 +39,7 @@ bool Frustum::IsAabbVisible(AABB const & box )
     // check box outside/inside of frustum
     for( int i=0; i<6; i++ )
     {
+        assert(i  < static_cast<int>(m_planes.size()));
         int out = 0;
         out += ((dot( m_planes[i], glm::vec4(box.getVmin().x, box.getVmin().y, box.getVmin().z, 1.0f) ) < 0.0 )?1:0);
         out += ((dot( m_planes[i], glm::vec4(box.getVmax().x, box.getVmin().y, box.getVmin().z, 1.0f) ) < 0.0 )?1:0);

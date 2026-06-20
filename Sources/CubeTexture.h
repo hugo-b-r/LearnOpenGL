@@ -1,6 +1,7 @@
 #ifndef CUBETEXTURE_H
 #define CUBETEXTURE_H
 
+#include <glad/glad.h>
 #include <string>
 
 enum class CubeAtlas { Air = 0, Grass = 1, Dirt = 2, Sand = 3, Stone = 4, Planks = 5, Wood = 6, Leaves = 7 };
@@ -30,7 +31,7 @@ class CubeTexture
         // the number of channels of the image
         int nbChannels;
         // the opengl texture number
-        unsigned int id;
+        GLuint id;
         bool correctlyLoad;
 
 };

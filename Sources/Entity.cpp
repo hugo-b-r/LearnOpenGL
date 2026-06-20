@@ -1,9 +1,11 @@
 #include "Entity.h"
-#include "World/Chunk.h"
+#include "utils.h"
+#include <iostream>
 
 Entity::Entity() : position(glm::vec3(0.f)), rotation(glm::vec3(0.f)), velocity(glm::vec3(0.f)) {}
 
 Entity::Entity(const glm::vec3& pos, const glm::vec3& rot) : position(pos), rotation(rot), velocity(glm::vec3(0.f)) {}
+
 glm::ivec2 Entity::chunkPosition() const {
-    return glm::ivec2(position.x/CHUNK_WIDTH, position.z/CHUNK_LENGTH);
+    return fromFloatToChunkCoordinates(position);
 }

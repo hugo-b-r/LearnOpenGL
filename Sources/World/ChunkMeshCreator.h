@@ -25,9 +25,12 @@ public:
   Mesh getMesh();
 
 protected:
-    inline bool shouldMakeFace(glm::ivec3 side_block);
+    bool shouldMakeFace(glm::ivec3 side_block);
 
     int buildMeshThreadFn();
+
+    /// push to m_mesh the mesh of a block, checking if it needs to build or not
+    void addBlockMesh(int i, int j, int k);
 
     Mesh m_mesh;
     int nb_vertices;
