@@ -2,6 +2,7 @@
 #define WORLDQUEUEOPERATION_H
 
 #include <glm/glm.hpp>
+#include <mutex>
 
 /* World queue operation
  *
