@@ -58,3 +58,19 @@ Then
 ```bash
 cd build && ctest
 ```
+
+
+# New architecture
+```mermaid
+flowchart TD
+    UserInput --> InputManager
+    InputManager --> GameController
+    GameController <--> GameState
+    GameController --> thread_pool
+    GameController --> ViewController
+    ViewController <--> ViewData
+    ViewController --> View
+    View --> Screen
+```
+
+
