@@ -39,7 +39,12 @@ pub fn build(b: *std.Build) void {
         // Later on we'll use this module as the root module of a test executable
         // which requires us to specify a target.
         .target = target,
+        .link_libc = true,
     });
+    mod.linkSystemLibrary("c", .{});
+    mod.linkSystemLibrary("glfw", .{});
+    mod.linkSystemLibrary("cglm", .{});
+    mod.addIncludePath(b.path("deps/glad/include/"));
 
     // Here we define an executable. An executable needs to have a root module
     // which needs to expose a `main` function. While we could add a main function

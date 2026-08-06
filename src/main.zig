@@ -1,6 +1,8 @@
 const std = @import("std");
 const Io = std.Io;
 
+const opengl = @import("opengl.zig");
+
 const LearnOpenGL = @import("LearnOpenGL");
 
 pub fn main(init: std.process.Init) !void {
@@ -68,4 +70,9 @@ fn testOne(context: void, smith: *std.testing.Smith) !void {
             );
         },
     };
+}
+
+comptime {
+    _ = @import("opengl.zig");
+    // And all other files
 }
