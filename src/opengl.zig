@@ -34,8 +34,17 @@ const OpenGLWindow = struct {
             return ErrorTypes.GLADError;
         }
         std.log.info("Window has been created", .{});
+
+        g.glfwSetInputMode(window, g.GLFW_CURSOR, g.GLFW_CURSOR_DISABLED);
+
         return OpenGLWindow{ .window = window };
     }
+
+    fn registerCallbacks(self: *OpenGLWindow) void {
+        _ = g.glfwSetFramebufferSizeCallback(self.window, @ptrCast(&frameBufferSizeCallback));
+    }
+
+    fn frameBufferSizeCallback() void {}
 
     pub fn deinit(self: *OpenGLWindow) void {
         if (self.window != null) {
@@ -52,6 +61,21 @@ const OpenGLWindow = struct {
 test "création de fenetre" {
     var Fen = try OpenGLWindow.init(1000, 600);
     defer Fen.deinit();
+
+    while (Fen.shouldClose() == 0) {
+        g.glClearColor(0.2, 0.3, 0.3, 1.0);
+        g.glClear(g.GL_COLOR_BUFFER_BIT);
+
+        g.glfwSwapBuffers(Fen.window);
+        g.glfwPollEvents();
+    }
+}
+
+test "création de fenetre et ajout des callbacks" {
+    var Fen = try OpenGLWindow.init(1000, 600);
+    defer Fen.deinit();
+
+    Fen.registerCallbacks();
 
     while (Fen.shouldClose() == 0) {
         g.glClearColor(0.2, 0.3, 0.3, 1.0);
