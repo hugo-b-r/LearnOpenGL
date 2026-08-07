@@ -44,7 +44,8 @@ pub fn build(b: *std.Build) void {
     mod.linkSystemLibrary("c", .{});
     mod.linkSystemLibrary("glfw", .{});
     mod.linkSystemLibrary("cglm", .{});
-    mod.addIncludePath(b.path("deps/glad/include/"));
+    mod.addIncludePath(b.path("./deps/glad/include/"));
+    mod.addCSourceFile(.{ .file = b.path("./deps/glad/src/glad.c") });
 
     // Here we define an executable. An executable needs to have a root module
     // which needs to expose a `main` function. While we could add a main function
