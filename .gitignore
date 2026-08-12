@@ -6,3 +6,6 @@ imgui.ini
 compile_commands.json
 .zed
 .vscode
+
+.zig-cache/
+zig-out/
