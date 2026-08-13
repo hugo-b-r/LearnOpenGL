@@ -42,7 +42,7 @@ pub fn initWindow(windowWidth: i32, windowHeight: i32, scene: *Scene) ErrorTypes
     }
     std.log.info("Window has been created", .{});
 
-    g.glfwSetWindowUserPointer(gl_window, scene);
+    g.glfwSetWindowUserPointer(gl_window, @ptrCast(scene));
     g.glfwSetInputMode(gl_window, g.GLFW_CURSOR, g.GLFW_CURSOR_DISABLED);
 
     return OpenGLWindow{ .gl_window = gl_window };
@@ -52,10 +52,10 @@ fn registerCallbacks(self: *OpenGLWindow) void {
     _ = g.glfwSetFramebufferSizeCallback(self.gl_window, @ptrCast(@alignCast(&frameBufferSizeCallback)));
 }
 
-fn frameBufferSizeCallback(win: *g.GLFWwindow, width: u16, height: u16) void {
+fn frameBufferSizeCallback(win: ?*g.GLFWwindow, width: c_int, height: c_int) callconv(.c) void {
     const s: *Scene = @ptrCast(@alignCast(g.glfwGetWindowUserPointer(win)));
-    s.configuration.window_height = height;
-    s.configuration.window_width = width;
+    s.configuration.window_height = @intCast(height);
+    s.configuration.window_width = @intCast(width);
     s.camera.updateProjViewMatrix();
     g.glViewport(0, 0, width, height);
 }

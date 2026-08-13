@@ -12,7 +12,6 @@ pub const Camera = struct {
     orientation: m.vec3,
     pub fn updateProjViewMatrix(self: *Camera) void {
         self.pos = self.pos;
-        std.debug.print("updated proj view matrixes", .{});
     }
 
     pub fn Default() Camera {
