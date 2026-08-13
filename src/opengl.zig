@@ -76,6 +76,7 @@ test "création de fenetre" {
         g.glfwSwapBuffers(Fen.gl_window);
         g.glfwPollEvents();
     }
+    std.debug.print("the window is closed now, should have passed", .{});
 }
 
 test "création de fenetre et ajout des callbacks" {
@@ -92,4 +93,5 @@ test "création de fenetre et ajout des callbacks" {
         g.glfwSwapBuffers(Fen.gl_window);
         g.glfwPollEvents();
     }
+    std.debug.print("the window is closed now, should have passed", .{});
 }
