@@ -50,6 +50,7 @@ pub fn initWindow(windowWidth: i32, windowHeight: i32, scene: *Scene) ErrorTypes
 
 fn registerCallbacks(self: *OpenGLWindow) void {
     _ = g.glfwSetFramebufferSizeCallback(self.gl_window, @ptrCast(@alignCast(&frameBufferSizeCallback)));
+    _ = g.glfwSetKeyCallback(self.gl_window, @ptrCast(@alignCast(&keyCallback)));
 }
 
 fn frameBufferSizeCallback(win: ?*g.GLFWwindow, width: c_int, height: c_int) callconv(.c) void {
@@ -58,6 +59,38 @@ fn frameBufferSizeCallback(win: ?*g.GLFWwindow, width: c_int, height: c_int) cal
     s.configuration.window_width = @intCast(width);
     s.camera.updateProjViewMatrix();
     g.glViewport(0, 0, width, height);
+}
+
+fn keyCallback(win: ?*g.GLFWwindow, key: c_int, scancode: c_int, action: c_int, mods: c_int) callconv(.c) void {
+    _ = mods; // unused
+    _ = scancode; //unused
+
+    const s: *Scene = @ptrCast(@alignCast(g.glfwGetWindowUserPointer(win)));
+    if (key == g.GLFW_KEY_Z and action == g.GLFW_PRESS) {
+        // to be fixed : check opengl polygone mode using some sort of
+        // app variable that has been linked to the gl window
+        var polyg_mode: g.GLint = undefined;
+        g.glGetIntegerv(g.GL_POLYGON_MODE, &polyg_mode);
+
+        if (polyg_mode == g.GL_LINE) {
+            g.glPolygonMode(g.GL_FRONT_AND_BACK, g.GL_FILL);
+        } else {
+            g.glPolygonMode(g.GL_FRONT_AND_BACK, g.GL_LINE);
+        }
+    }
+    if (key == g.GLFW_KEY_ESCAPE and action == g.GLFW_PRESS) {
+        s.configuration.mouse_free = !(s.configuration.mouse_free);
+        if (s.configuration.mouse_free) {
+            g.glfwSetInputMode(win, g.GLFW_CURSOR, g.GLFW_CURSOR_NORMAL);
+        } else {
+            g.glfwSetInputMode(win, g.GLFW_CURSOR, g.GLFW_CURSOR_DISABLED);
+        }
+    }
+    if (key == g.GLFW_KEY_F3 and action == g.GLFW_PRESS) {
+        s.configuration.show_debug_infos =
+            !(s.configuration.show_debug_infos);
+        std.log.debug("Show or hide now debug infos", .{});
+    }
 }
 
 pub fn deinit(self: *OpenGLWindow) void {
