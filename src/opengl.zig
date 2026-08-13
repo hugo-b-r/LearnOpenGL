@@ -1,5 +1,7 @@
 const g = @import("c.zig").gl;
 const m = @cImport("c.zig").cglm;
+const Scene = @import("scene.zig").Scene;
+const Camera = @import("scene.zig").Camera;
 const GenericWindow = @import("generic_window.zig").GenericWindow;
 
 const std = @import("std");
@@ -20,7 +22,7 @@ pub fn window(self: *OpenGLWindow) GenericWindow {
     } };
 }
 
-pub fn initWindow(windowWidth: i32, windowHeight: i32) ErrorTypes!OpenGLWindow {
+pub fn initWindow(windowWidth: i32, windowHeight: i32, scene: *Scene) ErrorTypes!OpenGLWindow {
     var gl_window: ?*g.GLFWwindow = null;
     _ = g.glfwInit();
     g.glfwWindowHint(g.GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -40,16 +42,23 @@ pub fn initWindow(windowWidth: i32, windowHeight: i32) ErrorTypes!OpenGLWindow {
     }
     std.log.info("Window has been created", .{});
 
+    g.glfwSetWindowUserPointer(gl_window, scene);
     g.glfwSetInputMode(gl_window, g.GLFW_CURSOR, g.GLFW_CURSOR_DISABLED);
 
     return OpenGLWindow{ .gl_window = gl_window };
 }
 
 fn registerCallbacks(self: *OpenGLWindow) void {
-    _ = g.glfwSetFramebufferSizeCallback(self.gl_window, @ptrCast(&frameBufferSizeCallback));
+    _ = g.glfwSetFramebufferSizeCallback(self.gl_window, @ptrCast(@alignCast(&frameBufferSizeCallback)));
 }
 
-fn frameBufferSizeCallback() void {}
+fn frameBufferSizeCallback(win: *g.GLFWwindow, width: u16, height: u16) void {
+    const s: *Scene = @ptrCast(@alignCast(g.glfwGetWindowUserPointer(win)));
+    s.configuration.window_height = height;
+    s.configuration.window_width = width;
+    s.camera.updateProjViewMatrix();
+    g.glViewport(0, 0, width, height);
+}
 
 pub fn deinit(self: *OpenGLWindow) void {
     if (self.gl_window != null) {
@@ -65,7 +74,11 @@ pub fn shouldClose(self: *const OpenGLWindow) u8 {
 // Testing!
 
 test "création de fenetre" {
-    var Fen = try OpenGLWindow.initWindow(1000, 600);
+    var sc: Scene = .{
+        .camera = Camera.Default(),
+        .configuration = .{},
+    };
+    var Fen = try OpenGLWindow.initWindow(1000, 600, &sc);
     defer Fen.deinit();
 
     const reference_time = g.glfwGetTime();
@@ -80,7 +93,11 @@ test "création de fenetre" {
 }
 
 test "création de fenetre et ajout des callbacks" {
-    var Fen = try OpenGLWindow.initWindow(1000, 600);
+    var sc: Scene = .{
+        .camera = Camera.Default(),
+        .configuration = .{},
+    };
+    var Fen = try OpenGLWindow.initWindow(1000, 600, &sc);
     defer Fen.deinit();
 
     Fen.registerCallbacks();
