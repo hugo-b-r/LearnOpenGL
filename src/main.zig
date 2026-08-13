@@ -2,6 +2,7 @@ const std = @import("std");
 const Io = std.Io;
 
 const opengl = @import("opengl.zig");
+const scene = @import("game.zig");
 
 const LearnOpenGL = @import("LearnOpenGL");
 
@@ -74,5 +75,6 @@ fn testOne(context: void, smith: *std.testing.Smith) !void {
 
 comptime {
     _ = @import("opengl.zig");
+    _ = @import("game.zig");
     // And all other files
 }
