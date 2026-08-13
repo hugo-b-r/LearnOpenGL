@@ -12,7 +12,7 @@ const std = @import("std");
 
 const ErrorTypes = error{ GLFWError, GLADError };
 
-const OpenGLWindow = struct {
+pub const OpenGLWindow = struct {
     window: ?*g.GLFWwindow = null,
 
     pub fn init(windowWidth: i32, windowHeight: i32) ErrorTypes!OpenGLWindow {

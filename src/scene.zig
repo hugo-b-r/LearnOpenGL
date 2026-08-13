@@ -8,7 +8,7 @@ const conf = @import("configuration.zig");
 const Camera = struct { pos: m.vec3, oritentation: m.vec3 };
 
 /// Scene struct to store all objects from a scene
-const Scene = struct {
+pub const Scene = struct {
     camera: Camera,
     configuration: conf.Configuration,
 };
