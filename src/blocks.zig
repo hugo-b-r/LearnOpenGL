@@ -1,5 +1,5 @@
 /// All the blocks present in the game
-const BlockType = enum {
+pub const BlockType = enum {
     Air,
     Grass,
     Dirt,
@@ -10,7 +10,7 @@ const BlockType = enum {
     Sand,
 };
 
-const BlockFaces = enum {
+pub const BlockFaces = enum {
     Top,
     Bottom,
     Left,
