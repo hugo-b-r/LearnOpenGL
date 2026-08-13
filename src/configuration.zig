@@ -1,5 +1,8 @@
+/// All the available backends for the app
+pub const BackendKind = enum { OpenGL };
+
 /// Configuration struct for the whole app
-const Configuration = struct {
+pub const Configuration = struct {
     window_width: u16 = 1000,
     window_height: u16 = 600,
     is_full_screen: bool = false,
