@@ -2,22 +2,22 @@ const std = @import("std");
 
 const ogl = @import("opengl.zig");
 const conf = @import("configuration.zig");
+const cglm = @import("c.zig").cglm;
+const blocks = @import("blocks.zig");
+
+const generic_window_allocator: std.mem.Allocator = std.heap.c_allocator;
 
 /// A generic window is a vtable
 /// It is an abstraction layer over the different rendering system
 pub const GenericWindow = struct {
     ptr: *anyopaque,
-    init: *const fn (ptr: *anyopaque) anyerror!void,
-    addBlockFace: *const fn (ptr: *anyopaque) anyerror!void,
-    removeBlockFace: *const fn (ptr: *anyopaque) anyerror!void,
+    vtable: *const GenericWindow.VTable,
 
-    /// Init a window according to the choice passed as argument. All the
-    /// programming function ptr logic goes here.
-    pub fn create(window_kind: conf.BackendKind) GenericWindow {
-        var alloc = std.heap.FixedBufferAllocator;
-        switch (window_kind) {
-            // Init an OpenGL window
-            conf.BackendKind.OpenGL => {},
-        }
-    }
+    pub const VTable = struct {
+        initWindow: *const fn (ptr: *anyopaque) anyerror!void,
+        shouldClose: *const fn (ptr: *anyopaque) bool,
+        addBlockFace: *const fn (ptr: *anyopaque, block_pos: cglm.ivec3, block_face: blocks.BlockFaces) anyerror!void,
+        removeBlockFace: *const fn (ptr: *anyopaque, block_pos: cglm.ivec3, block_face: blocks.BlockFaces) anyerror!void,
+        deinitWindow: *const fn (ptr: *anyopaque) void,
+    };
 };
