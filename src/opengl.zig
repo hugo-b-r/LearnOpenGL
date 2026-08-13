@@ -1,12 +1,5 @@
-const g = @cImport({
-    @cInclude("/home/hugo/Projets/LearnOpenGL/deps/glad/include/glad/glad.h");
-    @cInclude("GLFW/glfw3.h");
-    // @cInclude("g");
-});
-
-const m = @cImport({
-    @cInclude("cglm/cglm.h");
-});
+const g = @import("c.zig").gl;
+const m = @cImport("c.zig").cglm;
 
 const std = @import("std");
 
