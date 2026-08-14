@@ -54,6 +54,7 @@ pub fn initWindow(windowWidth: i32, windowHeight: i32, scene: *Scene) ErrorTypes
 fn registerCallbacks(self: *OpenGLWindow) void {
     _ = g.glfwSetFramebufferSizeCallback(self.gl_window, @ptrCast(@alignCast(&frameBufferSizeCallback)));
     _ = g.glfwSetKeyCallback(self.gl_window, @ptrCast(@alignCast(&keyCallback)));
+    _ = g.glfwSetMouseButtonCallback(self.gl_window, @ptrCast(@alignCast(&mouseButtonCallback)));
 }
 
 fn frameBufferSizeCallback(win: ?*g.GLFWwindow, width: c_int, height: c_int) callconv(.c) void {
@@ -93,6 +94,19 @@ fn keyCallback(win: ?*g.GLFWwindow, key: c_int, scancode: c_int, action: c_int, 
         s.configuration.show_debug_infos =
             !(s.configuration.show_debug_infos);
         std.log.debug("Show or hide now debug infos", .{});
+    }
+}
+
+fn mouseButtonCallback(win: ?*g.GLFWwindow, button: c_int, action: c_int, mods: c_int) callconv(.c) void {
+    _ = mods; // unused
+
+    const s: *Scene = @ptrCast(@alignCast(g.glfwGetWindowUserPointer(win)));
+    if (button == g.GLFW_MOUSE_BUTTON_LEFT and action == g.GLFW_PRESS) {
+        if (s.configuration.mouse_free) {
+            s.configuration.mouse_free =
+                !s.configuration.mouse_free;
+            g.glfwSetInputMode(win, g.GLFW_CURSOR, g.GLFW_CURSOR_DISABLED);
+        }
     }
 }
 
