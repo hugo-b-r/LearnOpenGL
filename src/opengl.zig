@@ -45,6 +45,8 @@ pub fn initWindow(windowWidth: i32, windowHeight: i32, scene: *Scene) ErrorTypes
     g.glfwSetWindowUserPointer(gl_window, @ptrCast(scene));
     g.glfwSetInputMode(gl_window, g.GLFW_CURSOR, g.GLFW_CURSOR_DISABLED);
 
+    g.glfwSwapInterval(0);
+
     g.glEnable(g.GL_DEPTH_TEST);
     g.glEnable(g.GL_CULL_FACE);
 
