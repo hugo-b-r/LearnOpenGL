@@ -3,6 +3,7 @@ const m = @cImport("c.zig").cglm;
 const Scene = @import("scene.zig").Scene;
 const Camera = @import("scene.zig").Camera;
 const GenericWindow = @import("generic_window.zig").GenericWindow;
+const Shader = @import("opengl_shader.zig");
 
 const std = @import("std");
 
@@ -126,25 +127,8 @@ pub fn shouldClose(self: *const OpenGLWindow) u8 {
 // Testing!
 
 test "création de fenetre" {
-    var sc: Scene = .{
-        .camera = Camera.Default(),
-        .configuration = .{},
-    };
-    var Fen = try OpenGLWindow.initWindow(1000, 600, &sc);
-    defer Fen.deinit();
-
-    const reference_time = g.glfwGetTime();
-    while (g.glfwGetTime() < reference_time + 1) {
-        g.glClearColor(0.2, 0.3, 0.3, 1.0);
-        g.glClear(g.GL_COLOR_BUFFER_BIT);
-
-        g.glfwSwapBuffers(Fen.gl_window);
-        g.glfwPollEvents();
-    }
-    std.debug.print("the window is closed now, should have passed", .{});
-}
-
-test "création de fenetre et ajout des callbacks" {
+    const io = std.testing.io;
+    const allocator = std.testing.allocator;
     var sc: Scene = .{
         .camera = Camera.Default(),
         .configuration = .{},
@@ -154,6 +138,8 @@ test "création de fenetre et ajout des callbacks" {
 
     Fen.registerCallbacks();
 
+    _ = try Shader.init("./Sources/Shaders/textured_cube_vertex.glsl", "./Sources/Shaders/textured_cube_fragment.glsl", io, allocator);
+
     const reference_time = g.glfwGetTime();
     while (g.glfwGetTime() < reference_time + 1) {
         g.glClearColor(0.2, 0.3, 0.3, 1.0);
@@ -162,5 +148,5 @@ test "création de fenetre et ajout des callbacks" {
         g.glfwSwapBuffers(Fen.gl_window);
         g.glfwPollEvents();
     }
-    std.debug.print("the window is closed now, should have passed", .{});
+    std.debug.print("the window is closed now. Ignore the following warning as it is emitted by a library used by glfw\n", .{});
 }

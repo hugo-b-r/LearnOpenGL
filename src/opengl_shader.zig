@@ -22,12 +22,6 @@ pub fn init(vertex_path: []const u8, fragment_path: []const u8, io: Io, allocato
     };
 }
 
-test "shaders reading" {
-    const io: std.Io = std.testing.io;
-    const allocator: std.mem.Allocator = std.testing.allocator;
-    _ = try init("./Sources/Shaders/textured_cube_vertex.glsl", "./Sources/Shaders/textured_cube_fragment.glsl", io, allocator);
-}
-
 /// This function reads a file into a buffer and returns it. The buffer is
 /// allocated at the right size but never freed here. It needs to be done by
 /// YOU the caller using the passed allocator.
