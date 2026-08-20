@@ -1,8 +1,8 @@
-const g = @import("c.zig").gl;
-const m = @cImport("c.zig").cglm;
-const Scene = @import("scene.zig").Scene;
-const Camera = @import("scene.zig").Camera;
-const GenericWindow = @import("generic_window.zig").GenericWindow;
+const g = @import("../c.zig").gl;
+const m = @cImport("../c.zig").cglm;
+const Scene = @import("../scene.zig").Scene;
+const Camera = @import("../scene.zig").Camera;
+const GenericWindow = @import("../generic_window.zig").GenericWindow;
 const Shader = @import("opengl_shader.zig");
 
 const std = @import("std");

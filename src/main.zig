@@ -1,7 +1,7 @@
 const std = @import("std");
 const Io = std.Io;
 
-const opengl = @import("opengl.zig");
+const opengl = @import("opengl/opengl.zig");
 const scene = @import("game.zig");
 
 pub fn main(init: std.process.Init) !void {
@@ -70,7 +70,7 @@ fn testOne(context: void, smith: *std.testing.Smith) !void {
 }
 
 comptime {
-    _ = @import("opengl.zig");
+    _ = @import("opengl/opengl.zig");
     _ = @import("game.zig");
     // And all other files
 }

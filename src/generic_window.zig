@@ -1,6 +1,6 @@
 const std = @import("std");
 
-const ogl = @import("opengl.zig");
+const ogl = @import("opengl/opengl.zig");
 const conf = @import("configuration.zig");
 const cglm = @import("c.zig").cglm;
 const blocks = @import("blocks.zig");

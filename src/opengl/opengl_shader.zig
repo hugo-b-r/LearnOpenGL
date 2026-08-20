@@ -3,7 +3,7 @@
 //! to manipulate ones from opengl.
 
 const std = @import("std");
-const g = @import("c.zig").gl;
+const g = @import("../c.zig").gl;
 
 const Dir = std.Io.Dir;
 const Io = std.Io;
@@ -109,7 +109,7 @@ fn readFileInAllocedBuffer(io: Io, allocator: std.mem.Allocator, path: []const u
 test "reading file and allocating the buffer" {
     const io: std.Io = std.testing.io;
     const allocator: std.mem.Allocator = std.testing.allocator;
-    const buf = try readFileInAllocedBuffer(io, allocator, "../src/opengl.zig");
+    const buf = try readFileInAllocedBuffer(io, allocator, "../src/opengl/opengl.zig");
     defer allocator.free(buf);
 
     const reference_buf = @embedFile("./opengl.zig");
