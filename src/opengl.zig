@@ -138,7 +138,8 @@ test "création de fenetre" {
 
     Fen.registerCallbacks();
 
-    _ = try Shader.init("./Sources/Shaders/textured_cube_vertex.glsl", "./Sources/Shaders/textured_cube_fragment.glsl", io, allocator);
+    const shader = try Shader.init("../Sources/Shaders/textured_cube_vertex.glsl", "../Sources/Shaders/textured_cube_fragment.glsl", io, allocator);
+    defer shader.deinit();
 
     const reference_time = g.glfwGetTime();
     while (g.glfwGetTime() < reference_time + 1) {
