@@ -5,6 +5,7 @@ const Chunk = @This();
 const std = @import("std");
 const cglm = @import("c.zig").cglm;
 const BlockType = @import("blocks.zig").BlockType;
+const World = @import("world.zig");
 
 /// Dimensions of the chunk in blocks : width
 pub const chunk_width: u16 = 32;
@@ -16,10 +17,12 @@ pub const chunk_height: u16 = 256;
 /// The blocks present in the chunk
 blocks: []BlockType,
 /// The pos of the world in the world, in chunk coordinates (not block coordinates)
-c_pos: cglm.ivec2,
+position: cglm.ivec2,
+
+world: *World,
 
 /// Create a chunk with memory allocation so you MUST use the deinit method.
-pub fn init(allocator: std.mem.Allocator, c_pos: cglm.ivec2, empty: bool) !Chunk {
+pub fn init(allocator: std.mem.Allocator, position: cglm.ivec2, empty: bool) !Chunk {
     const blocks = try allocator.alloc(chunk_width * chunk_length * chunk_height);
 
     // reset all the blocks
@@ -30,7 +33,7 @@ pub fn init(allocator: std.mem.Allocator, c_pos: cglm.ivec2, empty: bool) !Chunk
     }
     return .{
         .blocks = blocks,
-        .c_pos = c_pos,
+        .position = position,
     };
 }
 
