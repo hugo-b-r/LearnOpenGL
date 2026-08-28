@@ -1,5 +1,5 @@
 /// All the blocks present in the game
-pub const BlockType = enum {
+pub const BlockType = enum(u8) {
     Air,
     Grass,
     Dirt,
