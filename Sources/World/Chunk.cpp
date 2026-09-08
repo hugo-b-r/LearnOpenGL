@@ -84,10 +84,9 @@ bool Chunk::isLoaded() {
         return m_loadStatus == ChunkDataLoadStatus::FinishedLoaded;
 }
 
-void Chunk::createMesh(World &w) {
+void Chunk::createMesh(World &w, CubeTexture& ct) {
         spdlog::debug("Creating mesh for chunk : {}, {}", chunkPos.x,
                       chunkPos.y);
-        CubeTexture ct("./Assets/texture_atlas.png");
         ChunkMeshCreator builder(*this, ct, w);
         m_numberVertices = builder.buildMesh();
         m_mesh = builder.getMesh();

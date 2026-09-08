@@ -28,7 +28,7 @@ class LockableChunk;
 
 class World {
       public:
-        World(Camera &cam);
+        World(Camera &cam, ChunkRenderer& renderer);
         World(const World &w);
         ~World();
 
@@ -57,7 +57,7 @@ class World {
         /// checks whether a chunk is loaded or not at the ChunkPosition pos
         bool isLoadedAt(glm::ivec2 pos);
         /// create the mesh for the chunk at the pos pos
-        void createAndLoadMeshAt(glm::ivec2 pos);
+        void createAndLoadMeshAt(glm::ivec2 pos, CubeTexture* ct);
         /// checks whether a chunk is loaded or not at the ChunkPosition pos
         bool isMeshLoadedAt(glm::ivec2 pos);
 
@@ -89,6 +89,7 @@ class World {
         /// tests wether the chunk is in the boundaries of managed chunks at
         /// position pos (absolute position)
         bool existsAt(glm::ivec2 pos);
+        ChunkRenderer &renderer;
 
       protected:
         /// move all the map one Chunk in x + direction
@@ -142,6 +143,7 @@ class World {
         // The world is existing according to a camera. This is used to know
         // where to load chunks for example, but also what to render.
         Camera &camera;
+
         // The pos where the player was before : pretty useful to know if it
         // moved or not, and to compute the relative position of some chunks to
         // the actual player's position.

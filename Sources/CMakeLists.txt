@@ -8,6 +8,7 @@ target_sources(${TARGET_NAME} PRIVATE
     "Shader.cpp"
     "utils.cpp"
     "Configuration.cpp"
+    "OpenGLWindow.cpp"
 )
 
 add_subdirectory(World)

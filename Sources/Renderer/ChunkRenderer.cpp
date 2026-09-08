@@ -13,7 +13,7 @@
 #include "Camera.h"
 
 ChunkRenderer::ChunkRenderer()
-    : m_texture("./Assets/texture_atlas.png"),
+    : texture("./Assets/texture_atlas.jpg"),
       m_shader("Sources/Shaders/textured_cube_vertex.glsl",
                "Sources/Shaders/textured_cube_fragment.glsl") {}
 
@@ -24,7 +24,7 @@ void ChunkRenderer::render(Chunk &c, Camera &cam, int nb_vertices,
                         m_shader.use();
                 c.bindModel();
                 if (bindTexture)
-                        m_texture.bind();
+                        texture.bind();
                 glm::mat4 modelMat = glm::mat4(1.f);
                 modelMat = glm::translate(modelMat, c.getChunkPosCenter3());
                 m_shader.setMat4("model", modelMat);
@@ -36,6 +36,6 @@ void ChunkRenderer::render(Chunk &c, Camera &cam, int nb_vertices,
 Shader &ChunkRenderer::getShader() { return m_shader; }
 
 void ChunkRenderer::bindTextureAndShader() {
-        m_texture.bind();
+        texture.bind();
         m_shader.use();
 }

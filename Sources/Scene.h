@@ -1,32 +1,37 @@
+#pragma once
 #ifndef SCENE_H
 #define SCENE_H
 
 #include "Configuration.h"
 #include "Camera.h"
+
+#include "OpenGLWindow.h"
 #include "World/World.h"
 
-class Scene {
+class Game {
 public:
-  Scene(Configuration &c);
+  Game(Configuration &c);
 
   // avec une camera précédement initialisée avec la configuration
-  Scene(Configuration &c, Camera &cam);
+  // Game(Configuration &c, Camera &cam);
 
   // avec une camera précédement initialisée avec la configuration
-  Scene(Configuration &c, Camera &cam, World &world);
+  // Game(Configuration &c, Camera &cam, World &world);
 
-  Scene();
+  Game();
 
-  Camera &getCamera();
-  Configuration &getConfig();
-  World &getWorld();
+  // Camera &getCamera();
+  // Configuration &getConfig();
+  // World &getWorld();
 
   void updateCollisionWithTerrainCheck(bool checkColTerrain);
+  Configuration configuration;
+  OpenGLWindow window;
+  Camera camera;
+  ChunkRenderer renderer;
+  World world;
 
 private:
-  Configuration m_config;
-  Camera m_cam;
-  World m_world;
 };
 
 #endif

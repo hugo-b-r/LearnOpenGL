@@ -9,11 +9,11 @@
 
 #include <string>
 
-class Scene;
+class Game;
 
 class Camera : public Entity {
       public:
-        Camera(Scene &s);
+        Camera(Game &s);
         void update();
 
         void translate(glm::vec3 trans);
@@ -56,7 +56,7 @@ class Camera : public Entity {
         // the place the camera is pointing at
         glm::vec3 m_upVector;
 
-        Scene &m_scene;
+        Game &m_scene;
         Frustum m_frustum;
         AABB m_boundingBox;
 

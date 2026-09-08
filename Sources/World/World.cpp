@@ -16,10 +16,10 @@
 
 const glm::mat4 view_mat(1.0f);
 
-World::World(Camera &cam)
+World::World(Camera &cam, ChunkRenderer& renderer)
     : chunkWidth((2 * (cam.getRenderDistance() + 1) + 1)),
       chunksNb(chunkWidth * chunkWidth), chunks(chunksNb), camera(cam),
-      lastChunkPlayerPos(cam.chunkPosition()) {
+      lastChunkPlayerPos(cam.chunkPosition()), renderer(renderer) {
         // chunkWidth include a border of chunks needed to build the other
         // chunks so that explains : (2 * (cam.getRenderDistance() + 1) + 1)
         chunks.reserve(chunksNb);
@@ -28,7 +28,7 @@ World::World(Camera &cam)
 
 World::World(const World &w)
     : chunkWidth(w.chunkWidth), chunksNb(w.chunksNb), chunks(w.chunks),
-      camera(w.camera), lastChunkPlayerPos(w.lastChunkPlayerPos) {
+      camera(w.camera), lastChunkPlayerPos(w.lastChunkPlayerPos), renderer(w.renderer) {
         thread_pool_manager =
             new WorldParallelOperationsManager(*(w.thread_pool_manager));
 }
@@ -454,14 +454,14 @@ bool World::isLoadedAt(glm::ivec2 pos) {
         return res;
 }
 
-void World::createAndLoadMeshAt(glm::ivec2 pos) {
+void World::createAndLoadMeshAt(glm::ivec2 pos, CubeTexture* ct) {
         if (existsAt(pos)) {
                 // chunks_mutex.lock();
                 LockableChunk l_chunk = getRelativeToPlayerAt(pos);
                 Chunk *chunk_ptr = l_chunk.lock();
                 // chunks_mutex.unlock();
 
-                chunk_ptr->createMesh(*this);
+                chunk_ptr->createMesh(*this, renderer.texture);
                 chunk_ptr->loadMeshOnGPU();
 
                 l_chunk.unlock();

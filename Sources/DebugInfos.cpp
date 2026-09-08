@@ -11,13 +11,13 @@
 #include "../deps/implot/implot.h"
 #include <spdlog/spdlog.h>
 
-DebugInfos::DebugInfos(GLFWwindow *window, Scene &s)
+DebugInfos::DebugInfos(GLFWwindow *window, Game &s)
     : lastFrameTime((float)glfwGetTime()),
       framerates_values(NB_VALUES_FRAMERATE, 0),
       framerates_times(NB_VALUES_FRAMERATE, lastFrameTime), show_fr_plot(false),
       drawnChunks(0), m_scene(s) {
 
-        checkColTerrain = m_scene.getConfig().getCheckCollisions();
+        checkColTerrain = m_scene.configuration.getCheckCollisions();
         oldCheckColTerrain = checkColTerrain;
 
         IMGUI_CHECKVERSION();
@@ -58,7 +58,7 @@ void DebugInfos::initFrame() {
         ImGui::NewFrame();
 }
 
-void DebugInfos::drawFrame(Scene &scene) {
+void DebugInfos::drawFrame(Game &scene) {
         ImGuiStyle &style = ImGui::GetStyle();
 
         constexpr float title_size = 1.5f;
@@ -93,8 +93,8 @@ void DebugInfos::drawFrame(Scene &scene) {
         ImGui::Text("Camera");
         ImGui::PopFont();
 
-        ImGui::Text(scene.getCamera().debug_pos().c_str());
-        ImGui::Text(scene.getCamera().debug_direction().c_str());
+        ImGui::Text(scene.camera.debug_pos().c_str());
+        ImGui::Text(scene.camera.debug_direction().c_str());
 
         ImGui::Separator();
 
@@ -104,8 +104,8 @@ void DebugInfos::drawFrame(Scene &scene) {
 
 
         ImGui::Text(std::format("Chunks : {} / {}", drawnChunks,
-                                (scene.getConfig().renderDistance * 2 + 1) *
-                                    (scene.getConfig().renderDistance * 2 + 1))
+                                (scene.configuration.renderDistance * 2 + 1) *
+                                    (scene.configuration.renderDistance * 2 + 1))
                         .c_str());
 
         ImGui::Separator();

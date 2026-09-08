@@ -2,6 +2,7 @@
 #define WORLDGENERATOR_H
 
 #include "Chunk.h"
+#include "CubeTexture.h"
 
 class WorldGenerator {
       public:
@@ -15,6 +16,9 @@ class WorldGenerator {
 
       protected:
         static int sand_height(glm::ivec2 pos);
+
+        static CubeTexture ct;
+        
 };
 
 #endif

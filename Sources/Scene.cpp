@@ -1,28 +1,26 @@
 #include "Scene.h"
 #include "Camera.h"
 #include "Configuration.h"
+#include "Renderer/ChunkRenderer.h"
 #include "World/World.h"
 
-Scene::Scene(Configuration &c) : m_config(c), m_cam(*this), m_world(m_cam) {}
+// creating a game should be straithforward
+Game::Game(Configuration &c) : configuration(c), window(&c), camera(*this), renderer(), world(camera, renderer) {}
 
-// avec une camera précédement initialisée avec la configuration
-Scene::Scene(Configuration &c, Camera &cam) : m_config(c), m_cam(cam), m_world(m_cam) {}
 
-// avec une camera précédement initialisée avec la configuration
-Scene::Scene(Configuration &c, Camera &cam, World &world)
-    : m_config(c), m_cam(cam), m_world(world) {}
+Game::Game() : configuration(), window(&configuration), camera(*this), renderer(), world(camera, renderer) {}
 
-Scene::Scene() : m_config(), m_cam(*this), m_world(m_cam) {}
 
-Camera &Scene::getCamera() { return m_cam; }
-Configuration &Scene::getConfig() { return m_config; }
 
-World &Scene::getWorld() { return m_world; }
+// Camera &Game::getCamera() { return m_cam; }
+// Configuration &Game::getConfig() { return m_config; }
+
+// World &Game::getWorld() { return m_world; }
 
 /// Updates the camera collision detection and the configuration collision
 /// detection
-void Scene::updateCollisionWithTerrainCheck(bool checkColTerrain) {
+void Game::updateCollisionWithTerrainCheck(bool checkColTerrain) {
 
-        m_config.setCheckCollisions(checkColTerrain);
-        m_cam.updateTranslateFunc(checkColTerrain);
+        configuration.setCheckCollisions(checkColTerrain);
+        camera.updateTranslateFunc(checkColTerrain);
 }

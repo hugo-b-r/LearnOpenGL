@@ -6,19 +6,19 @@
 
 #include <GLFW/glfw3.h>
 
-class Scene;
+class Game;
 
 const int NB_VALUES_FRAMERATE = 100;
 const double FRAMERATE_TIME_INTERVAL = 0.1;
 class DebugInfos {
     public:
-        DebugInfos(GLFWwindow * window, Scene& s);
+        DebugInfos(GLFWwindow * window, Game& s);
         ~DebugInfos();
 
         // after glfwpollevents but before gl draw
         void initFrame();
         // should be used after opengl draw
-        void drawFrame(Scene& scene);
+        void drawFrame(Game& scene);
         // should be called before glfwTerminate
         void terminate();
         void updateDrawnChunks(int nb);
@@ -33,7 +33,7 @@ class DebugInfos {
 
         bool checkColTerrain;
         bool oldCheckColTerrain;
-        Scene &m_scene;
+        Game &m_scene;
 };
 
 #endif

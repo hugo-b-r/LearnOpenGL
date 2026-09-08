@@ -11,6 +11,7 @@ Model::Model(const Mesh& mesh) : m_vboCount(0) {
 
 Model::~Model() {
 
+
 }
 
 void Model::loadData(const Mesh& mesh, std::vector<int> dimensions) {

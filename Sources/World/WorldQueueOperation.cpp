@@ -87,7 +87,7 @@ void WorldQueueOperation::executeCreateMesh(World &world) {
 
         if (actual_chunk_ptr != nullptr) {
                 // creating the mesh
-                actual_chunk_ptr->createMesh(world);
+                actual_chunk_ptr->createMesh(world, world.renderer.texture);
                 // ask the main thread to be loaded on the gpu
                 world.addChunkMeshToLoad(abs_pos);
         }

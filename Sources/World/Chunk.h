@@ -44,7 +44,7 @@ class Chunk {
         void load(World &w);
         bool isLoaded();
 
-        void createMesh(World &w);
+        void createMesh(World &w, CubeTexture& ct);
         bool hasMesh();
 
         void loadMeshOnGPU();

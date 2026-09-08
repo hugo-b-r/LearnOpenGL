@@ -9,19 +9,19 @@
 
 const glm::vec3 AABB_DIMS = glm::vec3(0.8, 1.8, 0.8);
 
-Camera::Camera(Scene &s) : m_scene(s) {
+Camera::Camera(Game &s) : m_scene(s) {
 
         m_yaw = 0.;
         m_pitch = 0.;
-        lastX = (float)s.getConfig().windowWidth / 2.f;
-        lastY = (float)s.getConfig().windowHeight / 2.f;
+        lastX = (float)s.configuration.windowWidth / 2.f;
+        lastY = (float)s.configuration.windowHeight / 2.f;
 
         position = glm::vec3(0., 0., 0);
 
         m_frontPos = position - glm::vec3(0.0f, 0.0f, 4.0f);
         m_upVector = glm::vec3(0.0f, 1.0f, 0.0f);
 
-        updateTranslateFunc(s.getConfig().getCheckCollisions());
+        updateTranslateFunc(s.configuration.getCheckCollisions());
 
         updateProjViewMatrix();
 
@@ -34,7 +34,7 @@ void Camera::update() {
         updateAabb();
         updateUpVector();
         createFrustum();
-        if (!m_scene.getConfig().isFlying) {
+        if (!m_scene.configuration.isFlying) {
                 // get down
         }
 }
@@ -73,7 +73,7 @@ void Camera::translate_with_collisions(glm::vec3 trans) {
                                 for (int z = min.z; z < max.z; ++z) {
                                         glm::vec3 tmp_pos(x, y, z);
                                         CubeAtlas block =
-                                            m_scene.getWorld().getBlockAt(
+                                            m_scene.world.getBlockAt(
                                                 tmp_pos);
                                         if (block != CubeAtlas::Air) {
                                                 collided = true;
@@ -136,9 +136,9 @@ std::string Camera::debug_direction() {
 
 void Camera::updateProjViewMatrix() {
         m_projectionMatrix =
-            glm::perspective(glm::radians((float)m_scene.getConfig().fov),
-                             (float)m_scene.getConfig().windowWidth /
-                                 (float)m_scene.getConfig().windowHeight,
+            glm::perspective(glm::radians((float)m_scene.configuration.fov),
+                             (float)m_scene.configuration.windowWidth /
+                                 (float)m_scene.configuration.windowHeight,
                              0.1f, 2000.0f);
         m_viewMatrix =
             glm::lookAt(position, position + m_frontPos, glm::vec3(0, 1, 0));
@@ -184,7 +184,7 @@ glm::mat4 Camera::makeViewMatrix(const Camera &camera) {
 }
 
 int Camera::getRenderDistance() const {
-        return m_scene.getConfig().renderDistance;
+        return m_scene.configuration.renderDistance;
 }
 
 void Camera::updateUpVector() {

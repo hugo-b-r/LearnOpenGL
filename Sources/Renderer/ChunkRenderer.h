@@ -19,8 +19,10 @@ public:
     Shader& getShader();
     void bindTextureAndShader();
 
+    
+    CubeTexture texture;
+
 private:
-    CubeTexture m_texture;
     Shader m_shader;
 };
 
