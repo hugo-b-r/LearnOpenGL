@@ -8,6 +8,11 @@ const stbi = @import("c.zig").stb;
 const g = @import("c.zig").gl;
 
 ident: c_int,
+height: u16,
+width: u16,
+
+const used_texture_height = 16;
+const used_texture_width = 96;
 
 pub fn create(path: []const u8) Texture {
     var correctly_loaded = false;
@@ -34,6 +39,8 @@ pub fn create(path: []const u8) Texture {
 
     return .{
         .ident = id,
+        .height = real_texture_height,
+        .width = real_texture_width,
     };
 }
 
@@ -46,4 +53,8 @@ pub fn bind(self: *Texture) void {
 
 pub fn deinit(self: *Texture) void {
     g.glDeleteTextures(1, &self.ident);
+}
+
+pub fn getVerticalRatio(self: *Texture) f32 {
+    return used_texture_height / self.height;
 }

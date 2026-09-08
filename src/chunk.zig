@@ -6,6 +6,7 @@ const std = @import("std");
 const cglm = @import("c.zig").cglm;
 const BlockType = @import("blocks.zig").BlockType;
 const World = @import("world.zig");
+const ChunkMesh = @import("chunk_mesh.zig");
 
 /// Dimensions of the chunk in blocks : width
 pub const chunk_width: u16 = 32;
@@ -20,6 +21,8 @@ blocks: []BlockType,
 position: cglm.ivec2,
 
 world: *World,
+
+mesh: ChunkMesh,
 
 /// Create a chunk with memory allocation so you MUST use the deinit method.
 pub fn init(allocator: std.mem.Allocator, position: cglm.ivec2, empty: bool) !Chunk {

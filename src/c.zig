@@ -7,3 +7,7 @@ pub const gl = @cImport({
 pub const cglm = @cImport({
     @cInclude("cglm/cglm.h");
 });
+
+pub const stb = @cImport({
+    @cInclude("stb/stb_image.h");
+});
