@@ -5,10 +5,10 @@
 #include "World/World.h"
 
 // creating a game should be straithforward
-Game::Game(Configuration &c) : configuration(c), window(&c), camera(*this), renderer(), world(camera, renderer) {}
+Game::Game(Configuration &c) : configuration(c), window(&c, this), camera(*this), renderer(), world(camera, renderer) {}
 
 
-Game::Game() : configuration(), window(&configuration), camera(*this), renderer(), world(camera, renderer) {}
+Game::Game() : configuration(), window(&configuration, this), camera(*this), renderer(), world(camera, renderer) {}
 
 
 
@@ -19,6 +19,33 @@ Game::Game() : configuration(), window(&configuration), camera(*this), renderer(
 
 /// Updates the camera collision detection and the configuration collision
 /// detection
+//
+
+
+void Game::mainLoop() {
+        
+        while (window.shouldContinue()) {
+                glfwPollEvents();
+
+                window.beginFrameActions();
+                
+                window.processInput();
+
+                glClearColor(0.63f, 0.87f, 1.f, 1.0f);
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+                world.render(camera, renderer);
+
+                // if (scene.configuration.showDebugInfos) {
+                //         debug_inf.drawFrame(scene);
+                // }
+
+                window.endFrameActions();
+        }
+}
+
+
+
 void Game::updateCollisionWithTerrainCheck(bool checkColTerrain) {
 
         configuration.setCheckCollisions(checkColTerrain);

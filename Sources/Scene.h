@@ -1,4 +1,3 @@
-#pragma once
 #ifndef SCENE_H
 #define SCENE_H
 
@@ -7,6 +6,8 @@
 
 #include "OpenGLWindow.h"
 #include "World/World.h"
+
+// class OpenGLWindow;
 
 class Game {
 public:
@@ -23,6 +24,8 @@ public:
   // Camera &getCamera();
   // Configuration &getConfig();
   // World &getWorld();
+  //
+ void mainLoop();
 
   void updateCollisionWithTerrainCheck(bool checkColTerrain);
   Configuration configuration;

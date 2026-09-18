@@ -2,12 +2,17 @@
 #include "Configuration.h"
 #include "CubeTexture.h"
 #include "Scene.h"
+#include "World/WorldGenerator.h"
 #include "glm/common.hpp"
+
+#include "Mathematics/Noise.h"
 
 #include <format>
 #include <spdlog/spdlog.h>
 
 const glm::vec3 AABB_DIMS = glm::vec3(0.8, 1.8, 0.8);
+
+const glm::vec3 initial_pos = glm::vec3(0.0, 4.0, 0.0);
 
 Camera::Camera(Game &s) : m_scene(s) {
 
@@ -16,7 +21,7 @@ Camera::Camera(Game &s) : m_scene(s) {
         lastX = (float)s.configuration.windowWidth / 2.f;
         lastY = (float)s.configuration.windowHeight / 2.f;
 
-        position = glm::vec3(0., 0., 0);
+        position = glm::vec3(initial_pos.x, WorldGenerator::soilHeightAt(glm::vec2(initial_pos.x, initial_pos.z)) + initial_pos.y, initial_pos.z);
 
         m_frontPos = position - glm::vec3(0.0f, 0.0f, 4.0f);
         m_upVector = glm::vec3(0.0f, 1.0f, 0.0f);

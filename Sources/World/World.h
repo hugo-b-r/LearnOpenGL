@@ -37,7 +37,8 @@ class World {
 
         /// Renders the world using a renderer, according to a camera position,
         /// and whether it uses debuginfos or not
-        void render(Camera &cam, ChunkRenderer &renderer, DebugInfos &inf);
+        // void render(Camera &cam, ChunkRenderer &renderer, DebugInfos &inf);
+        void render(Camera &cam, ChunkRenderer &renderer);
 
         /// returns the block present at the coord pos (assuming they are
         /// absolute) if exists

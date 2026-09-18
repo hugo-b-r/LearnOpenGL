@@ -132,7 +132,8 @@ void World::load() {
         spdlog::debug("Finished loading the world.");
 }
 
-void World::render(Camera &cam, ChunkRenderer &renderer, DebugInfos &inf) {
+// void World::render(Camera &cam, ChunkRenderer &renderer, DebugInfos &inf) {
+void World::render(Camera &cam, ChunkRenderer &renderer) {
         chunks_mutex.lock();
         glm::ivec2 camPos = cam.chunkPosition();
         glm::ivec2 posDiff = camPos - lastChunkPlayerPos;
@@ -210,7 +211,7 @@ void World::render(Camera &cam, ChunkRenderer &renderer, DebugInfos &inf) {
                 }
         }
         chunks_mutex.unlock();
-        inf.updateDrawnChunks(total_drawn);
+        // inf.updateDrawnChunks(total_drawn);
 }
 
 CubeAtlas World::getBlockAt(glm::ivec3 pos) {

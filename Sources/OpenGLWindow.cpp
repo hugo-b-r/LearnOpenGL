@@ -4,12 +4,14 @@
 #include <imgui.h>
 #include "../deps/imgui/imgui.h"
 
+#include "GLFW/glfw3.h"
 #include "utils.h"
 #include "Scene.h"
+#include "DebugInfos.h"
 
 #include <spdlog/spdlog.h>
 
-OpenGLWindow::OpenGLWindow(Configuration* configuration) {
+OpenGLWindow::OpenGLWindow(Configuration* configuration, Game*game): game(game) {
 
 
         
@@ -51,7 +53,7 @@ OpenGLWindow::OpenGLWindow(Configuration* configuration) {
                 exit(EXIT_FAILURE);
         }
         spdlog::info("Window has been created");
-        // glfwSetWindowUserPointer(window, &scene);
+        glfwSetWindowUserPointer(window, game);
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         glfwSetFramebufferSizeCallback(window, &OpenGLWindow::framebufferSizeCallback);
 
@@ -66,11 +68,11 @@ OpenGLWindow::OpenGLWindow(Configuration* configuration) {
 
         glfwSwapInterval(0);
 
-        // DebugInfos debug_inf(window, scene);
-
         // ----------------------
         // Init imgui
         // Setup Dear ImGui context
+        debug_inf = new DebugInfos(window, *game);
+
 
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);
@@ -93,8 +95,29 @@ OpenGLWindow::OpenGLWindow(Configuration* configuration) {
 }
 
 OpenGLWindow::~OpenGLWindow() {
+
+        delete debug_inf;
         
         glfwTerminate();
+}
+
+
+bool OpenGLWindow::shouldContinue() {
+        return !glfwWindowShouldClose(window);
+}
+
+void OpenGLWindow::beginFrameActions() {
+        if (game->configuration.showDebugInfos) {
+                debug_inf->initFrame();
+        }
+        
+}
+
+void OpenGLWindow::endFrameActions() {
+        if (game->configuration.showDebugInfos) {
+                debug_inf->drawFrame(*game);
+        }
+        glfwSwapBuffers(window);
 }
 
 void OpenGLWindow::mouseCallback(GLFWwindow *window, double xpos, double ypos) {
@@ -149,35 +172,35 @@ void OpenGLWindow::errorCallback(int error, const char *description) {
                   << std::endl;
 }
 
-void OpenGLWindow::processInput(GLFWwindow *window, Game &s) {
+void OpenGLWindow::processInput() {
         static float currentFrame, deltaTime, lastFrame;
         currentFrame = (float)glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        const float camera_speed = s.configuration.camSpeedFactor * deltaTime;
+        const float camera_speed = game->configuration.camSpeedFactor * deltaTime;
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-                s.camera.translate_forward(camera_speed);
+                game->camera.translate_forward(camera_speed);
         }
         if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-                s.camera.translate_left(camera_speed);
+                game->camera.translate_left(camera_speed);
         }
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-                s.camera.translate_forward(-camera_speed);
+                game->camera.translate_forward(-camera_speed);
         }
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-                s.camera.translate_right(camera_speed);
+                game->camera.translate_right(camera_speed);
         }
         if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
-                s.camera.translate(camera_speed * glm::vec3(0., -1., 0.));
+                game->camera.translate(camera_speed * glm::vec3(0., -1., 0.));
         }
         if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-                s.camera.translate(camera_speed * glm::vec3(0., 1., 0.));
+                game->camera.translate(camera_speed * glm::vec3(0., 1., 0.));
         }
         if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
-                s.configuration.camSpeedFactor = 50;
+                game->configuration.camSpeedFactor = 50;
         } else {
-                s.configuration.camSpeedFactor = 5;
+                game->configuration.camSpeedFactor = 5;
         }
 }
 
