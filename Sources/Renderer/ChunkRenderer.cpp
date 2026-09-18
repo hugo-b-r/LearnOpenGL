@@ -13,7 +13,7 @@
 #include "Camera.h"
 
 ChunkRenderer::ChunkRenderer()
-    : texture("./Assets/texture_atlas.jpg"),
+    : texture("./Assets/texture_atlas.png"),
       m_shader("Sources/Shaders/textured_cube_vertex.glsl",
                "Sources/Shaders/textured_cube_fragment.glsl") {}
 
