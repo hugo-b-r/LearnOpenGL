@@ -1,7 +1,6 @@
 #include "World.h"
 #include "Camera.h"
 #include "CubeTexture.h"
-#include "DebugInfos.h"
 #include "Renderer/ChunkRenderer.h"
 #include "World/LockableChunk.h"
 #include "World/WorldParallelOperationsManager.h"
@@ -10,15 +9,14 @@
 #include <iostream>
 
 #include <glm/glm.hpp>
-#include <optional>
 #include <spdlog/spdlog.h>
 
 const glm::mat4 view_mat(1.0f);
 
 World::World(Camera &cam, ChunkRenderer& renderer)
-    : chunkWidth((2 * (cam.getRenderDistance() + 1) + 1)),
+    :renderer(renderer), chunkWidth((2 * (cam.getRenderDistance() + 1) + 1)),
       chunksNb(chunkWidth * chunkWidth), camera(cam),
-      lastChunkPlayerPos(cam.chunkPosition()), renderer(renderer) {
+      lastChunkPlayerPos(cam.chunkPosition()) {
         // chunkWidth include a border of chunks needed to build the other
         // chunks so that explains : (2 * (cam.getRenderDistance() + 1) + 1)
         // chunks.reserve(chunksNb);
@@ -26,8 +24,8 @@ World::World(Camera &cam, ChunkRenderer& renderer)
 }
 
 World::World(const World &w)
-    : chunkWidth(w.chunkWidth), chunksNb(w.chunksNb), chunks(w.chunks),
-      camera(w.camera), lastChunkPlayerPos(w.lastChunkPlayerPos), renderer(w.renderer) {
+    : renderer(w.renderer), chunkWidth(w.chunkWidth), chunksNb(w.chunksNb), chunks(w.chunks),
+      camera(w.camera), lastChunkPlayerPos(w.lastChunkPlayerPos) {
         thread_pool_manager =
             new WorldParallelOperationsManager(*(w.thread_pool_manager));
 }
@@ -173,12 +171,11 @@ void World::render(Camera &cam, ChunkRenderer &renderer) {
         Frustum &f = cam.getFrustum();
 
         //  Draw each chunk
-        int total_drawn = 0;
         renderer.getShader().setMat4("view", view_mat);
         renderer.getShader().setMat4("projection",
                                      cam.getProjectionViewMatrix());
         // we don't pass on the border as we don't want to render it
-        int border = (chunkWidth - 1) / 2 - 1;
+        // int border = (chunkWidth - 1) / 2 - 1;
         for (auto it = models_for_render.begin(); it != models_for_render.end(); ++it) {
                 
                 LocalizedBoundedModel &model_localized_bounded = (*it);
@@ -189,7 +186,6 @@ void World::render(Camera &cam, ChunkRenderer &renderer) {
                 if (f.IsAabbVisible(
                         model_localized_bounded.boundingBox)) {
                         renderer.render(it->ptr, cam, model_localized_bounded.nb_vertices, model_localized_bounded.center_pos);
-                        ++total_drawn;
                 }
         }
         models_lock.unlock();
