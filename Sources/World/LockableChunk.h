@@ -6,21 +6,20 @@
 #include <mutex>
 #include <optional>
 
-class Chunk;
 
 class LockableChunk {
       public:
-        LockableChunk();
+        LockableChunk(Chunk &c);
         LockableChunk(const LockableChunk &);
         ~LockableChunk();
 
-        Chunk *&lock();
+        Chunk * lock();
         std::optional<Chunk *> try_lock();
         void unlock();
 
       protected:
         std::mutex locker;
-        Chunk *chunk_value;
+        Chunk chunk_value;
 };
 
 #endif

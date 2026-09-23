@@ -1,11 +1,9 @@
 #ifndef CHUNK_H
 #define CHUNK_H
 
-#include "ChunkMeshCreator.h"
 #include "CubeTexture.h"
 #include "Mathematics/AABB.h"
 #include "Mesh.h"
-#include "Model.h"
 #include "Renderer/ChunkRenderer.h"
 #include "World.h"
 
@@ -25,6 +23,8 @@ enum class ChunkDataLoadStatus {
 
 class ChunkMeshCreator;
 class ChunkRenderer;
+class World;
+class LockableChunk;
 enum class ChunkMeshBuildStatus;
 
 class Chunk {
@@ -41,29 +41,29 @@ class Chunk {
         glm::ivec3 getChunkPosCenter();
         glm::vec3 getChunkPosCenter3();
 
-        void load(World &w);
+        void load(World *w);
         bool isLoaded();
 
-        void createMesh(World &w, CubeTexture& ct);
+        void createMesh(World *w, CubeTexture& ct);
         bool hasMesh();
 
-        void loadMeshOnGPU();
-        bool hasOnGPUMesh();
+        // void loadMeshOnGPU();
+        // bool hasOnGPUMesh();
 
-        void bindModel();
+        // void bindModel();
 
         void draw(Camera &cam, ChunkRenderer &renderer);
 
         void createBoundingBox();
 
         AABB &getBoundingBox();
+        Mesh m_mesh;
 
       protected:
         std::vector<CubeAtlas> blocks;
         ChunkDataLoadStatus m_loadStatus;
         ChunkMeshBuildStatus m_meshBuildStatus;
-        Mesh m_mesh;
-        Model m_model;
+        // Model m_model;
         glm::ivec2 chunkPos;
         glm::mat4 m_modelMat;
         glm::mat4 m_viewMat;

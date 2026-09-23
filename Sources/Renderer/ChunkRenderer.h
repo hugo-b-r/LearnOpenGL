@@ -14,7 +14,8 @@ class Chunk;
 class ChunkRenderer {
 public:
     ChunkRenderer();
-    void render(Chunk& c, Camera& cam, int nb_vertices, bool bindShader = false, bool bindTexture = false);
+    // void render(Chunk& c, Camera& cam, int nb_vertices, bool bindShader = false, bool bindTexture = false);
+    void render(Model& m, Camera& cam, int nb_vertices, glm::vec3 chunk_center, bool bindShader = false, bool bindTexture = false);
 
     Shader& getShader();
     void bindTextureAndShader();

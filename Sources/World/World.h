@@ -1,22 +1,24 @@
 #ifndef WORLD_H
 #define WORLD_H
 
-#include "LockableChunk.h"
-#include "WorldParallelOperationsManager.h"
 #include "WorldQueueOperation.h"
 #include "glm/fwd.hpp"
 #include <glm/glm.hpp>
 #include <queue>
+#include <unordered_map>
 #include <utility>
+#include "Model.h"
+
 // in order to have the ability to hash the type for unordered map
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
 #include <mutex>
 #include <vector>
+#include <forward_list>
+#include "Mathematics/AABB.h"
 
-#include "Chunk.h"
 #include "CubeTexture.h"
-#include "Renderer/ChunkRenderer.h"
+
 
 class Camera;
 class Chunk;
@@ -25,6 +27,20 @@ class DebugInfos;
 class WorldQueueOperation;
 class WorldParallelOperationsManager;
 class LockableChunk;
+
+
+struct LocalizedBoundedModel {
+    Model ptr;
+    AABB boundingBox;
+    glm::ivec2 pos;
+    unsigned int nb_vertices;
+    glm::vec3 center_pos;
+};
+
+struct ChunkToLoadOnGPUBundle {
+  Chunk * c;
+  
+};
 
 class World {
       public:
@@ -58,7 +74,7 @@ class World {
         /// checks whether a chunk is loaded or not at the ChunkPosition pos
         bool isLoadedAt(glm::ivec2 pos);
         /// create the mesh for the chunk at the pos pos
-        void createAndLoadMeshAt(glm::ivec2 pos, CubeTexture* ct);
+        // void createAndLoadMeshAt(glm::ivec2 pos, CubeTexture* ct);
         /// checks whether a chunk is loaded or not at the ChunkPosition pos
         bool isMeshLoadedAt(glm::ivec2 pos);
 
@@ -151,6 +167,23 @@ class World {
         glm::ivec2 lastChunkPlayerPos;
 
         void printWorldContent();
+
+
+
+        // next try
+        //
+        //
+        std::queue<unsigned int> free_rooms_chunks;
+        std::forward_list<LocalizedBoundedModel> models_for_render;
+        std::mutex models_lock;
+
+        std::queue<glm::ivec2> chunks_models_to_remove;
+        std::mutex chunks_models_to_remove_lock;
+
+        std::queue<ChunkToLoadOnGPUBundle> chunks_models_to_load_and_add;
+        std::mutex chunks_models_to_load_and_add_lock;
+
+
 };
 
 #endif

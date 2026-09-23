@@ -3,7 +3,6 @@
 #include "CubeTexture.h"
 #include "DebugInfos.h"
 #include "Renderer/ChunkRenderer.h"
-#include "World/Chunk.h"
 #include "World/LockableChunk.h"
 #include "World/WorldParallelOperationsManager.h"
 #include "WorldQueueOperation.h"
@@ -18,12 +17,13 @@ const glm::mat4 view_mat(1.0f);
 
 World::World(Camera &cam, ChunkRenderer& renderer)
     : chunkWidth((2 * (cam.getRenderDistance() + 1) + 1)),
-      chunksNb(chunkWidth * chunkWidth), chunks(chunksNb), camera(cam),
+      chunksNb(chunkWidth * chunkWidth), camera(cam),
       lastChunkPlayerPos(cam.chunkPosition()), renderer(renderer) {
         // chunkWidth include a border of chunks needed to build the other
         // chunks so that explains : (2 * (cam.getRenderDistance() + 1) + 1)
-        chunks.reserve(chunksNb);
+        // chunks.reserve(chunksNb);
         thread_pool_manager = new WorldParallelOperationsManager(*this);
+        chunks_mutex.lock();
 }
 
 World::World(const World &w)
@@ -31,6 +31,7 @@ World::World(const World &w)
       camera(w.camera), lastChunkPlayerPos(w.lastChunkPlayerPos), renderer(w.renderer) {
         thread_pool_manager =
             new WorldParallelOperationsManager(*(w.thread_pool_manager));
+        chunks_mutex.lock();
 }
 
 World::~World() {
@@ -51,8 +52,6 @@ void World::load() {
         for (int y = -worldLimits; y <= worldLimits; ++y) {
                 glm::ivec2 chunk_pos = glm::ivec2(0 + lastChunkPlayerPos.x,
                                                   y + lastChunkPlayerPos.y);
-                Chunk *chunk_ptr = new Chunk(chunk_pos);
-                setRelativeToPlayerAt(0, y, chunk_ptr);
                 thread_pool_manager->pushBackOperation(
                     WorldQueueOperation(chunk_pos, WldQOperationType::kLoad));
         }
@@ -61,8 +60,6 @@ void World::load() {
                 for (int y = -worldLimits; y <= worldLimits; ++y) {
                         glm::ivec2 chunk_pos = glm::ivec2(
                             x + lastChunkPlayerPos.x, y + lastChunkPlayerPos.y);
-                        Chunk *chunk_ptr = new Chunk(chunk_pos);
-                        setRelativeToPlayerAt(x, y, chunk_ptr);
 
                         thread_pool_manager->pushBackOperation(
                             WorldQueueOperation(chunk_pos,
@@ -70,8 +67,6 @@ void World::load() {
 
                         chunk_pos = glm::ivec2(-x + lastChunkPlayerPos.x,
                                                y + lastChunkPlayerPos.y);
-                        chunk_ptr = new Chunk(chunk_pos);
-                        setRelativeToPlayerAt(-x, y, chunk_ptr);
 
                         thread_pool_manager->pushBackOperation(
                             WorldQueueOperation(chunk_pos,
@@ -134,7 +129,8 @@ void World::load() {
 
 // void World::render(Camera &cam, ChunkRenderer &renderer, DebugInfos &inf) {
 void World::render(Camera &cam, ChunkRenderer &renderer) {
-        chunks_mutex.lock();
+        // chunks_mutex.lock();
+        models_lock.lock();
         glm::ivec2 camPos = cam.chunkPosition();
         glm::ivec2 posDiff = camPos - lastChunkPlayerPos;
         constexpr glm::ivec2 varNull = glm::ivec2(0, 0);
@@ -184,33 +180,20 @@ void World::render(Camera &cam, ChunkRenderer &renderer) {
                                      cam.getProjectionViewMatrix());
         // we don't pass on the border as we don't want to render it
         int border = (chunkWidth - 1) / 2 - 1;
-        for (int i = -border; i <= border; ++i) {
-                for (int j = -border; j <= border; ++j) {
-                        // remove rendererd chunks
-                        auto tmpPos = glm::ivec2(i, j);
-                        // if (posToUnLoad.contains(tmpPos))
-                        //   posToUnLoad.erase(tmpPos);
-                        LockableChunk l_chunk = getRelativeToPlayerAt(tmpPos);
-                        std::optional<Chunk *> chunk_ptr_opt =
-                            l_chunk.try_lock();
-                        if (chunk_ptr_opt.has_value()) {
-                                Chunk *chunk_ptr = chunk_ptr_opt.value();
-                                if (chunk_ptr != nullptr &&
-                                    f.IsAabbVisible(
-                                        chunk_ptr->getBoundingBox())) {
-                                        chunk_ptr->draw(cam, renderer);
-                                        ++total_drawn;
-                                } else if (chunk_ptr == nullptr) {
-                                        spdlog::debug(
-                                            "skipped because nullptr");
-                                }
-                                l_chunk.unlock();
-                        } else {
-                                spdlog::debug("skipped because not lockable");
-                        }
+        for (auto it = models_for_render.begin(); it != models_for_render.end(); ++it) {
+                
+                LocalizedBoundedModel &model_localized_bounded = (*it);
+                // std::optional<Chunk *> chunk_ptr_opt =
+                //     l_chunk.try_lock();
+                // if (chunk_ptr_opt.has_value()) {
+                        // Chunk *chunk_ptr = chunk_ptr_opt.value();
+                if (f.IsAabbVisible(
+                        model_localized_bounded.boundingBox)) {
+                        renderer.render(it->ptr, cam, model_localized_bounded.nb_vertices, model_localized_bounded.center_pos);
+                        ++total_drawn;
                 }
         }
-        chunks_mutex.unlock();
+        models_lock.unlock();
         // inf.updateDrawnChunks(total_drawn);
 }
 
@@ -280,6 +263,10 @@ void World::moveChunkXP() {
                 // -> we check that these are stored correctly on disk (coming)
 
                 // -> we remove them
+                //
+                chunks_meshes_to_load_locker.lock();
+                chunks_meshes_to_load.push(glm::ivec2(limit, y));
+                chunks_meshes_to_load_locker.unlock();
                 delete getRelativeToPlayerAt(limit, y).lock();
                 getRelativeToPlayerAt(limit, y).unlock();
         }
@@ -322,6 +309,9 @@ void World::moveChunkXM() {
                 // -> we check that these are stored correctly on disk (coming)
 
                 // -> we remove them
+                chunks_meshes_to_load_locker.lock();
+                chunks_meshes_to_load.push(glm::ivec2(-limit, y));
+                chunks_meshes_to_load_locker.unlock();
                 delete getRelativeToPlayerAt(-limit, y).lock();
                 getRelativeToPlayerAt(-limit, y).unlock();
         }
@@ -366,6 +356,9 @@ void World::moveChunkYP() {
                 // -> we check that these are stored correctly on disk (coming)
 
                 // -> we remove them
+                chunks_meshes_to_load_locker.lock();
+                chunks_meshes_to_load.push(glm::ivec2(x, limit));
+                chunks_meshes_to_load_locker.unlock();
                 delete getRelativeToPlayerAt(x, limit).lock();
                 getRelativeToPlayerAt(x, limit).unlock();
         }
@@ -408,6 +401,9 @@ void World::moveChunkYM() {
                 // -> we check that these are stored correctly on disk (coming)
 
                 // -> we remove them
+                chunks_meshes_to_load_locker.lock();
+                chunks_meshes_to_load.push(glm::ivec2(x, -limit));
+                chunks_meshes_to_load_locker.unlock();
                 delete getRelativeToPlayerAt(x, -limit).lock();
                 getRelativeToPlayerAt(x, -limit).unlock();
         }
@@ -455,31 +451,31 @@ bool World::isLoadedAt(glm::ivec2 pos) {
         return res;
 }
 
-void World::createAndLoadMeshAt(glm::ivec2 pos, CubeTexture* ct) {
-        if (existsAt(pos)) {
-                // chunks_mutex.lock();
-                LockableChunk l_chunk = getRelativeToPlayerAt(pos);
-                Chunk *chunk_ptr = l_chunk.lock();
-                // chunks_mutex.unlock();
+// void World::createAndLoadMeshAt(glm::ivec2 pos, CubeTexture* ct) {
+//         if (existsAt(pos)) {
+//                 // chunks_mutex.lock();
+//                 LockableChunk l_chunk = getRelativeToPlayerAt(pos);
+//                 Chunk *chunk_ptr = l_chunk.lock();
+//                 // chunks_mutex.unlock();
 
-                chunk_ptr->createMesh(*this, renderer.texture);
-                chunk_ptr->loadMeshOnGPU();
+//                 chunk_ptr->createMesh(*this, renderer.texture);
+//                 chunk_ptr->loadMeshOnGPU();
 
-                l_chunk.unlock();
-        }
-}
+//                 l_chunk.unlock();
+//         }
+// }
 
-bool World::isMeshLoadedAt(glm::ivec2 pos) {
-        if (existsAt(pos)) {
-                LockableChunk l_chunk = getRelativeToPlayerAt(pos);
-                Chunk *chunk_ptr = l_chunk.lock();
-                bool res = chunk_ptr->hasOnGPUMesh();
-                l_chunk.unlock();
-                return res;
-        } else {
-                return false;
-        }
-}
+// bool World::isMeshLoadedAt(glm::ivec2 pos) {
+//         if (existsAt(pos)) {
+//                 LockableChunk l_chunk = getRelativeToPlayerAt(pos);
+//                 Chunk *chunk_ptr = l_chunk.lock();
+//                 bool res = chunk_ptr->hasOnGPUMesh();
+//                 l_chunk.unlock();
+//                 return res;
+//         } else {
+//                 return false;
+//         }
+// }
 
 LockableChunk World::getRelativeToPlayerAt(glm::ivec2 pos) {
         int x = pos.x + (chunkWidth - 1) / 2;
@@ -523,7 +519,7 @@ void World::setRelativeToPlayerAt(glm::ivec2 pos, Chunk *c) {
         assert(x + y * chunkWidth >= 0);
         assert(x + y * chunkWidth < static_cast<int>(chunks.size()));
         // chunks_mutex.lock();
-        chunks[x + y * chunkWidth].lock() = c;
+        *(chunks[x + y * chunkWidth].lock()) = *c;
         chunks[x + y * chunkWidth].unlock();
         // chunks_mutex.unlock();
 }
@@ -536,7 +532,7 @@ void World::setRelativeToPlayerAt(int ox, int oy, Chunk *c) {
         assert(x + y * chunkWidth < static_cast<int>(chunks.size()));
         // chunks_mutex.lock();
 
-        chunks[x + y * chunkWidth].lock() = c;
+        *(chunks[x + y * chunkWidth].lock()) = *c;
         chunks[x + y * chunkWidth].unlock();
         // chunks_mutex.unlock();
 }
@@ -553,7 +549,7 @@ void World::setAbsoluteAt(int ox, int oy, Chunk *c) {
         assert(x + y * chunkWidth >= 0);
         assert(x + y * chunkWidth < static_cast<int>(chunks.size()));
         // chunks_mutex.lock();
-        chunks[x + y * chunkWidth].lock() = c;
+        *chunks[x + y * chunkWidth].lock() = *c;
         chunks[x + y * chunkWidth].unlock();
         // chunks_mutex.unlock();
 }
@@ -581,7 +577,8 @@ void World::printWorldContent() {
                                           << chunk_ptr->getChunkPos().y
                                           << chunk_ptr->isLoaded()
                                           << chunk_ptr->hasMesh()
-                                          << chunk_ptr->hasOnGPUMesh() << " ";
+                                          // << chunk_ptr->hasOnGPUMesh()
+                                           << " ";
                         else
                                 std::cout << "---" << " ";
                         getRelativeToPlayerAt(j, i).unlock();
@@ -594,22 +591,29 @@ void World::printWorldContent() {
 std::mutex &World::get_mutex() { return chunks_mutex; }
 
 void World::loadAChunkMeshOnGPU() {
-        chunks_meshes_to_load_locker.lock();
-        if (chunks_meshes_to_load.size() > 0) {
-                glm::ivec2 chunk_position = chunks_meshes_to_load.front();
-                chunks_meshes_to_load.pop();
-                chunks_meshes_to_load_locker.unlock();
+        chunks_models_to_load_and_add_lock.lock();
+        if (chunks_models_to_load_and_add.size() > 0) {
+                ChunkToLoadOnGPUBundle m = chunks_models_to_load_and_add.front();
+                chunks_models_to_load_and_add.pop();
+                chunks_models_to_load_and_add_lock.unlock();
 
-                if (existsAt(chunk_position)) {
 
-                        LockableChunk l_chunk = getAbsoluteAt(chunk_position);
-                        Chunk *chunk_ptr = l_chunk.lock();
 
-                        chunk_ptr->loadMeshOnGPU();
+                models_for_render.push_front(LocalizedBoundedModel(Model(), m.c->getBoundingBox(), m.c->getChunkPos(), m.c->m_mesh.vertexPositions.size(), m.c->getChunkPosCenter3()));
+                models_for_render.front().ptr.loadData(m.c->m_mesh, {3, 2, 3});
 
-                        l_chunk.unlock();
-                }
         } else {
                 chunks_meshes_to_load_locker.unlock();
         }
+        chunks_models_to_load_and_add_lock.unlock();
+
+        chunks_models_to_remove_lock.lock();
+        if (chunks_models_to_remove.size()>0) {
+                glm::ivec2 pos = chunks_models_to_remove.front();
+                chunks_models_to_remove.pop();
+
+                // remove all that have same position
+                models_for_render.remove_if([&](LocalizedBoundedModel m) -> bool {return m.pos == pos;});
+        }
+        chunks_models_to_remove_lock.unlock();
 }

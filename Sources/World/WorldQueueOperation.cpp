@@ -1,7 +1,8 @@
 #include <spdlog/spdlog.h>
 
-#include "Chunk.h"
 #include "World/LockableChunk.h"
+
+#include "Chunk.h"
 #include "WorldQueueOperation.h"
 
 #include <iostream>
@@ -67,7 +68,7 @@ void WorldQueueOperation::executeLoad(World &world) {
         Chunk *actual_chunk_ptr = l_chunk.lock();
         world.get_mutex().unlock();
         if (actual_chunk_ptr != nullptr) {
-                actual_chunk_ptr->load(world);
+                actual_chunk_ptr->load(&world);
         }
         l_chunk.unlock();
 }
@@ -87,7 +88,7 @@ void WorldQueueOperation::executeCreateMesh(World &world) {
 
         if (actual_chunk_ptr != nullptr) {
                 // creating the mesh
-                actual_chunk_ptr->createMesh(world, world.renderer.texture);
+                actual_chunk_ptr->createMesh(&world, world.renderer.texture);
                 // ask the main thread to be loaded on the gpu
                 world.addChunkMeshToLoad(abs_pos);
         }

@@ -6,6 +6,7 @@
 
 #include "OpenGLWindow.h"
 #include "World/World.h"
+#include "Renderer/ChunkRenderer.h"
 
 // class OpenGLWindow;
 

@@ -4,7 +4,6 @@
 #include <glm/glm.hpp>
 
 
-#include "Chunk.h"
 #include "CubeTexture.h"
 #include "Mesh.h"
 #include "World.h"

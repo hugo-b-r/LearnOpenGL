@@ -1,24 +1,16 @@
 
 #include "DebugInfos.h"
-#include "Renderer/ChunkRenderer.h"
 #include "Scene.h"
-#include "World/WorldGenerator.h"
-#include <cstdlib>
 #include <glad/glad.h>
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/string_cast.hpp>
 
-#include "Configuration.h"
-#include "Shader.h"
 
 #include <spdlog/spdlog.h>
 // #define STB_IMAGE_IMPLEMENTATION
-#include "../deps/imgui/imgui.h"
 #include "../deps/stb_image.h"
-#include "utils.h"
 #include <GLFW/glfw3.h>
-#include <iostream>
 
 // void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
 //         ImGuiIO &io = ImGui::GetIO();
