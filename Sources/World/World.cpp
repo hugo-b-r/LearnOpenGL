@@ -23,7 +23,6 @@ World::World(Camera &cam, ChunkRenderer& renderer)
         // chunks so that explains : (2 * (cam.getRenderDistance() + 1) + 1)
         // chunks.reserve(chunksNb);
         thread_pool_manager = new WorldParallelOperationsManager(*this);
-        chunks_mutex.lock();
 }
 
 World::World(const World &w)
@@ -31,7 +30,6 @@ World::World(const World &w)
       camera(w.camera), lastChunkPlayerPos(w.lastChunkPlayerPos), renderer(w.renderer) {
         thread_pool_manager =
             new WorldParallelOperationsManager(*(w.thread_pool_manager));
-        chunks_mutex.lock();
 }
 
 World::~World() {
@@ -129,6 +127,7 @@ void World::load() {
 
 // void World::render(Camera &cam, ChunkRenderer &renderer, DebugInfos &inf) {
 void World::render(Camera &cam, ChunkRenderer &renderer) {
+        spdlog::debug("First run");
         // chunks_mutex.lock();
         models_lock.lock();
         glm::ivec2 camPos = cam.chunkPosition();
