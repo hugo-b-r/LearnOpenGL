@@ -27,6 +27,10 @@ class Model {
         unsigned int m_EBO;
         unsigned int m_indicesCount;
 
+        bool vbo_generated = false;
+        bool vao_generation = false;
+        bool ebo_generated = false;
+
         std::vector<GLuint> m_buffers;
 
 

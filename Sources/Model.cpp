@@ -2,6 +2,7 @@
 
 #include <vector>
 
+#include "CubeTexture.h"
 #include "Mesh.h"
 #include "utils.h"
 
@@ -10,6 +11,22 @@ Model::Model(const Mesh& mesh) : m_vboCount(0) {
 }
 
 Model::~Model() {
+
+    if (ebo_generated) {
+        glDeleteBuffers(1, &m_EBO);
+        ebo_generated = false;
+    }
+
+    if (vao_generation) {
+        glDeleteVertexArrays(1, &m_VAO);
+        vao_generation = false;
+    }
+
+    if(vbo_generated) {
+        glDeleteBuffers(1, &m_VBO);
+        vbo_generated = false;
+    }
+
 
 
 }
