@@ -81,14 +81,14 @@ std::optional<CubeAtlas> World::getBlockAt(glm::ivec3 pos) {
 //         lc_res.addReason(r);
 // }
 
-// void World::cleanAllChunksNoReasonToKeep() {
-//         // for (auto it = chunks.begin(); it != chunks.end(); ++it) {
-//         //         if (!it->second.anyReasonToKeep()) {
-//         //                 chunks.erase(it);
-//         //         }
-//         // }
-//         throw std::runtime_error("implement qeue for removing chunks, here you should empty the queue and remove each chunk one by one");
-// }
+void World::cleanAllChunksNoReasonToKeep(glm::ivec2 new_player_pos, int manhattan_radius_limit) {
+
+        // for (auto it = chunks.begin(); it != chunks.end(); ++it) {
+        //         if (!it->second.anyReasonToKeep()) {
+        //                 chunks.erase(it);
+        //         }
+        // }
+}
 
 //
 void World::loadChunk(glm::ivec2 chunk_pos) {

@@ -39,9 +39,8 @@ class ChunkRenderer {
 
         void addChunkToRender(glm::ivec2 abs_pos, World *w, AABB bounding_box,
                               Mesh *mesh);
-        void removeChunkFromRender(glm::ivec2 abs_pos);
         void rebuildRenderChunk(glm::ivec2 abs_pos, World *w);
-
+        void sendCommandToRemoveChunk(glm::ivec2 chunk_pos);
       private:
         Shader m_shader;
 
@@ -53,6 +52,7 @@ class ChunkRenderer {
 
         std::queue<ChunkToLoadOnGPUBundle> chunks_models_to_load_and_add;
         std::mutex chunks_models_to_load_and_add_lock;
+        void removeChunkFromRender(glm::ivec2 abs_pos);
 };
 
 #endif

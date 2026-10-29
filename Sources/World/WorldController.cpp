@@ -4,12 +4,13 @@
 #include "World/LockableChunk.h"
 #include "World/WorldQueueOperation.h"
 
+#include <iostream>
 #include <spdlog/spdlog.h>
 
-    WorldController::WorldController(World *w, ChunkRenderer *r, Game *g,
-                                     int render_distance)
-    : world(w), renderer(r), chunkWidth(2 * (render_distance + 1) + 1),
-      game(g), lastPlayerChunkPos(glm::ivec2(0, 0)) {
+WorldController::WorldController(World *w, ChunkRenderer *r, Game *g,
+                                 int render_distance)
+    : world(w), renderer(r), chunkWidth(2 * (render_distance + 1) + 1), game(g),
+      lastPlayerChunkPos(glm::ivec2(0, 0)) {
         // init world by loading a lot of chunks and tell I need them
 }
 
@@ -19,8 +20,8 @@ void WorldController::perFrameControl(glm::ivec2 new_player_pos) {
         // check if player pos moved
         // if so move the world accordingly
         if (new_player_pos != lastPlayerChunkPos) {
-            spdlog::debug("moving world hehe !");
-            moveWorld(new_player_pos);
+                spdlog::debug("moving world hehe !");
+                moveWorld(new_player_pos);
         }
 
         meshes_to_load_lock.lock();
@@ -31,25 +32,45 @@ void WorldController::perFrameControl(glm::ivec2 new_player_pos) {
 }
 
 void WorldController::moveWorld(glm::ivec2 new_player_pos) {
-        int render_d = game->configuration.renderDistance;
-        for (int i = new_player_pos.x - render_d;
-             i <= lastPlayerChunkPos.x + render_d; ++i) {
+        int manhattan_radius_limit = game->configuration.renderDistance;
 
-                for (int j = lastPlayerChunkPos.y - render_d;
-                     j <= lastPlayerChunkPos.y + render_d; ++j) {
+        world->chunk_map_locker.lock();
 
-                        glm::ivec2 pos_abs(i, j);
-                        if (!(abs(j - new_player_pos.y) <= render_d ||
-                              abs(i - new_player_pos.x) <= render_d)) {
-                                world->unloadChunk(pos_abs);
+        for (int i = lastPlayerChunkPos.x - manhattan_radius_limit;
+             i <= lastPlayerChunkPos.x + manhattan_radius_limit; ++i) {
+
+                for (int j = lastPlayerChunkPos.y - manhattan_radius_limit;
+                     j <= lastPlayerChunkPos.y + manhattan_radius_limit; ++j) {
+
+                        if (!(abs(j - new_player_pos.y) <=
+                                  manhattan_radius_limit &&
+                              abs(i - new_player_pos.x) <=
+                                  manhattan_radius_limit)) {
+                                // std::cout << "heho la !" << std::endl;
+                                auto pos = glm::ivec2(i, j);
+                                world->unloadChunk(pos);
+                                renderer->sendCommandToRemoveChunk(pos);
                         }
                 }
         }
-        for (int i = new_player_pos.x - render_d;
-             i <= new_player_pos.x + render_d; ++i) {
+        // for (auto const &[key, value] : world->chunks) {
+        //         int i = key.x;
+        //         int j = key.y;
+        //         // int j = it->first.y;
+        //         if (!(abs(j - new_player_pos.y) <= manhattan_radius_limit &&
+        //               abs(i - new_player_pos.x) <= manhattan_radius_limit)) {
+        //                 // std::cout << "heho la !" << std::endl;
+        //                 world->unloadChunk(key);
+        //                 renderer->sendCommandToRemoveChunk(key);
+        //         }
+        // }
+        world->chunk_map_locker.unlock();
 
-                for (int j = new_player_pos.y - render_d;
-                     j <= new_player_pos.y + render_d; ++j) {
+        for (int i = new_player_pos.x - manhattan_radius_limit;
+             i <= new_player_pos.x + manhattan_radius_limit; ++i) {
+
+                for (int j = new_player_pos.y - manhattan_radius_limit;
+                     j <= new_player_pos.y + manhattan_radius_limit; ++j) {
 
                         // if (abs(j - new_player_pos.y) <= render_d ||
                         //     abs(i - new_player_pos.x) <= render_d) {
@@ -58,18 +79,17 @@ void WorldController::moveWorld(glm::ivec2 new_player_pos) {
                         if (!world->isChunkLoaded(pos))
                                 game->thread_pool_manager->pushBackOperation(
                                     WorldQueueOperation(
-                                        pos,
-                                        WldQOperationType::
-                                            LoadOrGenerateThenMesh));
+                                        pos, WldQOperationType::
+                                                 LoadOrGenerateThenMesh));
 
-                                    spdlog::debug("send task to create mesh at {} : {}", i, j);
+                        spdlog::debug("send task to create mesh at {} : {}", i,
+                                      j);
 
-                                
-                                // game->thread_pool_manager
-                                //     ->pushBackOperation(
-                                //         WorldQueueOperation(
-                                //             glm::ivec2(i, j),
-                                //             WldQOperationType::Load));
+                        // game->thread_pool_manager
+                        //     ->pushBackOperation(
+                        //         WorldQueueOperation(
+                        //             glm::ivec2(i, j),
+                        //             WldQOperationType::Load));
                         // }
                 }
         }
@@ -428,7 +448,8 @@ void WorldController::initialLoad(
         for (int y = -worldLimits; y <= worldLimits; ++y) {
                 glm::ivec2 chunk_pos = glm::ivec2(0 + lastPlayerChunkPos.x,
                                                   y + lastPlayerChunkPos.y);
-                spdlog::debug("pshed {} {}", 0 + lastPlayerChunkPos.x, y + lastPlayerChunkPos.y);
+                spdlog::debug("pshed {} {}", 0 + lastPlayerChunkPos.x,
+                              y + lastPlayerChunkPos.y);
                 thread_pool_manager->pushBackOperation(WorldQueueOperation(
                     chunk_pos, WldQOperationType::LoadOrGenerate));
         }
@@ -441,7 +462,8 @@ void WorldController::initialLoad(
                         thread_pool_manager->pushBackOperation(
                             WorldQueueOperation(
                                 chunk_pos, WldQOperationType::LoadOrGenerate));
-                spdlog::debug("pshed {} {}", x + lastPlayerChunkPos.x, y + lastPlayerChunkPos.y);
+                        spdlog::debug("pshed {} {}", x + lastPlayerChunkPos.x,
+                                      y + lastPlayerChunkPos.y);
 
                         chunk_pos = glm::ivec2(-x + lastPlayerChunkPos.x,
                                                y + lastPlayerChunkPos.y);
@@ -449,7 +471,8 @@ void WorldController::initialLoad(
                         thread_pool_manager->pushBackOperation(
                             WorldQueueOperation(
                                 chunk_pos, WldQOperationType::LoadOrGenerate));
-                spdlog::debug("pshed {} {}", -x + lastPlayerChunkPos.x, y + lastPlayerChunkPos.y);
+                        spdlog::debug("pshed {} {}", -x + lastPlayerChunkPos.x,
+                                      y + lastPlayerChunkPos.y);
                 }
         }
         spdlog::debug("Finished loading the world");
