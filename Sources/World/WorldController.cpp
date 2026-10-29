@@ -19,7 +19,8 @@ void WorldController::perFrameControl(glm::ivec2 new_player_pos) {
         // check if player pos moved
         // if so move the world accordingly
         if (new_player_pos != lastPlayerChunkPos) {
-                moveWorld(new_player_pos);
+            spdlog::debug("moving world hehe !");
+            moveWorld(new_player_pos);
         }
 
         meshes_to_load_lock.lock();
@@ -66,6 +67,7 @@ void WorldController::moveWorld(glm::ivec2 new_player_pos) {
                         }
                 }
         }
+        lastPlayerChunkPos = new_player_pos;
 }
 
 void WorldController::loadOneMeshOnGpu() {

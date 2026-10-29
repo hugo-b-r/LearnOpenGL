@@ -46,7 +46,7 @@ class ChunkRenderer {
         Shader m_shader;
 
         std::forward_list<LocalizedBoundedModel> models_for_render;
-        std::mutex models_lock;
+        // std::mutex models_lock;
 
         std::queue<glm::ivec2> chunks_models_to_remove;
         std::mutex chunks_models_to_remove_lock;

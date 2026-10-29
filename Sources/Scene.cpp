@@ -6,6 +6,7 @@
 
 #include "World/WorldController.h"
 #include "World/WorldParallelOperationsManager.h"
+#include "utils.h"
 
 // creating a game should be straithforward
 Game::Game(Configuration &c) : configuration(c), window(&c, this), camera(*this), renderer(), world(), world_controller(&world, &renderer, this, camera.getRenderDistance()) {
@@ -45,7 +46,9 @@ void Game::mainLoop() {
 
                 renderer.render(camera);
 
-                // world_controller.perFrameControl(camera.m_frontPos);
+
+                // world_controller.perFrameControl(fromFloatToChunkCoordinates(camera.m_frontPos));
+                world_controller.perFrameControl(camera.chunkPosition());
 
                 // if (scene.configuration.showDebugInfos) {
                 //         debug_inf.drawFrame(scene);

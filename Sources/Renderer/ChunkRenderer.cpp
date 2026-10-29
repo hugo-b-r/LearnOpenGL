@@ -62,11 +62,13 @@ void ChunkRenderer::addChunkToRender(glm::ivec2 abs_pos, World *w, AABB bounding
         // load on the gpu
         Model m(*mesh);
 
-        models_lock.lock();
+        // models_lock.lock();
 
         models_for_render.push_front(LocalizedBoundedModel(m, bounding_box, abs_pos, mesh->getNbVertices(), fromChunkToBlockCoordinatesOfCenterOfChunk(abs_pos)));
 
-        models_lock.unlock();
+        // models_lock.unlock();
+
+        // delete mesh;
         // w->IdontNeedAnymore(abs_pos, ReasonToKeep::UsedForMeshing);
 }
 
