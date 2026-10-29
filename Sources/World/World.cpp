@@ -112,3 +112,8 @@ void World::loadChunk(ReadSafeChunk chunk) {
 void World::unloadChunk(glm::ivec2 chunk_pos) {
         chunks.erase(chunk_pos);
 }
+
+
+bool World::isChunkLoaded(glm::ivec2 chunk_pos) {
+        return chunks.contains(chunk_pos);
+}

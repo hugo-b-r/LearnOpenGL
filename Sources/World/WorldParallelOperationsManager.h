@@ -26,7 +26,7 @@ class WorldParallelOperationsManager {
         std::queue<WorldQueueOperation> actions;
         std::mutex actions_running_locker;
 
-        const int nbThreads = 7;
+        const int nbThreads = 14;
         std::vector<std::thread> threads;
         WorldController *world_controller;
 };

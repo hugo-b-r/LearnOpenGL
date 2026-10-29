@@ -43,6 +43,7 @@ class World {
         void cleanAllChunksNoReasonToKeep();
         void IdontNeedAnymore(glm::ivec2 abs_pos, ReasonToKeep r);
         void loadChunk(ReadSafeChunk chunk);
+        bool isChunkLoaded(glm::ivec2 chunk_pos);
         void unloadChunk(glm::ivec2 chunk_pos);
 
       protected:

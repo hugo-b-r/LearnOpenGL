@@ -55,12 +55,10 @@ void ChunkRenderer::render(Camera &cam) {
         m_shader.use();
         texture.bind();
         glm::mat4 modelMat = glm::mat4(1.f);
-        int nb_els = 0;
         for (auto it = models_for_render.begin(); it != models_for_render.end();
              ++it) {
-                nb_els += 1;
                      
-                // if (cam.getFrustum().IsAabbVisible(it->boundingBox)) {
+                if (cam.getFrustum().IsAabbVisible(it->boundingBox)) {
                         // spdlog::debug("there is one rendered");
                 it->model.bindVAO();
                 modelMat = glm::mat4(1.f);
@@ -68,9 +66,8 @@ void ChunkRenderer::render(Camera &cam) {
                 m_shader.setMat4("model", modelMat);
                 // render container
                 glDrawArrays(GL_TRIANGLES, 0, it->nb_vertices);
-                // }
+                }
         }
-        spdlog::debug("nb_els : {}", nb_els);
 }
 
 Shader &ChunkRenderer::getShader() { return m_shader; }

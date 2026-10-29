@@ -51,20 +51,26 @@ void WorldController::moveWorld(glm::ivec2 new_player_pos) {
                 for (int j = new_player_pos.y - render_d;
                      j <= new_player_pos.y + render_d; ++j) {
 
-                        if (abs(j - new_player_pos.y) <= render_d ||
-                            abs(i - new_player_pos.x) <= render_d) {
+                        // if (abs(j - new_player_pos.y) <= render_d ||
+                        //     abs(i - new_player_pos.x) <= render_d) {
 
+                        auto pos = glm::ivec2(i, j);
+                        if (!world->isChunkLoaded(pos))
                                 game->thread_pool_manager->pushBackOperation(
                                     WorldQueueOperation(
-                                        glm::ivec2(i, j),
+                                        pos,
                                         WldQOperationType::
                                             LoadOrGenerateThenMesh));
+
+                                    spdlog::debug("send task to create mesh at {} : {}", i, j);
+
+                                
                                 // game->thread_pool_manager
                                 //     ->pushBackOperation(
                                 //         WorldQueueOperation(
                                 //             glm::ivec2(i, j),
                                 //             WldQOperationType::Load));
-                        }
+                        // }
                 }
         }
         lastPlayerChunkPos = new_player_pos;
