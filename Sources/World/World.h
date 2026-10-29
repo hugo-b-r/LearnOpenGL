@@ -43,11 +43,11 @@ class World {
         void cleanAllChunksNoReasonToKeep();
         void IdontNeedAnymore(glm::ivec2 abs_pos, ReasonToKeep r);
         void loadChunk(ReadSafeChunk chunk);
+        void unloadChunk(glm::ivec2 chunk_pos);
 
       protected:
 
         void loadChunk(glm::ivec2 chunk_pos);
-        void unloadChunk(glm::ivec2 chunk_pos);
         std::unordered_map<glm::ivec2, ReadSafeChunk> chunks;
         std::mutex chunk_map_locker;
         std::unordered_map<glm::ivec2, ReasonToKeepManager> reasons_manager;

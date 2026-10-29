@@ -8,13 +8,15 @@
 #include "World/WorldParallelOperationsManager.h"
 
 // creating a game should be straithforward
-Game::Game(Configuration &c) : configuration(c), window(&c, this), camera(*this), renderer(), world(), world_controller(&world, &renderer, this) {
-        thread_pool_manager = new WorldParallelOperationsManager(world_controller );
+Game::Game(Configuration &c) : configuration(c), window(&c, this), camera(*this), renderer(), world(), world_controller(&world, &renderer, this, camera.getRenderDistance()) {
+        thread_pool_manager = new WorldParallelOperationsManager(&world_controller);
+        world_controller.initialLoad(thread_pool_manager);
 }
 
 
-Game::Game() : configuration(), window(&configuration, this), camera(*this), renderer(), world(), world_controller(&world, &renderer, this) {
-        thread_pool_manager = new WorldParallelOperationsManager(world_controller);
+Game::Game() : configuration(), window(&configuration, this), camera(*this), renderer(), world(), world_controller(&world, &renderer, this, camera.getRenderDistance()) {
+        thread_pool_manager = new WorldParallelOperationsManager(&world_controller);
+        world_controller.initialLoad(thread_pool_manager);
 }
 
 
@@ -42,6 +44,8 @@ void Game::mainLoop() {
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
                 renderer.render(camera);
+
+                // world_controller.perFrameControl(camera.m_frontPos);
 
                 // if (scene.configuration.showDebugInfos) {
                 //         debug_inf.drawFrame(scene);

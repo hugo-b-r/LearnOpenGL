@@ -29,14 +29,14 @@ void WorldQueueOperation::execute(WorldController &world_controller) {
                 return executeLoadOrGenerate(world_controller);
                 break;
         case WldQOperationType::LoadOrGenerateThenMesh:
-                executeLoadOrGenerate(world_controller);
-                executeCreateMesh(world_controller);
+                return executeLoadOrGenerate(world_controller);
+                // executeCreateMesh(world_controller);
                 break;
         case WldQOperationType::CreateMesh:
                 return executeCreateMesh(world_controller);
                 break;
         }
-        spdlog::info("end of execution !");
+        spdlog::info("end of execution !, type : {}", (int)type);
 }
 
 // create a chunk data
@@ -54,8 +54,9 @@ void WorldQueueOperation::executeCreateMesh(WorldController &world_controller) {
         // std::this_thread::sleep_for(1000ms);
         auto l_chunk_res = world_controller.world->getAbsoluteChunkAt(abs_pos);
         if (l_chunk_res.has_value()) { // should normally but hey let's check
-                Mesh * m = new Mesh;
+                Mesh * m = new Mesh();
                 ChunkMeshCreator builder (*l_chunk_res.value().get(), world_controller.renderer->texture.FactorHeight(), *world_controller.world, m);
+
                 builder.buildMesh();
                 AABB bounding_box = l_chunk_res.value().get()->getBoundingBox();
                 world_controller.addMeshToLoadJob(abs_pos, m, bounding_box);

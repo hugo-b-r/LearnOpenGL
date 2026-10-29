@@ -258,7 +258,6 @@
 //
 int main() {
         Game game;
-        game.world.initialLoad();
         game.mainLoop();
 
         // put loop in window update, renderer update, etc.

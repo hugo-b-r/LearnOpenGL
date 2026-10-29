@@ -6,15 +6,14 @@
 #include <vector>
 #include <mutex>
 
-#include "WorldController.h"
-#include "WorldQueueOperation.h"
 
 class WorldQueueOperation;
 class World;
+class WorldController;
 
 class WorldParallelOperationsManager {
       public:
-        WorldParallelOperationsManager(WorldController &world_controller);
+        WorldParallelOperationsManager(WorldController *world_controller);
         WorldParallelOperationsManager(const WorldParallelOperationsManager &m);
         ~WorldParallelOperationsManager();
 
@@ -29,7 +28,7 @@ class WorldParallelOperationsManager {
 
         const int nbThreads = 7;
         std::vector<std::thread> threads;
-        WorldController &world_controller;
+        WorldController *world_controller;
 };
 
 #endif

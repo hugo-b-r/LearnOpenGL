@@ -26,7 +26,6 @@ World::World(const World &w) : chunks(w.chunks) {}
 
 World::~World() {}
 
-void World::initialLoad() {}
 
 std::optional<ReadSafeChunk> World::getAbsoluteChunkAt(glm::ivec2 abs_pos) {
         if (chunks.contains(abs_pos)) {
@@ -65,31 +64,31 @@ std::optional<CubeAtlas> World::getBlockAt(glm::ivec3 pos) {
 //         // }
 // }
 
-void World::IdontNeedAnymore(glm::ivec2 abs_pos, ReasonToKeep r) {
-        auto reasons = reasons_manager.at(abs_pos);
-        reasons.removeReason(r);
+// void World::IdontNeedAnymore(glm::ivec2 abs_pos, ReasonToKeep r) {
+//         auto reasons = reasons_manager.at(abs_pos);
+//         reasons.removeReason(r);
 
-        // to delete code
-        throw std::runtime_error("implement queue for removing chunks");
-        // if (!reasons.anyReasonToKeep()) {
-        //         Chunk * c = lc_res.value().lock();
-        //         chunks.erase(c->getChunkPos());
-        // }
-}
+//         // to delete code
+//         throw std::runtime_error("implement queue for removing chunks");
+//         // if (!reasons.anyReasonToKeep()) {
+//         //         Chunk * c = lc_res.value().lock();
+//         //         chunks.erase(c->getChunkPos());
+//         // }
+// }
 
-void World::tagWithReason(glm::ivec2 abs_pos, ReasonToKeep r) {
-        auto lc_res = reasons_manager.at(abs_pos);
-        lc_res.addReason(r);
-}
+// void World::tagWithReason(glm::ivec2 abs_pos, ReasonToKeep r) {
+//         auto lc_res = reasons_manager.at(abs_pos);
+//         lc_res.addReason(r);
+// }
 
-void World::cleanAllChunksNoReasonToKeep() {
-        // for (auto it = chunks.begin(); it != chunks.end(); ++it) {
-        //         if (!it->second.anyReasonToKeep()) {
-        //                 chunks.erase(it);
-        //         }
-        // }
-        throw std::runtime_error("implement qeue for removing chunks, here you should empty the queue and remove each chunk one by one");
-}
+// void World::cleanAllChunksNoReasonToKeep() {
+//         // for (auto it = chunks.begin(); it != chunks.end(); ++it) {
+//         //         if (!it->second.anyReasonToKeep()) {
+//         //                 chunks.erase(it);
+//         //         }
+//         // }
+//         throw std::runtime_error("implement qeue for removing chunks, here you should empty the queue and remove each chunk one by one");
+// }
 
 //
 void World::loadChunk(glm::ivec2 chunk_pos) {
@@ -110,4 +109,6 @@ void World::loadChunk(ReadSafeChunk chunk) {
 
 }
 
-void World::unloadChunk(glm::ivec2 chunk_pos) {}
+void World::unloadChunk(glm::ivec2 chunk_pos) {
+        chunks.erase(chunk_pos);
+}

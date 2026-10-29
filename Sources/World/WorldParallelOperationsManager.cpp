@@ -1,10 +1,11 @@
 #include "WorldParallelOperationsManager.h"
+#include "WorldQueueOperation.h"
 
-WorldParallelOperationsManager::WorldParallelOperationsManager(WorldController &world_controller)
+WorldParallelOperationsManager::WorldParallelOperationsManager(WorldController *world_controller)
     : running(true), world_controller(world_controller) {
         for (int i = 0; i < nbThreads; ++i) {
                 threads.push_back(std::thread(
-                    &WorldParallelOperationsManager::threadFn, this, &world_controller));
+                    &WorldParallelOperationsManager::threadFn, this, world_controller));
         }
 }
 
@@ -13,7 +14,7 @@ WorldParallelOperationsManager::WorldParallelOperationsManager(
     : running(true), world_controller(m.world_controller) {
         for (int i = 0; i < nbThreads; ++i) {
                 threads.push_back(std::thread(
-                    &WorldParallelOperationsManager::threadFn, this, &world_controller));
+                    &WorldParallelOperationsManager::threadFn, this, world_controller));
         }
 }
 

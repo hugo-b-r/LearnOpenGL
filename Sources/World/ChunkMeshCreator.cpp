@@ -351,8 +351,8 @@ std::array<GLfloat, 48> ChunkMeshCreator::rearFace(int select, float x, float y,
 
 ChunkMeshCreator::ChunkMeshCreator(Chunk &c, float tex_factor_height, World &w, Mesh * result_location)
     : tex_vertical_factor(tex_factor_height), data(c),
-      status(ChunkMeshBuildStatus::Running), world(w) {
-        *m_mesh = {{}, {}, {}};
+      status(ChunkMeshBuildStatus::Running), world(w), m_mesh(result_location) {
+        *result_location = {{}, {}, {}};
 }
 
 
