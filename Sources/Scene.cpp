@@ -4,11 +4,18 @@
 #include "Renderer/ChunkRenderer.h"
 #include "World/World.h"
 
+#include "World/WorldController.h"
+#include "World/WorldParallelOperationsManager.h"
+
 // creating a game should be straithforward
-Game::Game(Configuration &c) : configuration(c), window(&c, this), camera(*this), renderer(), world(camera, renderer) {}
+Game::Game(Configuration &c) : configuration(c), window(&c, this), camera(*this), renderer(), world(), world_controller(&world, &renderer, this) {
+        thread_pool_manager = new WorldParallelOperationsManager(world_controller );
+}
 
 
-Game::Game() : configuration(), window(&configuration, this), camera(*this), renderer(), world(camera, renderer) {}
+Game::Game() : configuration(), window(&configuration, this), camera(*this), renderer(), world(), world_controller(&world, &renderer, this) {
+        thread_pool_manager = new WorldParallelOperationsManager(world_controller);
+}
 
 
 
@@ -34,7 +41,7 @@ void Game::mainLoop() {
                 glClearColor(0.63f, 0.87f, 1.f, 1.0f);
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-                world.render(camera, renderer);
+                renderer.render(camera);
 
                 // if (scene.configuration.showDebugInfos) {
                 //         debug_inf.drawFrame(scene);

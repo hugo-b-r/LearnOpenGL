@@ -20,6 +20,9 @@ glm::ivec2 fromBlockToChunkCoordinates(glm::ivec3 blockPos);
 // returning first block (x = 0, z = 0 in chunk) with y = blockHeight
 glm::ivec3 fromChunkToBlockCoordinates(glm::ivec2 chunkPos, int blockHeight);
 
+// return s positionf of the center of the chunk
+glm::ivec3 fromChunkToBlockCoordinatesOfCenterOfChunk(glm::ivec2 chunkPos);
+
 // Global -> local (chunk space)
 glm::ivec3 fromGlobalToInChunkCoordinates(glm::ivec3 blockPos);
 

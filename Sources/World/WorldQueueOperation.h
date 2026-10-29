@@ -2,6 +2,7 @@
 #define WORLDQUEUEOPERATION_H
 
 #include <glm/glm.hpp>
+#include <World/WorldController.h>
 #include <mutex>
 
 /* World queue operation
@@ -9,7 +10,7 @@
  * this file manages the storing of the  operations added to a queue
  */
 
-enum class WldQOperationType { kCreate, kLoad, kCreateAndLoad, kCreateMesh };
+enum class WldQOperationType { LoadOrGenerate, LoadOrGenerateThenMesh, CreateMesh };
 
 class World;
 
@@ -20,7 +21,7 @@ class WorldQueueOperation {
         WorldQueueOperation(glm::ivec2 absolute_pos, WldQOperationType type);
         virtual ~WorldQueueOperation();
 
-        void execute(World &world);
+        void execute(WorldController &world_controller);
 
       protected:
         // the absolute position of the thread that we will manage
@@ -28,13 +29,9 @@ class WorldQueueOperation {
         // the type of operation to apply to it.
         WldQOperationType type;
 
-        void executeCreate(World &world);
+        void executeLoadOrGenerate(WorldController &world_controller);
 
-        void executeLoad(World &world);
-
-        void executeCreateAndLoad(World &world);
-
-        void executeCreateMesh(World &world);
+        void executeCreateMesh(WorldController &world_controller);
 };
 
 #endif

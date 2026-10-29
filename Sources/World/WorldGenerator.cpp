@@ -2,6 +2,7 @@
 #include "CubeTexture.h"
 #include "Mathematics/Noise.h"
 #include "World/Chunk.h"
+#include "World/World.h"
 #include "utils.h"
 
 #include <iostream>
@@ -87,28 +88,28 @@ int WorldGenerator::soilHeightAt(glm::vec2 pos) {
 void WorldGenerator::addTreeAt(int i, int j, int k, World &world) {
         // create a trunk
         for (int l = j; l < std::min(j + 4, 255); l++) {
-                if (world.getBlockAt(glm::ivec3(i, l, k)) == CubeAtlas::Air)
-                        world.setBlockAt(glm::ivec3(i, l, k), CubeAtlas::Wood);
+                // if (world.getBlockAt(glm::ivec3(i, l, k)) == CubeAtlas::Air)
+                        // world.setBlockAt(glm::ivec3(i, l, k), CubeAtlas::Wood);
         }
-        for (int a = i - 2; a <= i + 2; a++) {
-                for (int b = k - 2; b <= k + 2; b++) {
-                        for (int m = 0; m < 2; m++) {
-                                if (world.getBlockAt(glm::ivec3(
-                                        a, j + 2 + m, b)) == CubeAtlas::Air)
-                                        world.setBlockAt(
-                                            glm::ivec3(a, j + 2 + m, b),
-                                            CubeAtlas::Leaves);
-                        }
-                }
-        }
-        for (int a = i - 1; a <= i + 1; a++) {
-                for (int b = k - 1; b <= k + 1; b++) {
-                        if (world.getBlockAt(glm::ivec3(a, j + 4, b)) ==
-                            CubeAtlas::Air)
-                                world.setBlockAt(glm::ivec3(a, j + 4, b),
-                                                 CubeAtlas::Leaves);
-                }
-        }
+        // for (int a = i - 2; a <= i + 2; a++) {
+        //         for (int b = k - 2; b <= k + 2; b++) {
+        //                 for (int m = 0; m < 2; m++) {
+        //                         if (world.getBlockAt(glm::ivec3(
+        //                                 a, j + 2 + m, b)) == CubeAtlas::Air)
+        //                                 world.setBlockAt(
+        //                                     glm::ivec3(a, j + 2 + m, b),
+        //                                     CubeAtlas::Leaves);
+        //                 }
+        //         }
+        // }
+        // for (int a = i - 1; a <= i + 1; a++) {
+        //         for (int b = k - 1; b <= k + 1; b++) {
+        //                 // if (world.getBlockAt(glm::ivec3(a, j + 4, b)) ==
+        //                     // CubeAtlas::Air)
+        //                         // world.setBlockAt(glm::ivec3(a, j + 4, b),
+        //                                          // CubeAtlas::Leaves);
+        //         }
+        // }
 }
 
 int WorldGenerator::sand_height(glm::ivec2 pos) {

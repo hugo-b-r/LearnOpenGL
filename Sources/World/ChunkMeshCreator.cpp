@@ -349,22 +349,15 @@ std::array<GLfloat, 48> ChunkMeshCreator::rearFace(int select, float x, float y,
         });
 };
 
-ChunkMeshCreator::ChunkMeshCreator(Chunk &c, CubeTexture &tex, World &w)
-    : nb_vertices(0), tex_vertical_factor(tex.FactorHeight()), data(c),
-      status(ChunkMeshBuildStatus::Running), m_world(w) {
-        m_mesh = {{}, {}, {}};
+ChunkMeshCreator::ChunkMeshCreator(Chunk &c, float tex_factor_height, World &w, Mesh * result_location)
+    : tex_vertical_factor(tex_factor_height), data(c),
+      status(ChunkMeshBuildStatus::Running), world(w) {
+        *m_mesh = {{}, {}, {}};
 }
 
-int ChunkMeshCreator::buildMesh() { return buildMeshThreadFn(); }
 
-Mesh ChunkMeshCreator::getMesh() { return m_mesh; }
 
-bool ChunkMeshCreator::isFinished() {
-        return status == ChunkMeshBuildStatus::DoneNotLoaded ||
-               status == ChunkMeshBuildStatus::DoneLoaded;
-}
 
-int ChunkMeshCreator::nbVertices() { return nb_vertices; }
 
 bool ChunkMeshCreator::shouldMakeFace(glm::ivec3 side_block) {
         int x = side_block.x, y = side_block.y, z = side_block.z;
@@ -391,40 +384,36 @@ bool ChunkMeshCreator::shouldMakeFace(glm::ivec3 side_block) {
         } else if (y >= CHUNK_HEIGHT) {
                 return true;
         } else {
-                auto block = m_world.getBlockAt(fromInChunkToGlobalCoordinates(
+                auto block = world.getBlockAt(fromInChunkToGlobalCoordinates(
                     side_block, data.getChunkPos()));
-                switch (block) {
-                case CubeAtlas::Air:
+                if (block.has_value()) {
+                        switch (block.value()) {
+                        case CubeAtlas::Air:
+                                return true;
+                        case CubeAtlas::Leaves:
+                                return true;
+                        default:
+                                return false;
+                        }
+                } else {
+                        // no block so yeah
                         return true;
-                case CubeAtlas::Leaves:
-                        return true;
-                default:
-                        return false;
                 }
         }
 }
 
-int ChunkMeshCreator::buildMeshThreadFn() {
-        m_world.get_mutex().lock();
-        if (!(m_world.existsAt(data.getChunkPos() + glm::ivec2(1, 0)) &&
-              m_world.existsAt(data.getChunkPos() + glm::ivec2(-1, 0)) &&
-              m_world.existsAt(data.getChunkPos() + glm::ivec2(0, -1)) &&
-              m_world.existsAt(data.getChunkPos() + glm::ivec2(0, 1)))) {
-                m_world.get_mutex().unlock();
 
-                return 0;
-        } else {
-                m_world.get_mutex().unlock();
-                for (int i = 0; i < CHUNK_WIDTH; i++) {
-                        for (int j = 0; j < CHUNK_HEIGHT; j++) {
-                                for (int k = 0; k < CHUNK_LENGTH; k++) {
-                                        addBlockMesh(i, j, k);
-                                }
+
+/// Contract : hey give me neighbors bruh
+void ChunkMeshCreator::buildMesh() {
+        for (int i = 0; i < CHUNK_WIDTH; i++) {
+                for (int j = 0; j < CHUNK_HEIGHT; j++) {
+                        for (int k = 0; k < CHUNK_LENGTH; k++) {
+                                addBlockMesh(i, j, k);
                         }
                 }
-                status = ChunkMeshBuildStatus::DoneLoaded;
-                return nb_vertices;
         }
+        status = ChunkMeshBuildStatus::DoneLoaded;
 }
 
 void ChunkMeshCreator::addBlockMesh(int i, int j, int k) {
@@ -439,49 +428,43 @@ void ChunkMeshCreator::addBlockMesh(int i, int j, int k) {
                 std::array<GLfloat, 48> temp =
                     upFace((int)block, (float)i, (float)j, (float)k);
 
-                m_mesh.vertexPositions.insert(m_mesh.vertexPositions.end(),
+                m_mesh->vertexPositions.insert(m_mesh->vertexPositions.end(),
                                               temp.begin(), temp.end());
-                nb_vertices += 6;
         }
 
         if (shouldMakeFace(neighboors.down)) {
                 std::array<GLfloat, 48> temp =
                     downFace((int)block, (float)i, (float)j, (float)k);
 
-                m_mesh.vertexPositions.insert(m_mesh.vertexPositions.end(),
+                m_mesh->vertexPositions.insert(m_mesh->vertexPositions.end(),
                                               temp.begin(), temp.end());
-                nb_vertices += 6;
         }
         if (shouldMakeFace(neighboors.left)) {
                 std::array<GLfloat, 48> temp =
                     leftFace((int)block, (float)i, (float)j, (float)k);
 
-                m_mesh.vertexPositions.insert(m_mesh.vertexPositions.end(),
+                m_mesh->vertexPositions.insert(m_mesh->vertexPositions.end(),
                                               temp.begin(), temp.end());
-                nb_vertices += 6;
         }
         if (shouldMakeFace(neighboors.right)) {
                 std::array<GLfloat, 48> temp =
                     rightFace((int)block, (float)i, (float)j, (float)k);
 
-                m_mesh.vertexPositions.insert(m_mesh.vertexPositions.end(),
+                m_mesh->vertexPositions.insert(m_mesh->vertexPositions.end(),
                                               temp.begin(), temp.end());
-                nb_vertices += 6;
         }
         if (shouldMakeFace(neighboors.front)) {
                 std::array<GLfloat, 48> temp =
                     frontFace((int)block, (float)i, (float)j, (float)k);
 
-                m_mesh.vertexPositions.insert(m_mesh.vertexPositions.end(),
+                m_mesh->vertexPositions.insert(m_mesh->vertexPositions.end(),
                                               temp.begin(), temp.end());
-                nb_vertices += 6;
         }
         if (shouldMakeFace(neighboors.rear)) {
                 std::array<GLfloat, 48> temp =
                     rearFace((int)block, (float)i, (float)j, (float)k);
 
-                m_mesh.vertexPositions.insert(m_mesh.vertexPositions.end(),
+                m_mesh->vertexPositions.insert(m_mesh->vertexPositions.end(),
                                               temp.begin(), temp.end());
-                nb_vertices += 6;
         }
 }

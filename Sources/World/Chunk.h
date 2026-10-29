@@ -4,8 +4,7 @@
 #include "CubeTexture.h"
 #include "Mathematics/AABB.h"
 #include "Mesh.h"
-#include "Renderer/ChunkRenderer.h"
-#include "World.h"
+#include "Camera.h"
 
 #include <glm/glm.hpp>
 #include <vector>
@@ -24,7 +23,7 @@ enum class ChunkDataLoadStatus {
 class ChunkMeshCreator;
 class ChunkRenderer;
 class World;
-class LockableChunk;
+class RemoveSafeChunk;
 enum class ChunkMeshBuildStatus;
 
 class Chunk {
@@ -34,6 +33,8 @@ class Chunk {
         Chunk(glm::ivec2 pos);
         // creates a chunk at pos (x, y) in chunk coordinates among other chunks
         Chunk(int x, int y);
+
+        virtual ~Chunk();
         CubeAtlas getBlockAt(int x, int y, int z);
         void setBlockAt(int x, int y, int z, CubeAtlas ca);
 

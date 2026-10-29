@@ -9,24 +9,21 @@
 
 
 enum class ReasonToKeep {InDirectRenderZone, UsedForMeshing};
-class LockableChunk {
+class ReasonToKeepManager {
       public:
-        LockableChunk();
-        LockableChunk(Chunk &c);
-        LockableChunk(const LockableChunk &);
-        ~LockableChunk();
+        // ReadSafeChunk();
+        ReasonToKeepManager();
+        ReasonToKeepManager(const ReasonToKeepManager&);
+        virtual ~ReasonToKeepManager();
 
-        Chunk * lock();
-        std::optional<Chunk *> try_lock();
-        void unlock();
 
         void addReason(ReasonToKeep r);
         void removeReason(ReasonToKeep r);
         bool anyReasonToKeep();
       protected:
+        std::mutex locker_reasons;
         std::unordered_set<ReasonToKeep> reason;
-        std::mutex locker;
-        Chunk chunk_value;
+
 };
 
 #endif

@@ -6,6 +6,7 @@ target_sources(${TARGET_NAME} PRIVATE
     "WorldQueueOperation.cpp"
     "WorldParallelOperationsManager.cpp"
     "LockableChunk.cpp"
+    "WorldController.cpp"
 )
 
 if(BUILD_TESTS)

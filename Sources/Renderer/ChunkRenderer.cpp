@@ -1,6 +1,8 @@
 #include "CubeTexture.h"
 #include "Shader.h"
+#include "World/LockableChunk.h"
 #include "glm/ext/matrix_transform.hpp"
+#include "utils.h"
 #include <Camera.h>
 #include <GLFW/glfw3.h>
 #include <Renderer/ChunkRenderer.h>
@@ -33,18 +35,20 @@ ChunkRenderer::ChunkRenderer()
 //         // }
 // }
 
-void ChunkRenderer::render(Model &c, Camera &cam, int nb_vertices, glm::vec3 chunk_center,
-                           bool bindShader, bool bindTexture) {
-                if (bindShader)
-                        m_shader.use();
-                c.bindVAO();
-                if (bindTexture)
-                        texture.bind();
-                glm::mat4 modelMat = glm::mat4(1.f);
-                modelMat = glm::translate(modelMat, chunk_center);
-                m_shader.setMat4("model", modelMat);
-                // render container
-                glDrawArrays(GL_TRIANGLES, 0, nb_vertices);
+void ChunkRenderer::render(Camera &cam) {
+        m_shader.use();
+        texture.bind();
+        glm::mat4 modelMat = glm::mat4(1.f);
+        for (auto it = models_for_render.begin(); it != models_for_render.end();
+             ++it) {
+                if (cam.getFrustum().IsAabbVisible(it->boundingBox)) {
+                        it->model.bindVAO();
+                        modelMat = glm::translate(modelMat, it->center_pos);
+                        m_shader.setMat4("model", modelMat);
+                        // render container
+                        glDrawArrays(GL_TRIANGLES, 0, it->nb_vertices);
+                }
+        }
 }
 
 Shader &ChunkRenderer::getShader() { return m_shader; }
@@ -53,3 +57,16 @@ void ChunkRenderer::bindTextureAndShader() {
         texture.bind();
         m_shader.use();
 }
+
+void ChunkRenderer::addChunkToRender(glm::ivec2 abs_pos, World *w, AABB bounding_box, Mesh * mesh) {
+        // load on the gpu
+        Model m(*mesh);
+
+        models_lock.lock();
+
+        models_for_render.push_front(LocalizedBoundedModel(m, bounding_box, abs_pos, mesh->getNbVertices(), fromChunkToBlockCoordinatesOfCenterOfChunk(abs_pos)));
+
+        models_lock.unlock();
+        w->IdontNeedAnymore(abs_pos, ReasonToKeep::UsedForMeshing);
+}
+

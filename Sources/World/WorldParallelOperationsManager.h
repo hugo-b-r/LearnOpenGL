@@ -4,8 +4,9 @@
 #include <queue>
 #include <thread>
 #include <vector>
+#include <mutex>
 
-#include "World.h"
+#include "WorldController.h"
 #include "WorldQueueOperation.h"
 
 class WorldQueueOperation;
@@ -13,13 +14,13 @@ class World;
 
 class WorldParallelOperationsManager {
       public:
-        WorldParallelOperationsManager(World &world);
+        WorldParallelOperationsManager(WorldController &world_controller);
         WorldParallelOperationsManager(const WorldParallelOperationsManager &m);
         ~WorldParallelOperationsManager();
 
         void pushBackOperation(WorldQueueOperation op);
 
-        void threadFn(World *world);
+        void threadFn(WorldController *world_controller);
 
       protected:
         bool running;
@@ -28,7 +29,7 @@ class WorldParallelOperationsManager {
 
         const int nbThreads = 7;
         std::vector<std::thread> threads;
-        World &world;
+        WorldController &world_controller;
 };
 
 #endif

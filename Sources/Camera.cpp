@@ -77,10 +77,10 @@ void Camera::translate_with_collisions(glm::vec3 trans) {
                         for (int y = min.y; y < max.y; ++y) {
                                 for (int z = min.z; z < max.z; ++z) {
                                         glm::vec3 tmp_pos(x, y, z);
-                                        CubeAtlas block =
+                                        std::optional<CubeAtlas> block =
                                             m_scene.world.getBlockAt(
                                                 tmp_pos);
-                                        if (block != CubeAtlas::Air) {
+                                        if (block.has_value() && block.value() != CubeAtlas::Air) {
                                                 collided = true;
                                                 break;
                                         }

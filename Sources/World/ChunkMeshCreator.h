@@ -15,25 +15,19 @@ class World;
 
 class ChunkMeshCreator {
 public:
-  ChunkMeshCreator(Chunk& c, CubeTexture& tex, World& m);
-  int buildMesh();
+  ChunkMeshCreator(Chunk& c, float tex_factor_height, World& m, Mesh* result_location);
+  void buildMesh();
 
-  bool isFinished();
-  int nbVertices();
 
-  Mesh getMesh();
 
 protected:
     bool shouldMakeFace(glm::ivec3 side_block);
 
-    int buildMeshThreadFn();
 
     /// push to m_mesh the mesh of a block, checking if it needs to build or not
     void addBlockMesh(int i, int j, int k);
 
-    Mesh m_mesh;
-    int nb_vertices;
-
+    Mesh * m_mesh;
     std::array<GLfloat, 48> upFace(int select, float x, float y, float z) const;
     std::array<GLfloat, 48> downFace(int select, float x, float y, float z) const;
     std::array<GLfloat, 48> leftFace(int select, float x, float y, float z) const;
@@ -46,7 +40,7 @@ protected:
     Chunk& data;
     ChunkMeshBuildStatus status;
 
-    World& m_world;
+    World& world;
 
 
 };

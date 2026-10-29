@@ -4,7 +4,6 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glad/glad.h>
 
-#include "World/World.h"
 #include <GLFW/glfw3.h>
 #include <glm/gtx/string_cast.hpp>
 

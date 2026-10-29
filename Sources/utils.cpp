@@ -32,6 +32,11 @@ glm::ivec3 fromChunkToBlockCoordinates(glm::ivec2 chunkPos, int blockHeight) {
     return glm::ivec3(chunkPos.x *CHUNK_WIDTH, blockHeight, chunkPos.y*CHUNK_LENGTH);
 }
 
+glm::ivec3 fromChunkToBlockCoordinatesOfCenterOfChunk(glm::ivec2 chunkPos) {
+    return fromChunkToBlockCoordinates(chunkPos, 0) + glm::ivec3(CHUNK_WIDTH/2, CHUNK_HEIGHT/2, CHUNK_LENGTH/2);
+}
+
+
 glm::ivec3 fromGlobalToInChunkCoordinates(glm::ivec3 blockPos) {
     int xc = blockPos.x % CHUNK_WIDTH;
     if (xc < 0) {

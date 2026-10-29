@@ -1,54 +1,41 @@
 #include "LockableChunk.h"
 #include <optional>
 
-LockableChunk::LockableChunk() : chunk_value() {}
-LockableChunk::LockableChunk(Chunk &c) : chunk_value(c) {}
+// ReadSafeChunk::ReadSafeChunk() : chunk_value() {}
+ReasonToKeepManager::ReasonToKeepManager() {}
 
-LockableChunk::LockableChunk(const LockableChunk &other_chunk) {
-        chunk_value = other_chunk.chunk_value;
+ReasonToKeepManager::ReasonToKeepManager(const ReasonToKeepManager &other_chunk) {
 }
 
-LockableChunk::~LockableChunk() {
+ReasonToKeepManager::~ReasonToKeepManager() {
         // delete chunk_value;
 }
 
-Chunk *LockableChunk::lock() {
-        locker.lock();
-        return &chunk_value;
-}
-
-std::optional<Chunk*> LockableChunk::try_lock() {
-        if (locker.try_lock()) {
-                return &chunk_value;
-        } else {
-                return std::nullopt;
-        }
-}
-
-void LockableChunk::unlock() { locker.unlock(); }
 
 
-void LockableChunk::addReason(ReasonToKeep r) {
-        locker.lock();
+void ReasonToKeepManager::addReason(ReasonToKeep r) {
+        locker_reasons.lock();
 
         reason.insert(r);
-        locker.unlock();
+        locker_reasons.unlock();
 }
 
-void LockableChunk::removeReason(ReasonToKeep r) {
-        locker.lock();
+void ReasonToKeepManager::removeReason(ReasonToKeep r) {
+        locker_reasons.lock();
 
         reason.erase(r);
 
-        locker.unlock();
+        locker_reasons.unlock();
 }
 
-bool LockableChunk::anyReasonToKeep() {
-        locker.lock();
+bool ReasonToKeepManager::anyReasonToKeep() {
+        locker_reasons.lock();
 
         bool res = !reason.empty();
 
-        locker.unlock();
+        locker_reasons.unlock();
 
         return res;
 }
+
+

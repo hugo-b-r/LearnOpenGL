@@ -4,9 +4,11 @@
 #include "Configuration.h"
 #include "Camera.h"
 
+#include "Renderer/ChunkRenderer.h"
 #include "OpenGLWindow.h"
 #include "World/World.h"
-#include "Renderer/ChunkRenderer.h"
+#include "World/WorldController.h"
+#include "World/WorldParallelOperationsManager.h"
 
 // class OpenGLWindow;
 
@@ -34,6 +36,8 @@ public:
   Camera camera;
   ChunkRenderer renderer;
   World world;
+  WorldController world_controller;
+  WorldParallelOperationsManager *thread_pool_manager;
 
 private:
 };

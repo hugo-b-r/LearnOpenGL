@@ -1,9 +1,14 @@
 #include <spdlog/spdlog.h>
 
+#include "Mesh.h"
+#include "World/ChunkMeshCreator.h"
 #include "World/LockableChunk.h"
 
 #include "Chunk.h"
+#include "World/World.h"
 #include "WorldQueueOperation.h"
+#include "Renderer/ChunkRenderer.h"
+#include "World/WorldGenerator.h"
 
 #include <iostream>
 #include <thread>
@@ -18,79 +23,41 @@ WorldQueueOperation::WorldQueueOperation(glm::ivec2 absolute_pos,
 WorldQueueOperation::~WorldQueueOperation() {}
 
 // exeuctes the operations of the type
-void WorldQueueOperation::execute(World &world) {
+void WorldQueueOperation::execute(WorldController &world_controller) {
         switch (type) {
-        case WldQOperationType::kCreate:
-                return executeCreate(world);
+        case WldQOperationType::LoadOrGenerate:
+                return executeLoadOrGenerate(world_controller);
                 break;
-        case WldQOperationType::kLoad:
-                return executeLoad(world);
+        case WldQOperationType::LoadOrGenerateThenMesh:
+                executeLoadOrGenerate(world_controller);
+                executeCreateMesh(world_controller);
                 break;
-        case WldQOperationType::kCreateAndLoad:
-                return executeCreateAndLoad(world);
-                break;
-        case WldQOperationType::kCreateMesh:
-                return executeCreateMesh(world);
+        case WldQOperationType::CreateMesh:
+                return executeCreateMesh(world_controller);
                 break;
         }
         spdlog::info("end of execution !");
 }
 
-void WorldQueueOperation::executeCreate(World &world) {
-        world.get_mutex().lock();
-        if (!world.existsAt(abs_pos)) {
-                world.get_mutex().unlock();
-                return;
-        }
-        LockableChunk l_chunk = world.getAbsoluteAt(abs_pos);
-        Chunk *actual_chunk_ptr = l_chunk.lock();
-        if (actual_chunk_ptr == nullptr) {
-                Chunk *chunk_ptr = new Chunk(abs_pos);
-                if (!world.existsAt(abs_pos)) {
-                        l_chunk.unlock();
-                        world.get_mutex().unlock();
-                        return;
-                }
-                world.setAbsoluteAt(abs_pos, chunk_ptr);
-        }
+// create a chunk data
+void WorldQueueOperation::executeLoadOrGenerate(WorldController &world_controller) {
 
-        l_chunk.unlock();
-        world.get_mutex().unlock();
+        std::shared_ptr<Chunk> c = std::make_shared<Chunk>(Chunk(abs_pos));
+
+        WorldGenerator::buildChunk(*c.get(), *world_controller.world);
+        world_controller.addMeshAndGPULoadChunkJob(c);
 }
 
-void WorldQueueOperation::executeLoad(World &world) {
-        world.get_mutex().lock();
-        if (!world.existsAt(abs_pos)) {
-                world.get_mutex().unlock();
-                return;
-        }
-        LockableChunk l_chunk = world.getAbsoluteAt(abs_pos);
-        Chunk *actual_chunk_ptr = l_chunk.lock();
-        world.get_mutex().unlock();
-        if (actual_chunk_ptr != nullptr) {
-                actual_chunk_ptr->load(&world);
-        }
-        l_chunk.unlock();
-}
 
-void WorldQueueOperation::executeCreateAndLoad(World &world) {
-        executeCreate(world);
-        executeLoad(world);
-}
-
-void WorldQueueOperation::executeCreateMesh(World &world) {
+/// create the mesh for an existing chunk
+void WorldQueueOperation::executeCreateMesh(WorldController &world_controller) {
         // std::this_thread::sleep_for(1000ms);
-        world.get_mutex().lock();
-        LockableChunk l_chunk = world.getAbsoluteAt(abs_pos);
-        Chunk *actual_chunk_ptr = l_chunk.lock();
-
-        world.get_mutex().unlock();
-
-        if (actual_chunk_ptr != nullptr) {
-                // creating the mesh
-                actual_chunk_ptr->createMesh(&world, world.renderer.texture);
-                // ask the main thread to be loaded on the gpu
-                world.addChunkMeshToLoad(abs_pos);
+        auto l_chunk_res = world_controller.world->getAbsoluteChunkAt(abs_pos);
+        if (l_chunk_res.has_value()) { // should normally but hey let's check
+                Mesh * m = new Mesh;
+                ChunkMeshCreator builder (*l_chunk_res.value().get(), world_controller.renderer->texture.FactorHeight(), *world_controller.world, m);
+                builder.buildMesh();
+                AABB bounding_box = l_chunk_res.value().get()->getBoundingBox();
+                world_controller.addMeshToLoadJob(abs_pos, m, bounding_box);
         }
-        l_chunk.unlock();
 }
