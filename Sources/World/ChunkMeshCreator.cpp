@@ -414,6 +414,7 @@ void ChunkMeshCreator::buildMesh() {
                 }
         }
         status = ChunkMeshBuildStatus::DoneLoaded;
+        spdlog::debug("mesh : {}", m_mesh->vertexPositions.size());
 }
 
 void ChunkMeshCreator::addBlockMesh(int i, int j, int k) {

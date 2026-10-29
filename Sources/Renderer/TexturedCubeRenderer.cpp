@@ -121,7 +121,7 @@ TexturedCubeRenderer::TexturedCubeRenderer(CubeAtlas ca)
   // };
 
 
-  m_quadModel.loadData({vertices, {}, {}}, {3, 2});
+  m_quadModel.loadData({3, 2});
 }
 
 void TexturedCubeRenderer::add(glm::vec3 pos, CubeOrientation orientation) {

@@ -7,13 +7,13 @@
 class Model {
     public:
         Model() = default;
-        Model(const Mesh& mesh);
+        Model(Mesh* mesh);
         ~Model();
 
         // Model(const Model& other);
         // Model& operator=(const Model& other) const;
 
-        void loadData(const Mesh& mesh, std::vector<int> dimensions = {});
+        void loadData(std::vector<int> dimensions = {});
 
         void genVAO();
         void addEBO(const std::vector<GLuint>& indices);
@@ -30,6 +30,8 @@ class Model {
         bool vbo_generated = false;
         bool vao_generation = false;
         bool ebo_generated = false;
+
+        Mesh * mesh;
 
         std::vector<GLuint> m_buffers;
 

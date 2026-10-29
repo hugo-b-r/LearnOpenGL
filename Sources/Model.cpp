@@ -5,9 +5,9 @@
 #include "CubeTexture.h"
 #include "Mesh.h"
 #include "utils.h"
+#include <spdlog/spdlog.h>
 
-Model::Model(const Mesh& mesh) : m_vboCount(0) {
-    loadData(mesh, {});
+Model::Model(Mesh *mesh) : m_vboCount(0), mesh(mesh){
 }
 
 Model::~Model() {
@@ -31,16 +31,16 @@ Model::~Model() {
 
 }
 
-void Model::loadData(const Mesh& mesh, std::vector<int> dimensions) {
+void Model::loadData(std::vector<int> dimensions) {
     m_vboCount = 0;
     genVAO();
     for (int& i : dimensions) {
-        addVBO(i, mesh.vertexPositions);
+        addVBO(i, mesh->vertexPositions);
     }
-    if (mesh.textureCoords.size()>0)
-        addVBO(2, mesh.textureCoords);
-    if (mesh.indices.size()>0)
-        addEBO(mesh.indices);
+    if (mesh->textureCoords.size()>0)
+        addVBO(2, mesh->textureCoords);
+    if (mesh->indices.size()>0)
+        addEBO(mesh->indices);
 }
 
 void Model::bindVAO() {

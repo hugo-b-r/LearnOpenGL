@@ -6,19 +6,19 @@
 
 QuadRenderer::QuadRenderer() {
   m_transforModel = glm::mat4(1.f);
-  m_quadModel.loadData({{0.5f, 0.5f, 0.0f,   // top right
-                         0.5f, -0.5f, 0.0f,  // bottom right
-                         -0.5f, -0.5f, 0.0f, // bottom left
-                         -0.5f, 0.5f, 0.0f},
-                        {},
-                        {
-                            0,
-                            1,
-                            3,
-                            1,
-                            2,
-                            3,
-                        }});
+  // m_quadModel.loadData({{0.5f, 0.5f, 0.0f,   // top right
+  //                        0.5f, -0.5f, 0.0f,  // bottom right
+  //                        -0.5f, -0.5f, 0.0f, // bottom left
+  //                        -0.5f, 0.5f, 0.0f},
+  //                       {},
+  //                       {
+  //                           0,
+  //                           1,
+  //                           3,
+  //                           1,
+  //                           2,
+  //                           3,
+  //                       }});
 }
 
 void QuadRenderer::render(Shader &shader, Camera &cam) {

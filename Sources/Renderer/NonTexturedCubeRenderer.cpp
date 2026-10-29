@@ -8,31 +8,31 @@ const int CUBE_NB_VERTICES = 36;
 NonTexturedCubeRenderer::NonTexturedCubeRenderer(glm::vec3 pos, bool rotating) : m_pos(pos), m_rotating(rotating){
 glm::mat4 view (1.0f);
     view = glm::translate(view, pos);
-  m_quadModel.loadData({{
-                            -0.5, -0.5, -0.5, // A
-                            0.5, -0.5, -0.5, // B
-                            0.5, -0.5, 0.5, // C
-                            0.5, 0.5, 0.5, //D
-                            0.5, 0.5, -0.5, // E
-                            -0.5, 0.5, -0.5, //F
-                            -0.5, 0.5, 0.5, //G
-                            -0.5, -0.5, 0.5 // H
-                        },
-                        {},
-                        {
-                            0, 1, 4, // ABE
-                            1, 2, 3, // BCD
-                            2, 7, 6, // CHG
-                            7, 0, 5, // HAF
-                            4, 5, 6, // EFG
-                            1, 2, 7, // BCH
-                            0, 5, 4, // ABE
-                            1, 4, 3, // BCD
-                            2, 3, 6, // CHG
-                            7, 6, 5, // HAF
-                            4, 3, 6, // EFG
-                            1, 0, 7, // BCH
-                        }});
+  // m_quadModel.loadData({{
+  //                           -0.5, -0.5, -0.5, // A
+  //                           0.5, -0.5, -0.5, // B
+  //                           0.5, -0.5, 0.5, // C
+  //                           0.5, 0.5, 0.5, //D
+  //                           0.5, 0.5, -0.5, // E
+  //                           -0.5, 0.5, -0.5, //F
+  //                           -0.5, 0.5, 0.5, //G
+  //                           -0.5, -0.5, 0.5 // H
+  //                       },
+  //                       {},
+  //                       {
+  //                           0, 1, 4, // ABE
+  //                           1, 2, 3, // BCD
+  //                           2, 7, 6, // CHG
+  //                           7, 0, 5, // HAF
+  //                           4, 5, 6, // EFG
+  //                           1, 2, 7, // BCH
+  //                           0, 5, 4, // ABE
+  //                           1, 4, 3, // BCD
+  //                           2, 3, 6, // CHG
+  //                           7, 6, 5, // HAF
+  //                           4, 3, 6, // EFG
+  //                           1, 0, 7, // BCH
+  //                       }});
 }
 
 void NonTexturedCubeRenderer::render(Shader &shader, Camera &cam) {

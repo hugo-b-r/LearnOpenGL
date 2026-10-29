@@ -58,6 +58,7 @@ void WorldQueueOperation::executeCreateMesh(WorldController &world_controller) {
                 ChunkMeshCreator builder (*l_chunk_res.value().get(), world_controller.renderer->texture.FactorHeight(), *world_controller.world, m);
 
                 builder.buildMesh();
+                l_chunk_res.value().get()->createBoundingBox();
                 AABB bounding_box = l_chunk_res.value().get()->getBoundingBox();
                 world_controller.addMeshToLoadJob(abs_pos, m, bounding_box);
         }

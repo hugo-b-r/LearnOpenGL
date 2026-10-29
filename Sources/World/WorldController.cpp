@@ -72,6 +72,7 @@ void WorldController::moveWorld(glm::ivec2 new_player_pos) {
 
 void WorldController::loadOneMeshOnGpu() {
         MeshToLoadBundle &meshB = meshes_to_load.front();
+        meshes_to_load.pop();
         renderer->addChunkToRender(meshB.abs_pos, world, meshB.bounding_box,
                                    meshB.ptr);
 }
