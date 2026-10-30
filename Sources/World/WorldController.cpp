@@ -1,16 +1,13 @@
 #include "World/WorldController.h"
 #include "Renderer/ChunkRenderer.h"
 #include "Scene.h"
-#include "World/LockableChunk.h"
 #include "World/WorldQueueOperation.h"
-
-#include <iostream>
 #include <spdlog/spdlog.h>
 
 WorldController::WorldController(World *w, ChunkRenderer *r, Game *g,
                                  int render_distance)
-    : world(w), renderer(r), chunkWidth(2 * (render_distance + 1) + 1), game(g),
-      lastPlayerChunkPos(glm::ivec2(0, 0)) {
+    : world(w), renderer(r), lastPlayerChunkPos(glm::ivec2(0, 0)),
+      chunkWidth(2 * (render_distance + 1) + 1), game(g) {
         // init world by loading a lot of chunks and tell I need them
 }
 
@@ -19,7 +16,7 @@ WorldController::~WorldController() {}
 void WorldController::perFrameControl(glm::ivec2 new_player_pos) {
         // check if player pos moved
         // if so move the world accordingly
-        
+
         for (int i = 0; i < number_chunks_to_delete_at_a_time; ++i) {
                 renderer->doOneQueuedChunkRemovalIfNeeded();
         }
@@ -57,7 +54,6 @@ void WorldController::removeChunkFromGPU(glm::ivec2 abs_pos) {
         renderer->sendCommandToRemoveChunk(abs_pos);
 }
 
-void WorldController::removeChunkHandleWorldAndGPU(glm::ivec2 chunk_pos) {}
 
 void WorldController::moveWorld(glm::ivec2 new_player_pos) {
         int manhattan_radius_limit = game->configuration.renderDistance;
@@ -121,8 +117,8 @@ void WorldController::loadOneMeshOnGpu() {
         chunk_properties_lock.lock();
         if (chunk_properties.contains(meshB.abs_pos) &&
             !chunk_properties.at(meshB.abs_pos).in_renderer) {
-                renderer->addChunkToRender(meshB.abs_pos, world,
-                                           meshB.bounding_box, meshB.ptr);
+                renderer->addChunkToRender(meshB.abs_pos, meshB.bounding_box,
+                                           meshB.ptr);
                 chunk_properties.at(meshB.abs_pos).in_renderer = true;
         }
         chunk_properties_lock.unlock();
@@ -150,7 +146,6 @@ void WorldController::addMeshAndGPULoadChunkJob(std::shared_ptr<Chunk> chunk) {
                 if (chunk_properties.contains(key) &&
                     !chunk_properties.at(key).in_renderer &&
                     chunk_properties.at(key).in_world) {
-                        spdlog::debug("haha !!!");
                         game->thread_pool_manager->pushBackOperation(
                             WorldQueueOperation(key,
                                                 WldQOperationType::CreateMesh));
@@ -166,8 +161,6 @@ void WorldController::addMeshToLoadJob(glm::ivec2 abs_pos, Mesh *mesh,
         meshes_to_load.emplace(MeshToLoadBundle(mesh, abs_pos, bounding_box));
         meshes_to_load_lock.unlock();
 }
-
-
 
 void WorldController::initialLoad(
     WorldParallelOperationsManager *thread_pool_manager) {

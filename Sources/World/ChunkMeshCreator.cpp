@@ -4,9 +4,7 @@
 #include "Mesh.h"
 #include "World.h"
 #include "utils.h"
-
 #include <array>
-#include <iostream>
 #include <memory>
 #include <spdlog/spdlog.h>
 
@@ -353,8 +351,8 @@ std::array<GLfloat, 48> ChunkMeshCreator::rearFace(int select, float x, float y,
 
 ChunkMeshCreator::ChunkMeshCreator(Chunk &c, float tex_factor_height, World &w,
                                    Mesh *result_location)
-    : tex_vertical_factor(tex_factor_height), data(c),
-      status(ChunkMeshBuildStatus::Running), world(w), m_mesh(result_location) {
+    :m_mesh(result_location), tex_vertical_factor(tex_factor_height), data(c),
+      status(ChunkMeshBuildStatus::Running), world(w)  {
         *result_location = {{}, {}, {}};
 }
 
@@ -427,7 +425,6 @@ ChunkMeshCreator::getFromNeighbors(glm::ivec3 block_pos,
 bool ChunkMeshCreator::buildMesh() {
         auto neighbors = world.getChunkNeighbors(data.getChunkPos());
         if (neighbors.has_value()) {
-                spdlog::debug("it has value omg");
                 for (int i = 0; i < CHUNK_WIDTH; i++) {
                         for (int j = 0; j < CHUNK_HEIGHT; j++) {
                                 for (int k = 0; k < CHUNK_LENGTH; k++) {

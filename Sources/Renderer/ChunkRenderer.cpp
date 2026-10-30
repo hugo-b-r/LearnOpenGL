@@ -1,6 +1,5 @@
 #include "CubeTexture.h"
 #include "Shader.h"
-#include "World/LockableChunk.h"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/ext/vector_int2.hpp"
 #include "utils.h"
@@ -9,13 +8,10 @@
 #include <Renderer/ChunkRenderer.h>
 #include <World/Chunk.h>
 #include <World/ChunkMeshCreator.h>
-#include <iostream>
 #include <spdlog/spdlog.h>
 #define GLM_ENABLE_EXPERIMENTAL
 #include "../deps/glm/glm/gtx/string_cast.hpp"
 #include "Camera.h"
-
-const glm::mat4 view_mat(1.0f);
 
 ChunkRenderer::ChunkRenderer()
     : texture("./Assets/texture_atlas.png"),
@@ -24,27 +20,22 @@ ChunkRenderer::ChunkRenderer()
 
 void ChunkRenderer::doOneQueuedChunkRemovalIfNeeded() {
         chunks_models_to_remove_lock.lock();
-        if (chunks_models_to_remove.size()>0) {
+        if (chunks_models_to_remove.size() > 0) {
                 glm::ivec2 toRemove = chunks_models_to_remove.front();
                 removeChunkFromRender(toRemove);
                 chunks_models_to_remove.pop();
         }
         chunks_models_to_remove_lock.unlock();
-        
 }
 
 void ChunkRenderer::render(Camera &cam) {
-
-
 
         // do the rendering
         getShader().setVec3("lightPos", glm::vec3(0, 300, 0));
         getShader().setVec3("viewPos", cam.position);
         bindTextureAndShader();
-        // Frustum &f = cam.getFrustum();
 
         //  Draw each chunk
-        int total_drawn = 0;
         getShader().setMat4("view", view_mat);
         getShader().setMat4("projection", cam.getProjectionViewMatrix());
 
@@ -73,8 +64,8 @@ void ChunkRenderer::bindTextureAndShader() {
         m_shader.use();
 }
 
-void ChunkRenderer::addChunkToRender(glm::ivec2 abs_pos, World *w,
-                                     AABB bounding_box, Mesh *mesh) {
+void ChunkRenderer::addChunkToRender(glm::ivec2 abs_pos, AABB bounding_box,
+                                     Mesh *mesh) {
         // load on the gpu
         Model m(mesh);
 
@@ -92,13 +83,13 @@ void ChunkRenderer::addChunkToRender(glm::ivec2 abs_pos, World *w,
 
         // for (const auto& el: models_for_render) {
         //         spdlog::debug("{}:{}", el.center_pos.x, el.center_pos.y);
-        // } 
+        // }
         // models_lock.unlock();
 
         loaded_pos_lock.lock();
         loaded_pos.insert(abs_pos);
         loaded_pos_lock.unlock();
-        
+
         // delete mesh;
         // w->IdontNeedAnymore(abs_pos, ReasonToKeep::UsedForMeshing);
 }
@@ -116,13 +107,12 @@ bool ChunkRenderer::isChunkInRenderer(glm::ivec2 abs_pos) {
         return res;
 }
 
-
-
 void ChunkRenderer::removeChunkFromRender(glm::ivec2 chunk_pos) {
         loaded_pos_lock.lock();
         loaded_pos.insert(chunk_pos);
         loaded_pos_lock.unlock();
         // std::cout << "trying to erase" << std::endl;
-        models_for_render.remove_if(
-            [&](const LocalizedBoundedModel& it) {  return it.pos == chunk_pos; });
+        models_for_render.remove_if([&](const LocalizedBoundedModel &it) {
+                return it.pos == chunk_pos;
+        });
 }

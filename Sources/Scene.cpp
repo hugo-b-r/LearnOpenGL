@@ -9,18 +9,22 @@
 #include "utils.h"
 
 // creating a game should be straithforward
-Game::Game(Configuration &c) : configuration(c), window(&c, this), camera(*this), renderer(), world(), world_controller(&world, &renderer, this, camera.getRenderDistance()) {
-        thread_pool_manager = new WorldParallelOperationsManager(&world_controller);
+Game::Game(Configuration &c)
+    : configuration(c), window(&c, this), camera(*this), renderer(), world(),
+      world_controller(&world, &renderer, this, camera.getRenderDistance()) {
+        thread_pool_manager =
+            new WorldParallelOperationsManager(&world_controller);
         world_controller.initialLoad(thread_pool_manager);
 }
 
-
-Game::Game() : configuration(), window(&configuration, this), camera(*this), renderer(), world(), world_controller(&world, &renderer, this, camera.getRenderDistance()) {
-        thread_pool_manager = new WorldParallelOperationsManager(&world_controller);
+Game::Game()
+    : configuration(), window(&configuration, this), camera(*this), renderer(),
+      world(),
+      world_controller(&world, &renderer, this, camera.getRenderDistance()) {
+        thread_pool_manager =
+            new WorldParallelOperationsManager(&world_controller);
         world_controller.initialLoad(thread_pool_manager);
 }
-
-
 
 // Camera &Game::getCamera() { return m_cam; }
 // Configuration &Game::getConfig() { return m_config; }
@@ -31,21 +35,19 @@ Game::Game() : configuration(), window(&configuration, this), camera(*this), ren
 /// detection
 //
 
-
 void Game::mainLoop() {
-        
+
         while (window.shouldContinue()) {
                 glfwPollEvents();
 
                 window.beginFrameActions();
-                
+
                 window.processInput();
 
                 glClearColor(0.63f, 0.87f, 1.f, 1.0f);
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
                 renderer.render(camera);
-
 
                 // world_controller.perFrameControl(fromFloatToChunkCoordinates(camera.m_frontPos));
                 world_controller.perFrameControl(camera.chunkPosition());
@@ -57,8 +59,6 @@ void Game::mainLoop() {
                 window.endFrameActions();
         }
 }
-
-
 
 void Game::updateCollisionWithTerrainCheck(bool checkColTerrain) {
 

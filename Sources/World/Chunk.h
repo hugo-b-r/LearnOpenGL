@@ -1,14 +1,14 @@
 #ifndef CHUNK_H
 #define CHUNK_H
 
+#include "Camera.h"
 #include "CubeTexture.h"
 #include "Mathematics/AABB.h"
 #include "Mesh.h"
-#include "Camera.h"
 
 #include <glm/glm.hpp>
-#include <vector>
 #include <memory>
+#include <vector>
 
 const int CHUNK_WIDTH = 16;
 const int CHUNK_HEIGHT = 256;
@@ -27,7 +27,6 @@ class ChunkRenderer;
 class World;
 class RemoveSafeChunk;
 enum class ChunkMeshBuildStatus;
-
 
 struct NeighboringChunks {
         std::shared_ptr<Chunk> x_p; // in x positive direction
@@ -56,7 +55,7 @@ class Chunk {
         void load(World *w);
         bool isLoaded();
 
-        void createMesh(World *w, CubeTexture& ct);
+        void createMesh(World *w, CubeTexture &ct);
         bool hasMesh();
 
         // void loadMeshOnGPU();

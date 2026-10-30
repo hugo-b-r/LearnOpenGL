@@ -13,6 +13,8 @@
 #include <queue>
 #include <unordered_set>
 
+const glm::mat4 view_mat(1.0f);
+
 class Chunk;
 
 struct LocalizedBoundedModel {
@@ -30,8 +32,6 @@ struct ChunkToLoadOnGPUBundle {
 class ChunkRenderer {
       public:
         ChunkRenderer();
-        // void render(Chunk& c, Camera& cam, int nb_vertices, bool bindShader =
-        // false, bool bindTexture = false);
         void render(Camera &cam);
 
         Shader &getShader();
@@ -39,7 +39,7 @@ class ChunkRenderer {
 
         CubeTexture texture;
 
-        void addChunkToRender(glm::ivec2 abs_pos, World *w, AABB bounding_box,
+        void addChunkToRender(glm::ivec2 abs_pos, AABB bounding_box,
                               Mesh *mesh);
         void rebuildRenderChunk(glm::ivec2 abs_pos, World *w);
 
@@ -47,6 +47,7 @@ class ChunkRenderer {
         void sendCommandToRemoveChunk(glm::ivec2 chunk_pos);
 
         bool isChunkInRenderer(glm::ivec2 chunk_pos);
+
       private:
         Shader m_shader;
 
@@ -62,9 +63,6 @@ class ChunkRenderer {
         std::unordered_set<glm::ivec2, KeyFuncs, KeyFuncs> loaded_pos;
         std::mutex loaded_pos_lock;
         void removeChunkFromRender(glm::ivec2 abs_pos);
-
-
-        
 };
 
 #endif

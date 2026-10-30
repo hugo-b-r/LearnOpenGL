@@ -1,19 +1,19 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#include <string>
 #include <glm/glm.hpp>
+#include <string>
 
 #define UNUSED(x) (void)x
 
 // Quick reminder about coordinates:
-// Chunk coordinates : number of chunk along axixes 
-// Block coordinates : number of blocks along axixes 
+// Chunk coordinates : number of chunk along axixes
+// Block coordinates : number of blocks along axixes
 
-std::string mat4_to_string(const glm::mat4& matrix);
+std::string mat4_to_string(const glm::mat4 &matrix);
 
-
-// Returns coordinates in chunk coordinates in world space from block coordinates in world space
+// Returns coordinates in chunk coordinates in world space from block
+// coordinates in world space
 glm::ivec2 fromBlockToChunkCoordinates(glm::ivec3 blockPos);
 
 // number of chunk to number of block
@@ -27,7 +27,8 @@ glm::ivec3 fromChunkToBlockCoordinatesOfCenterOfChunk(glm::ivec2 chunkPos);
 glm::ivec3 fromGlobalToInChunkCoordinates(glm::ivec3 blockPos);
 
 // Local (chunk) -> Global coordinates
-glm::ivec3 fromInChunkToGlobalCoordinates(glm::ivec3 inChunkPos, glm::ivec2 chunkPos);
+glm::ivec3 fromInChunkToGlobalCoordinates(glm::ivec3 inChunkPos,
+                                          glm::ivec2 chunkPos);
 
 // global but granular -> discrete coordinates (blocks)
 glm::ivec3 fromFloatToBlockCoordinates(glm::vec3 point);
@@ -36,18 +37,14 @@ glm::ivec3 fromFloatToBlockCoordinates(glm::vec3 point);
 // returns the chunk pos is in
 glm::ivec2 fromFloatToChunkCoordinates(glm::vec3 pos);
 
+struct KeyFuncs {
+        size_t operator()(const glm::ivec2 &k) const {
+                return std::hash<int>()(k.x) ^ std::hash<int>()(k.y);
+        }
 
-struct KeyFuncs
-{
-    size_t operator()(const glm::ivec2& k)const
-    {
-        return std::hash<int>()(k.x) ^ std::hash<int>()(k.y);
-    }
-
-    bool operator()(const glm::ivec2& a, const glm::ivec2& b)const
-    {
-            return a.x == b.x && a.y == b.y;
-    }
+        bool operator()(const glm::ivec2 &a, const glm::ivec2 &b) const {
+                return a.x == b.x && a.y == b.y;
+        }
 };
 
 #endif

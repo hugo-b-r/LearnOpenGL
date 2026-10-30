@@ -3,7 +3,6 @@
 #include "Renderer/ChunkRenderer.h"
 #include "World/Chunk.h"
 #include "World/ChunkMeshCreator.h"
-#include "World/LockableChunk.h"
 #include "World/WorldGenerator.h"
 #include "World/WorldParallelOperationsManager.h"
 #include "WorldQueueOperation.h"
@@ -13,9 +12,6 @@
 #include <memory>
 #include <optional>
 #include <spdlog/spdlog.h>
-#include <stdexcept>
-
-const glm::mat4 view_mat(1.0f);
 
 World::World() {
         // chunkWidth include a border of chunks needed to build the other
@@ -48,47 +44,6 @@ std::optional<CubeAtlas> World::getBlockAt(glm::ivec3 pos) {
         } else {
                 return std::nullopt;
         }
-}
-
-// void World::setBlockAt(glm::ivec3 pos, CubeAtlas value) {
-//         // glm::ivec2 chunkCoord = fromBlockToChunkCoordinates(pos);
-//         // auto l_chunk_res = getAbsoluteAt(chunkCoord);
-//         // if (l_chunk_res.has_value()) {
-//         //         auto blockInChunkPos =
-//         fromGlobalToInChunkCoordinates(pos);
-//         //         int a = blockInChunkPos.x;
-//         //         int b = blockInChunkPos.y;
-//         //         int c = blockInChunkPos.z;
-//         //         chunk_ptr->setBlockAt(a, b, c, value);
-//         //         l_chunk_res.value().unlock();
-//         // }
-// }
-
-// void World::IdontNeedAnymore(glm::ivec2 abs_pos, ReasonToKeep r) {
-//         auto reasons = reasons_manager.at(abs_pos);
-//         reasons.removeReason(r);
-
-//         // to delete code
-//         throw std::runtime_error("implement queue for removing chunks");
-//         // if (!reasons.anyReasonToKeep()) {
-//         //         Chunk * c = lc_res.value().lock();
-//         //         chunks.erase(c->getChunkPos());
-//         // }
-// }
-
-// void World::tagWithReason(glm::ivec2 abs_pos, ReasonToKeep r) {
-//         auto lc_res = reasons_manager.at(abs_pos);
-//         lc_res.addReason(r);
-// }
-
-void World::cleanAllChunksNoReasonToKeep(glm::ivec2 new_player_pos,
-                                         int manhattan_radius_limit) {
-
-        // for (auto it = chunks.begin(); it != chunks.end(); ++it) {
-        //         if (!it->second.anyReasonToKeep()) {
-        //                 chunks.erase(it);
-        //         }
-        // }
 }
 
 /// Returns neighbors only if they exist all

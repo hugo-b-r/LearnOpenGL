@@ -5,7 +5,6 @@
 #include "World/World.h"
 #include "utils.h"
 
-#include <iostream>
 
 #include <spdlog/spdlog.h>
 
