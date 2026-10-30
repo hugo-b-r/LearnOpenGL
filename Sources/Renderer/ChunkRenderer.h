@@ -3,6 +3,7 @@
 
 #include "Camera.h"
 #include "World/World.h"
+#include "utils.h"
 #include <CubeTexture.h>
 #include <Model.h>
 #include <Shader.h>
@@ -10,6 +11,7 @@
 #include <forward_list>
 #include <mutex>
 #include <queue>
+#include <unordered_set>
 
 class Chunk;
 
@@ -41,6 +43,8 @@ class ChunkRenderer {
                               Mesh *mesh);
         void rebuildRenderChunk(glm::ivec2 abs_pos, World *w);
         void sendCommandToRemoveChunk(glm::ivec2 chunk_pos);
+
+        bool isChunkInRenderer(glm::ivec2 chunk_pos);
       private:
         Shader m_shader;
 
@@ -52,7 +56,13 @@ class ChunkRenderer {
 
         std::queue<ChunkToLoadOnGPUBundle> chunks_models_to_load_and_add;
         std::mutex chunks_models_to_load_and_add_lock;
+
+        std::unordered_set<glm::ivec2, KeyFuncs, KeyFuncs> loaded_pos;
+        std::mutex loaded_pos_lock;
         void removeChunkFromRender(glm::ivec2 abs_pos);
+
+
+        
 };
 
 #endif

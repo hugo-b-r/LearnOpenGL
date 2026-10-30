@@ -31,25 +31,47 @@ void WorldController::perFrameControl(glm::ivec2 new_player_pos) {
         meshes_to_load_lock.unlock();
 }
 
+void WorldController::removeChunkFromWorld(glm::ivec2 abs_pos) {
+        chunk_properties_lock.lock();
+        chunk_properties[abs_pos].in_world = false;
+        if (chunk_properties[abs_pos].in_renderer == false) {
+                chunk_properties.erase(abs_pos);
+        }
+        chunk_properties_lock.unlock();
+
+        world->unloadChunk(abs_pos);
+}
+
+void WorldController::removeChunkFromGPU(glm::ivec2 abs_pos) {
+        chunk_properties_lock.lock();
+        chunk_properties[abs_pos].in_renderer = false;
+        if (chunk_properties[abs_pos].in_world == false) {
+                chunk_properties.erase(abs_pos);
+        }
+        chunk_properties_lock.unlock();
+        renderer->sendCommandToRemoveChunk(abs_pos);
+}
+
 void WorldController::moveWorld(glm::ivec2 new_player_pos) {
-        int manhattan_radius_limit = game->configuration.renderDistance;
+        int manhattan_radius_limit = game->configuration.renderDistance+1;
 
         world->chunk_map_locker.lock();
 
-        for (int i = lastPlayerChunkPos.x - manhattan_radius_limit;
-             i <= lastPlayerChunkPos.x + manhattan_radius_limit; ++i) {
+        for (int i = lastPlayerChunkPos.x - manhattan_radius_limit - 1;
+             i <= lastPlayerChunkPos.x + manhattan_radius_limit + 1; ++i) {
 
-                for (int j = lastPlayerChunkPos.y - manhattan_radius_limit;
-                     j <= lastPlayerChunkPos.y + manhattan_radius_limit; ++j) {
+                for (int j = lastPlayerChunkPos.y - manhattan_radius_limit - 1;
+                     j <= lastPlayerChunkPos.y + manhattan_radius_limit + 1;
+                     ++j) {
 
                         if (!(abs(j - new_player_pos.y) <=
-                                  manhattan_radius_limit &&
+                                  manhattan_radius_limit  &&
                               abs(i - new_player_pos.x) <=
-                                  manhattan_radius_limit)) {
+                                  manhattan_radius_limit )) {
                                 // std::cout << "heho la !" << std::endl;
                                 auto pos = glm::ivec2(i, j);
-                                world->unloadChunk(pos);
-                                renderer->sendCommandToRemoveChunk(pos);
+                                removeChunkFromGPU(pos);
+                                removeChunkFromWorld(pos);
                         }
                 }
         }
@@ -85,6 +107,12 @@ void WorldController::moveWorld(glm::ivec2 new_player_pos) {
                         spdlog::debug("send task to create mesh at {} : {}", i,
                                       j);
 
+                        if (world->isChunkLoaded(pos) && !renderer->isChunkInRenderer(pos)) {
+                                spdlog::debug("add to create mesh");
+                                game->thread_pool_manager->pushBackOperation(
+                                    WorldQueueOperation(
+                                        pos, WldQOperationType::CreateMesh));
+                        }
                         // game->thread_pool_manager
                         //     ->pushBackOperation(
                         //         WorldQueueOperation(
@@ -99,14 +127,46 @@ void WorldController::moveWorld(glm::ivec2 new_player_pos) {
 void WorldController::loadOneMeshOnGpu() {
         MeshToLoadBundle &meshB = meshes_to_load.front();
         meshes_to_load.pop();
-        renderer->addChunkToRender(meshB.abs_pos, world, meshB.bounding_box,
-                                   meshB.ptr);
+        chunk_properties_lock.lock();
+        if (chunk_properties.contains(meshB.abs_pos) &&
+            !chunk_properties.at(meshB.abs_pos).in_renderer) {
+                renderer->addChunkToRender(meshB.abs_pos, world,
+                                           meshB.bounding_box, meshB.ptr);
+                chunk_properties.at(meshB.abs_pos).in_renderer = true;
+        }
+        chunk_properties_lock.unlock();
 }
 
 void WorldController::addMeshAndGPULoadChunkJob(std::shared_ptr<Chunk> chunk) {
+        glm::ivec2 chunk_pos = chunk.get()->getChunkPos();
+
+        chunk_properties_lock.lock();
+        chunk_properties.insert({chunk.get()->getChunkPos(), {true, false}});
+        chunk_properties_lock.unlock();
         world->loadChunk(chunk);
+        chunk_properties_lock.lock();
+        chunk_properties[chunk_pos].in_world = true;
         game->thread_pool_manager->pushBackOperation(WorldQueueOperation(
             chunk.get()->getChunkPos(), WldQOperationType::CreateMesh));
+
+        for (const auto &key : {
+                 chunk_pos + glm::ivec2(1, 0),
+                 chunk_pos + glm::ivec2(1, 0),
+                 chunk_pos + glm::ivec2(-1, 0),
+                 chunk_pos + glm::ivec2(0, 1),
+                 chunk_pos + glm::ivec2(0, -1),
+             }) {
+                if (chunk_properties.contains(key) &&
+                    !chunk_properties.at(key).in_renderer &&
+                    chunk_properties.at(key).in_world) {
+                        spdlog::debug("haha !!!");
+                        game->thread_pool_manager->pushBackOperation(
+                            WorldQueueOperation(key,
+                                                WldQOperationType::CreateMesh));
+                }
+        }
+
+        chunk_properties_lock.unlock();
 }
 
 void WorldController::addMeshToLoadJob(glm::ivec2 abs_pos, Mesh *mesh,

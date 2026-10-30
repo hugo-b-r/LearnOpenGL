@@ -93,16 +93,23 @@ void ChunkRenderer::addChunkToRender(glm::ivec2 abs_pos, World *w,
 
         // models_lock.lock();
 
-        spdlog::debug("bounded box : {}{}{}{}", bounding_box.getVmax().x,
-                      bounding_box.getVmin().x, bounding_box.getVmax().y,
-                      bounding_box.getVmin().y);
+        // spdlog::debug("bounded box : {}{}{}{}", bounding_box.getVmax().x,
+        //               bounding_box.getVmin().x, bounding_box.getVmax().y,
+        //               bounding_box.getVmin().y);
 
         models_for_render.push_front(LocalizedBoundedModel(
             m, bounding_box, abs_pos, mesh->getNbVertices(),
             fromChunkToBlockCoordinatesOfCenterOfChunk(abs_pos)));
 
+        // for (const auto& el: models_for_render) {
+        //         spdlog::debug("{}:{}", el.center_pos.x, el.center_pos.y);
+        // } 
         // models_lock.unlock();
 
+        loaded_pos_lock.lock();
+        loaded_pos.insert(abs_pos);
+        loaded_pos_lock.unlock();
+        
         // delete mesh;
         // w->IdontNeedAnymore(abs_pos, ReasonToKeep::UsedForMeshing);
 }
@@ -112,8 +119,21 @@ void ChunkRenderer::sendCommandToRemoveChunk(glm::ivec2 chunk_pos) {
         chunks_models_to_remove.emplace(chunk_pos);
         chunks_models_to_remove_lock.unlock();
 }
+
+bool ChunkRenderer::isChunkInRenderer(glm::ivec2 abs_pos) {
+        loaded_pos_lock.lock();
+        bool res = loaded_pos.contains(abs_pos);
+        loaded_pos_lock.unlock();
+        return res;
+}
+
+
+
 void ChunkRenderer::removeChunkFromRender(glm::ivec2 chunk_pos) {
+        loaded_pos_lock.lock();
+        loaded_pos.insert(chunk_pos);
+        loaded_pos_lock.unlock();
         // std::cout << "trying to erase" << std::endl;
         models_for_render.remove_if(
-            [&](const LocalizedBoundedModel& it) { if (it.pos == chunk_pos) {spdlog::info("erased");} return it.pos == chunk_pos; });
+            [&](const LocalizedBoundedModel& it) {  return it.pos == chunk_pos; });
 }

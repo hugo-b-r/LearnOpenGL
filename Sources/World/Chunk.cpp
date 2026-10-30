@@ -58,6 +58,15 @@ CubeAtlas Chunk::getBlockAt(int x, int y, int z) {
 	return res;
 }
 
+
+CubeAtlas Chunk::getBlockAt(glm::ivec3 pos) {
+	CubeAtlas res = getBlockAt(pos.x, pos.y, pos.z);
+
+	
+
+	return res;
+}
+
 void Chunk::setBlockAt(int x, int y, int z, CubeAtlas ca) {
 	if (x >= 0 && x < CHUNK_WIDTH && y >= 0 && y < CHUNK_HEIGHT && z >= 0 &&
 			z < CHUNK_LENGTH) {

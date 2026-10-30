@@ -8,8 +8,10 @@
 #include <unordered_map>
 
 // in order to have the ability to hash the type for unordered map
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm/gtx/hash.hpp>
+// #define GLM_ENABLE_EXPERIMENTAL
+// #include <glm/gtx/hash.hpp>
+//
+#include <utils.h>
 
 #include "World/LockableChunk.h"
 #include <mutex>
@@ -47,12 +49,14 @@ class World {
         bool isChunkLoaded(glm::ivec2 chunk_pos);
         void unloadChunk(glm::ivec2 chunk_pos);
 
-        std::unordered_map<glm::ivec2, ReadSafeChunk> chunks;
+
+        std::optional<NeighboringChunks> getChunkNeighbors(glm::ivec2 abs_pos);
+        std::unordered_map<glm::ivec2, ReadSafeChunk, KeyFuncs, KeyFuncs> chunks;
         std::mutex chunk_map_locker;
       protected:
 
         void loadChunk(glm::ivec2 chunk_pos);
-        std::unordered_map<glm::ivec2, ReasonToKeepManager> reasons_manager;
+        // std::unordered_map<glm::ivec2, ReasonToKeepManager> reasons_manager;
 
 
 

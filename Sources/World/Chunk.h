@@ -8,6 +8,7 @@
 
 #include <glm/glm.hpp>
 #include <vector>
+#include <memory>
 
 const int CHUNK_WIDTH = 16;
 const int CHUNK_HEIGHT = 256;
@@ -20,11 +21,20 @@ enum class ChunkDataLoadStatus {
         FinishedLoaded
 };
 
+class Chunk;
 class ChunkMeshCreator;
 class ChunkRenderer;
 class World;
 class RemoveSafeChunk;
 enum class ChunkMeshBuildStatus;
+
+
+struct NeighboringChunks {
+        std::shared_ptr<Chunk> x_p; // in x positive direction
+        std::shared_ptr<Chunk> x_m; // in x negative direction
+        std::shared_ptr<Chunk> y_p; // in y positive direction
+        std::shared_ptr<Chunk> y_m; // in y negative direction
+};
 
 class Chunk {
       public:
@@ -36,6 +46,7 @@ class Chunk {
 
         virtual ~Chunk();
         CubeAtlas getBlockAt(int x, int y, int z);
+        CubeAtlas getBlockAt(glm::ivec3 pos);
         void setBlockAt(int x, int y, int z, CubeAtlas ca);
 
         glm::ivec2 getChunkPos();

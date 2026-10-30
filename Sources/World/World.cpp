@@ -1,6 +1,7 @@
 #include "World.h"
 #include "CubeTexture.h"
 #include "Renderer/ChunkRenderer.h"
+#include "World/Chunk.h"
 #include "World/ChunkMeshCreator.h"
 #include "World/LockableChunk.h"
 #include "World/WorldGenerator.h"
@@ -25,7 +26,6 @@ World::World() {
 World::World(const World &w) : chunks(w.chunks) {}
 
 World::~World() {}
-
 
 std::optional<ReadSafeChunk> World::getAbsoluteChunkAt(glm::ivec2 abs_pos) {
         if (chunks.contains(abs_pos)) {
@@ -81,13 +81,55 @@ std::optional<CubeAtlas> World::getBlockAt(glm::ivec3 pos) {
 //         lc_res.addReason(r);
 // }
 
-void World::cleanAllChunksNoReasonToKeep(glm::ivec2 new_player_pos, int manhattan_radius_limit) {
+void World::cleanAllChunksNoReasonToKeep(glm::ivec2 new_player_pos,
+                                         int manhattan_radius_limit) {
 
         // for (auto it = chunks.begin(); it != chunks.end(); ++it) {
         //         if (!it->second.anyReasonToKeep()) {
         //                 chunks.erase(it);
         //         }
         // }
+}
+
+/// Returns neighbors only if they exist all
+std::optional<NeighboringChunks> World::getChunkNeighbors(glm::ivec2 abs_pos) {
+        chunk_map_locker.lock();
+        glm::ivec2 x_p_pos(1, 0);
+        glm::ivec2 x_m_pos(-1, 0);
+        glm::ivec2 y_p_pos(0, 1);
+        glm::ivec2 y_m_pos(0, -1);
+        std::shared_ptr<Chunk> x_p;
+        std::shared_ptr<Chunk> x_m;
+        std::shared_ptr<Chunk> y_p;
+        std::shared_ptr<Chunk> y_m;
+
+        if (chunks.contains(abs_pos + x_p_pos)) {
+                x_p = chunks.at(abs_pos + x_p_pos);
+        } else {
+                chunk_map_locker.unlock();
+                return std::nullopt;
+        }
+        if (chunks.contains(abs_pos + x_m_pos)) {
+                x_m = chunks.at(abs_pos + x_m_pos);
+        } else {
+                chunk_map_locker.unlock();
+                return std::nullopt;
+        }
+        if (chunks.contains(abs_pos + y_p_pos)) {
+                y_p = chunks.at(abs_pos + y_p_pos);
+        } else {
+                chunk_map_locker.unlock();
+                return std::nullopt;
+        }
+        if (chunks.contains(abs_pos + y_m_pos)) {
+                y_m = chunks.at(abs_pos + y_m_pos);
+        } else {
+                chunk_map_locker.unlock();
+                return std::nullopt;
+        }
+        chunk_map_locker.unlock();
+
+        return NeighboringChunks({x_p, x_m, y_p, y_m});
 }
 
 //
@@ -98,7 +140,6 @@ void World::loadChunk(glm::ivec2 chunk_pos) {
         WorldGenerator::buildChunk(*(chunks[chunk_pos].get()), *this);
 
         loadChunk(c);
-
 }
 
 void World::loadChunk(ReadSafeChunk chunk) {
@@ -106,13 +147,10 @@ void World::loadChunk(ReadSafeChunk chunk) {
         chunk_map_locker.lock();
         chunks[chunk.get()->getChunkPos()] = chunk;
         chunk_map_locker.unlock();
-
+        ;
 }
 
-void World::unloadChunk(glm::ivec2 chunk_pos) {
-        chunks.erase(chunk_pos);
-}
-
+void World::unloadChunk(glm::ivec2 chunk_pos) { chunks.erase(chunk_pos); }
 
 bool World::isChunkLoaded(glm::ivec2 chunk_pos) {
         return chunks.contains(chunk_pos);

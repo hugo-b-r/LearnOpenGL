@@ -2,10 +2,12 @@
 #include "Chunk.h"
 #include "CubeTexture.h"
 #include "Mesh.h"
+#include "World.h"
 #include "utils.h"
 
 #include <array>
 #include <iostream>
+#include <memory>
 #include <spdlog/spdlog.h>
 
 struct NeighbooringFaces {
@@ -349,17 +351,15 @@ std::array<GLfloat, 48> ChunkMeshCreator::rearFace(int select, float x, float y,
         });
 };
 
-ChunkMeshCreator::ChunkMeshCreator(Chunk &c, float tex_factor_height, World &w, Mesh * result_location)
+ChunkMeshCreator::ChunkMeshCreator(Chunk &c, float tex_factor_height, World &w,
+                                   Mesh *result_location)
     : tex_vertical_factor(tex_factor_height), data(c),
       status(ChunkMeshBuildStatus::Running), world(w), m_mesh(result_location) {
         *result_location = {{}, {}, {}};
 }
 
-
-
-
-
-bool ChunkMeshCreator::shouldMakeFace(glm::ivec3 side_block) {
+bool ChunkMeshCreator::shouldMakeFace(glm::ivec3 side_block,
+                                      const NeighboringChunks &neighbors) {
         int x = side_block.x, y = side_block.y, z = side_block.z;
         if (y < 0) {
                 // under the sea
@@ -384,88 +384,115 @@ bool ChunkMeshCreator::shouldMakeFace(glm::ivec3 side_block) {
         } else if (y >= CHUNK_HEIGHT) {
                 return true;
         } else {
-                auto block = world.getBlockAt(fromInChunkToGlobalCoordinates(
-                    side_block, data.getChunkPos()));
-                if (block.has_value()) {
-                        switch (block.value()) {
-                        case CubeAtlas::Air:
-                                return true;
-                        case CubeAtlas::Leaves:
-                                return true;
-                        default:
-                                return false;
-                        }
-                } else {
-                        // no block so yeah
+                auto block =
+                    getFromNeighbors(fromInChunkToGlobalCoordinates(
+                                         side_block, data.getChunkPos()),
+                                     neighbors);
+                switch (block) {
+                case CubeAtlas::Air:
                         return true;
+                case CubeAtlas::Leaves:
+                        return true;
+                default:
+                        return false;
                 }
         }
 }
 
-
+CubeAtlas
+ChunkMeshCreator::getFromNeighbors(glm::ivec3 block_pos,
+                                   const NeighboringChunks &neighbors) {
+        glm::ivec2 diff =
+            fromBlockToChunkCoordinates(block_pos) - data.getChunkPos();
+        if (diff.x == 1) {
+                return neighbors.x_p.get()->getBlockAt(
+                    fromGlobalToInChunkCoordinates(block_pos));
+        }
+        if (diff.x == -1) {
+                return neighbors.x_m.get()->getBlockAt(
+                    fromGlobalToInChunkCoordinates(block_pos));
+        }
+        if (diff.y == 1) {
+                return neighbors.y_p.get()->getBlockAt(
+                    fromGlobalToInChunkCoordinates(block_pos));
+        }
+        if (diff.y == -1) {
+                return neighbors.y_m.get()->getBlockAt(
+                    fromGlobalToInChunkCoordinates(block_pos));
+        }
+        return CubeAtlas::Air;
+}
 
 /// Contract : hey give me neighbors bruh
-void ChunkMeshCreator::buildMesh() {
-        for (int i = 0; i < CHUNK_WIDTH; i++) {
-                for (int j = 0; j < CHUNK_HEIGHT; j++) {
-                        for (int k = 0; k < CHUNK_LENGTH; k++) {
-                                addBlockMesh(i, j, k);
+bool ChunkMeshCreator::buildMesh() {
+        auto neighbors = world.getChunkNeighbors(data.getChunkPos());
+        if (neighbors.has_value()) {
+                spdlog::debug("it has value omg");
+                for (int i = 0; i < CHUNK_WIDTH; i++) {
+                        for (int j = 0; j < CHUNK_HEIGHT; j++) {
+                                for (int k = 0; k < CHUNK_LENGTH; k++) {
+                                        addBlockMesh(i, j, k,
+                                                     neighbors.value());
+                                }
                         }
                 }
+        } else {
+                return false;
         }
         status = ChunkMeshBuildStatus::DoneLoaded;
-        spdlog::debug("mesh : {}", m_mesh->vertexPositions.size());
+        return true;
 }
 
-void ChunkMeshCreator::addBlockMesh(int i, int j, int k) {
-        NeighbooringFaces neighboors;
-        neighboors.update(i, j, k);
+void ChunkMeshCreator::addBlockMesh(int i, int j, int k,
+                                    NeighboringChunks &neighbors) {
+        NeighbooringFaces neighboring_faces;
+        neighboring_faces.update(i, j, k);
         CubeAtlas block = data.getBlockAt(i, j, k);
         if (block == CubeAtlas::Air) {
                 return;
         }
 
-        if (shouldMakeFace(neighboors.up)) {
+        if (shouldMakeFace(neighboring_faces.up, neighbors)) {
                 std::array<GLfloat, 48> temp =
                     upFace((int)block, (float)i, (float)j, (float)k);
 
                 m_mesh->vertexPositions.insert(m_mesh->vertexPositions.end(),
-                                              temp.begin(), temp.end());
+                                               temp.begin(), temp.end());
         }
 
-        if (shouldMakeFace(neighboors.down)) {
+        if (shouldMakeFace(neighboring_faces.down, neighbors)) {
                 std::array<GLfloat, 48> temp =
                     downFace((int)block, (float)i, (float)j, (float)k);
 
                 m_mesh->vertexPositions.insert(m_mesh->vertexPositions.end(),
-                                              temp.begin(), temp.end());
+                                               temp.begin(), temp.end());
         }
-        if (shouldMakeFace(neighboors.left)) {
+        if (shouldMakeFace(neighboring_faces.left, neighbors)) {
                 std::array<GLfloat, 48> temp =
                     leftFace((int)block, (float)i, (float)j, (float)k);
 
                 m_mesh->vertexPositions.insert(m_mesh->vertexPositions.end(),
-                                              temp.begin(), temp.end());
+                                               temp.begin(), temp.end());
         }
-        if (shouldMakeFace(neighboors.right)) {
+        if (shouldMakeFace(neighboring_faces.right, neighbors)) {
                 std::array<GLfloat, 48> temp =
                     rightFace((int)block, (float)i, (float)j, (float)k);
 
                 m_mesh->vertexPositions.insert(m_mesh->vertexPositions.end(),
-                                              temp.begin(), temp.end());
+                                               temp.begin(), temp.end());
         }
-        if (shouldMakeFace(neighboors.front)) {
+        if (shouldMakeFace(neighboring_faces.front, neighbors)) {
                 std::array<GLfloat, 48> temp =
                     frontFace((int)block, (float)i, (float)j, (float)k);
 
                 m_mesh->vertexPositions.insert(m_mesh->vertexPositions.end(),
-                                              temp.begin(), temp.end());
+                                               temp.begin(), temp.end());
         }
-        if (shouldMakeFace(neighboors.rear)) {
+        if (shouldMakeFace(neighboring_faces.rear, neighbors)) {
                 std::array<GLfloat, 48> temp =
                     rearFace((int)block, (float)i, (float)j, (float)k);
 
                 m_mesh->vertexPositions.insert(m_mesh->vertexPositions.end(),
-                                              temp.begin(), temp.end());
+                                               temp.begin(), temp.end());
         }
 }
