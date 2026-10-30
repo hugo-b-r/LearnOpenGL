@@ -58,6 +58,7 @@ class WorldController {
 
         Game *game;
 
+        void removeChunkHandleWorldAndGPU(glm::ivec2 chunk_pos);
         void moveWorld(glm::ivec2 new_player_pos);
         void loadOneMeshOnGpu();
 

@@ -52,8 +52,10 @@ void WorldController::removeChunkFromGPU(glm::ivec2 abs_pos) {
         renderer->sendCommandToRemoveChunk(abs_pos);
 }
 
+void WorldController::removeChunkHandleWorldAndGPU(glm::ivec2 chunk_pos) {}
+
 void WorldController::moveWorld(glm::ivec2 new_player_pos) {
-        int manhattan_radius_limit = game->configuration.renderDistance+1;
+        int manhattan_radius_limit = game->configuration.renderDistance;
 
         world->chunk_map_locker.lock();
 
@@ -64,14 +66,17 @@ void WorldController::moveWorld(glm::ivec2 new_player_pos) {
                      j <= lastPlayerChunkPos.y + manhattan_radius_limit + 1;
                      ++j) {
 
-                        if (!(abs(j - new_player_pos.y) <=
-                                  manhattan_radius_limit  &&
-                              abs(i - new_player_pos.x) <=
-                                  manhattan_radius_limit )) {
+                        int diff_x = abs(i - new_player_pos.x);
+                        int diff_y = abs(j - new_player_pos.y);
+                        if (!(diff_y <= manhattan_radius_limit &&
+                              diff_x <= manhattan_radius_limit)) {
                                 // std::cout << "heho la !" << std::endl;
                                 auto pos = glm::ivec2(i, j);
                                 removeChunkFromGPU(pos);
-                                removeChunkFromWorld(pos);
+                                if (!(diff_y <= manhattan_radius_limit &&
+                                      diff_x <= manhattan_radius_limit)) {
+                                        removeChunkFromWorld(pos);
+                                }
                         }
                 }
         }
@@ -79,8 +84,10 @@ void WorldController::moveWorld(glm::ivec2 new_player_pos) {
         //         int i = key.x;
         //         int j = key.y;
         //         // int j = it->first.y;
-        //         if (!(abs(j - new_player_pos.y) <= manhattan_radius_limit &&
-        //               abs(i - new_player_pos.x) <= manhattan_radius_limit)) {
+        //         if (!(abs(j - new_player_pos.y) <=
+        //         manhattan_radius_limit &&
+        //               abs(i - new_player_pos.x) <=
+        //               manhattan_radius_limit)) {
         //                 // std::cout << "heho la !" << std::endl;
         //                 world->unloadChunk(key);
         //                 renderer->sendCommandToRemoveChunk(key);
@@ -107,7 +114,8 @@ void WorldController::moveWorld(glm::ivec2 new_player_pos) {
                         spdlog::debug("send task to create mesh at {} : {}", i,
                                       j);
 
-                        if (world->isChunkLoaded(pos) && !renderer->isChunkInRenderer(pos)) {
+                        if (world->isChunkLoaded(pos) &&
+                            !renderer->isChunkInRenderer(pos)) {
                                 spdlog::debug("add to create mesh");
                                 game->thread_pool_manager->pushBackOperation(
                                     WorldQueueOperation(
@@ -182,8 +190,10 @@ void WorldController::addMeshToLoadJob(glm::ivec2 abs_pos, Mesh *mesh,
 //         int worldLimits = (chunkWidth - 1) / 2;
 
 //         for (int y = -worldLimits; y <= worldLimits; ++y) {
-//                 glm::ivec2 chunk_pos = glm::ivec2(0 + lastChunkPlayerPos.x,
-//                                                   y + lastChunkPlayerPos.y);
+//                 glm::ivec2 chunk_pos = glm::ivec2(0 +
+//                 lastChunkPlayerPos.x,
+//                                                   y +
+//                                                   lastChunkPlayerPos.y);
 //                 thread_pool_manager->pushBackOperation(
 //                     WorldQueueOperation(chunk_pos,
 //                     WldQOperationType::kLoad));
@@ -199,8 +209,10 @@ void WorldController::addMeshToLoadJob(glm::ivec2 abs_pos, Mesh *mesh,
 //                             WorldQueueOperation(chunk_pos,
 //                                                 WldQOperationType::kLoad));
 
-//                         chunk_pos = glm::ivec2(-x + lastChunkPlayerPos.x,
-//                                                y + lastChunkPlayerPos.y);
+//                         chunk_pos = glm::ivec2(-x +
+//                         lastChunkPlayerPos.x,
+//                                                y +
+//                                                lastChunkPlayerPos.y);
 
 //                         thread_pool_manager->pushBackOperation(
 //                             WorldQueueOperation(chunk_pos,
@@ -210,15 +222,17 @@ void WorldController::addMeshToLoadJob(glm::ivec2 abs_pos, Mesh *mesh,
 //         spdlog::debug("Finished loading the world");
 //         spdlog::debug("Starting to create meshes and load them on the
 //         GPU...");
-//         // need a second pass because we need other chunk data to compute
-//         // correct models, but we don't pass on the border, we don't want it
-//         to
+//         // need a second pass because we need other chunk data to
+//         compute
+//         // correct models, but we don't pass on the border, we don't
+//         want it to
 //         // be seen
 //         int border = (chunkWidth - 1) / 2 - 1;
 
 //         glm::ivec2 chunk_pos(0, 0);
 //         thread_pool_manager->pushBackOperation(
-//             WorldQueueOperation(chunk_pos, WldQOperationType::kCreateMesh));
+//             WorldQueueOperation(chunk_pos,
+//             WldQOperationType::kCreateMesh));
 //         for (int a = 1; a <= border; ++a) {
 //                 int x = -a;
 //                 int y = -a;
@@ -227,7 +241,8 @@ void WorldController::addMeshToLoadJob(glm::ivec2 abs_pos, Mesh *mesh,
 //                         glm::ivec2 chunk_pos(x, y);
 //                         thread_pool_manager->pushBackOperation(
 //                             WorldQueueOperation(
-//                                 chunk_pos, WldQOperationType::kCreateMesh));
+//                                 chunk_pos,
+//                                 WldQOperationType::kCreateMesh));
 //                         x++;
 //                 }
 //                 x--;
@@ -236,7 +251,8 @@ void WorldController::addMeshToLoadJob(glm::ivec2 abs_pos, Mesh *mesh,
 //                         glm::ivec2 chunk_pos(x, y);
 //                         thread_pool_manager->pushBackOperation(
 //                             WorldQueueOperation(
-//                                 chunk_pos, WldQOperationType::kCreateMesh));
+//                                 chunk_pos,
+//                                 WldQOperationType::kCreateMesh));
 //                         y++;
 //                 }
 //                 y--;
@@ -245,7 +261,8 @@ void WorldController::addMeshToLoadJob(glm::ivec2 abs_pos, Mesh *mesh,
 //                         glm::ivec2 chunk_pos(x, y);
 //                         thread_pool_manager->pushBackOperation(
 //                             WorldQueueOperation(
-//                                 chunk_pos, WldQOperationType::kCreateMesh));
+//                                 chunk_pos,
+//                                 WldQOperationType::kCreateMesh));
 //                         x--;
 //                 }
 //                 x++;
@@ -254,7 +271,8 @@ void WorldController::addMeshToLoadJob(glm::ivec2 abs_pos, Mesh *mesh,
 //                         glm::ivec2 chunk_pos(x, y);
 //                         thread_pool_manager->pushBackOperation(
 //                             WorldQueueOperation(
-//                                 chunk_pos, WldQOperationType::kCreateMesh));
+//                                 chunk_pos,
+//                                 WldQOperationType::kCreateMesh));
 //                         y--;
 //                 }
 //                 y++;
@@ -266,10 +284,11 @@ void WorldController::addMeshToLoadJob(glm::ivec2 abs_pos, Mesh *mesh,
 //         // the limit in length to player's position to managed chunks
 //         int limit = (chunkWidth - 1) / 2;
 //         for (int y = -limit; y <= limit; ++y) {
-//                 // managing all the chunks that would get out of the bounds
+//                 // managing all the chunks that would get out of the
+//                 bounds
 
-//                 // -> we check that these are stored correctly on disk
-//                 (coming)
+//                 // -> we check that these are stored correctly on
+//                 disk (coming)
 
 //                 // -> we remove them
 //                 //
@@ -284,22 +303,25 @@ void WorldController::addMeshToLoadJob(glm::ivec2 abs_pos, Mesh *mesh,
 //                 // line per line
 //                 for (int y = -limit; y <= limit; ++y) {
 //                         setRelativeToPlayerAt(
-//                             x + 1, y, getRelativeToPlayerAt(x, y).lock());
+//                             x + 1, y, getRelativeToPlayerAt(x,
+//                             y).lock());
 //                         getRelativeToPlayerAt(x, y).unlock();
 //                 }
 //         }
-//         // we can now manage the last row/column that needs to be built.
-//         for (int y = -limit; y <= limit; ++y) {
+//         // we can now manage the last row/column that needs to be
+//         built. for (int y = -limit; y <= limit; ++y) {
 //                 // allocate a new chunk
 //                 setRelativeToPlayerAt(
 //                     -limit, y,
-//                     new Chunk(lastChunkPlayerPos + glm::ivec2(-limit, y)));
+//                     new Chunk(lastChunkPlayerPos + glm::ivec2(-limit,
+//                     y)));
 //                 // add it to the queue of loading
 //                 thread_pool_manager->pushBackOperation(WorldQueueOperation(
 //                     glm::ivec2(-limit, y) + lastChunkPlayerPos,
 //                     WldQOperationType::kLoad));
 //         }
-//         // and finally create the mesh for chunks already loaded but without
+//         // and finally create the mesh for chunks already loaded but
+//         without
 //         a
 //         // mesh
 //         for (int y = -limit + 1; y <= limit - 1; ++y) {
@@ -314,10 +336,11 @@ void WorldController::addMeshToLoadJob(glm::ivec2 abs_pos, Mesh *mesh,
 //         // the limit in length to player's position to managed chunks
 //         int limit = (chunkWidth - 1) / 2;
 //         for (int y = -limit; y <= limit; ++y) {
-//                 // managing all the chunks that would get out of the bounds
+//                 // managing all the chunks that would get out of the
+//                 bounds
 
-//                 // -> we check that these are stored correctly on disk
-//                 (coming)
+//                 // -> we check that these are stored correctly on
+//                 disk (coming)
 
 //                 // -> we remove them
 //                 chunks_meshes_to_load_locker.lock();
@@ -330,25 +353,27 @@ void WorldController::addMeshToLoadJob(glm::ivec2 abs_pos, Mesh *mesh,
 //         for (int x = -limit + 1; x <= limit; ++x) {
 //                 // line per line
 //                 for (int y = -limit; y <= limit; ++y) {
-//                         LockableChunk l_chunk = getRelativeToPlayerAt(x, y);
-//                         Chunk *chunk_ptr = l_chunk.lock();
-//                         setRelativeToPlayerAt(x - 1, y, chunk_ptr);
-//                         l_chunk.unlock();
+//                         LockableChunk l_chunk =
+//                         getRelativeToPlayerAt(x, y); Chunk *chunk_ptr
+//                         = l_chunk.lock(); setRelativeToPlayerAt(x -
+//                         1, y, chunk_ptr); l_chunk.unlock();
 //                 }
 //         }
-//         // we can now manage the last row/column that needs to be built.
-//         for (int y = -limit; y <= limit; ++y) {
+//         // we can now manage the last row/column that needs to be
+//         built. for (int y = -limit; y <= limit; ++y) {
 //                 // allocate a new chunk
 //                 setRelativeToPlayerAt(
 //                     limit, y,
-//                     new Chunk(lastChunkPlayerPos + glm::ivec2(limit, y)));
+//                     new Chunk(lastChunkPlayerPos + glm::ivec2(limit,
+//                     y)));
 //                 // add it to the queue of loading (future)
 //                 // -> for now : load it directly
 //                 thread_pool_manager->pushBackOperation(WorldQueueOperation(
 //                     glm::ivec2(limit, y) + lastChunkPlayerPos,
 //                     WldQOperationType::kLoad));
 //         }
-//         // and finally create the mesh for chunks already loaded but without
+//         // and finally create the mesh for chunks already loaded but
+//         without
 //         a
 //         // mesh
 //         for (int y = -limit + 1; y <= limit - 1; ++y) {
@@ -363,10 +388,11 @@ void WorldController::addMeshToLoadJob(glm::ivec2 abs_pos, Mesh *mesh,
 //         // the limit in length to player's position to managed chunks
 //         int limit = (chunkWidth - 1) / 2;
 //         for (int x = -limit; x <= limit; ++x) {
-//                 // managing all the chunks that would get out of the bounds
+//                 // managing all the chunks that would get out of the
+//                 bounds
 
-//                 // -> we check that these are stored correctly on disk
-//                 (coming)
+//                 // -> we check that these are stored correctly on
+//                 disk (coming)
 
 //                 // -> we remove them
 //                 chunks_meshes_to_load_locker.lock();
@@ -380,22 +406,25 @@ void WorldController::addMeshToLoadJob(glm::ivec2 abs_pos, Mesh *mesh,
 //                 // line per line
 //                 for (int x = -limit; x <= limit; ++x) {
 //                         setRelativeToPlayerAt(
-//                             x, y + 1, getRelativeToPlayerAt(x, y).lock());
+//                             x, y + 1, getRelativeToPlayerAt(x,
+//                             y).lock());
 //                         getRelativeToPlayerAt(x, y).unlock();
 //                 }
 //         }
-//         // we can now manage the last row/column that needs to be built.
-//         for (int x = -limit; x <= limit; ++x) {
+//         // we can now manage the last row/column that needs to be
+//         built. for (int x = -limit; x <= limit; ++x) {
 //                 // allocate a new chunk
 //                 setRelativeToPlayerAt(
 //                     x, -limit,
-//                     new Chunk(lastChunkPlayerPos + glm::ivec2(x, -limit)));
+//                     new Chunk(lastChunkPlayerPos + glm::ivec2(x,
+//                     -limit)));
 //                 // add it to the queue of loading
 //                 thread_pool_manager->pushBackOperation(WorldQueueOperation(
 //                     glm::ivec2(x, -limit) + lastChunkPlayerPos,
 //                     WldQOperationType::kLoad));
 //         }
-//         // and finally create the mesh for chunks already loaded but without
+//         // and finally create the mesh for chunks already loaded but
+//         without
 //         a
 //         // mesh
 //         for (int x = -limit + 1; x <= limit - 1; ++x) {
@@ -410,10 +439,11 @@ void WorldController::addMeshToLoadJob(glm::ivec2 abs_pos, Mesh *mesh,
 //         // the limit in length to player's position to managed chunks
 //         int limit = (chunkWidth - 1) / 2;
 //         for (int x = -limit; x <= limit; ++x) {
-//                 // managing all the chunks that would get out of the bounds
+//                 // managing all the chunks that would get out of the
+//                 bounds
 
-//                 // -> we check that these are stored correctly on disk
-//                 (coming)
+//                 // -> we check that these are stored correctly on
+//                 disk (coming)
 
 //                 // -> we remove them
 //                 chunks_meshes_to_load_locker.lock();
@@ -427,22 +457,25 @@ void WorldController::addMeshToLoadJob(glm::ivec2 abs_pos, Mesh *mesh,
 //                 // line per line
 //                 for (int x = -limit; x <= limit; ++x) {
 //                         setRelativeToPlayerAt(
-//                             x, y - 1, getRelativeToPlayerAt(x, y).lock());
+//                             x, y - 1, getRelativeToPlayerAt(x,
+//                             y).lock());
 //                         getRelativeToPlayerAt(x, y).unlock();
 //                 }
 //         }
-//         // we can now manage the last row/column that needs to be built.
-//         for (int x = -limit; x <= limit; ++x) {
+//         // we can now manage the last row/column that needs to be
+//         built. for (int x = -limit; x <= limit; ++x) {
 //                 // allocate a new chunk
 //                 setRelativeToPlayerAt(
 //                     x, limit,
-//                     new Chunk(lastChunkPlayerPos + glm::ivec2(x, limit)));
+//                     new Chunk(lastChunkPlayerPos + glm::ivec2(x,
+//                     limit)));
 //                 // add it to the queue of loading
 //                 thread_pool_manager->pushBackOperation(WorldQueueOperation(
 //                     glm::ivec2(x, limit) + lastChunkPlayerPos,
 //                     WldQOperationType::kLoad));
 //         }
-//         // and finally create the mesh for chunks already loaded but without
+//         // and finally create the mesh for chunks already loaded but
+//         without
 //         a
 //         // mesh
 //         for (int x = -limit + 1; x <= limit - 1; ++x) {
@@ -479,8 +512,8 @@ void WorldController::addMeshToLoadJob(glm::ivec2 abs_pos, Mesh *mesh,
 //                 m.c->getBoundingBox(), m.c->getChunkPos(),
 //                 m.c->m_mesh.vertexPositions.size(),
 //                 m.c->getChunkPosCenter3()));
-//                 models_for_render.front().ptr.loadData(m.c->m_mesh, {3, 2,
-//                 3});
+//                 models_for_render.front().ptr.loadData(m.c->m_mesh,
+//                 {3, 2, 3});
 
 //         } else {
 //                 chunks_meshes_to_load_locker.unlock();
@@ -493,8 +526,8 @@ void WorldController::addMeshToLoadJob(glm::ivec2 abs_pos, Mesh *mesh,
 //                 chunks_models_to_remove.pop();
 
 //                 // remove all that have same position
-//                 models_for_render.remove_if([&](LocalizedBoundedModel m) ->
-//                 bool {return m.pos == pos;});
+//                 models_for_render.remove_if([&](LocalizedBoundedModel
+//                 m) -> bool {return m.pos == pos;});
 //         }
 //         chunks_models_to_remove_lock.unlock();
 // }/ }/ }
