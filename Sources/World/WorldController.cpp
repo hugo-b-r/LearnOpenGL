@@ -19,6 +19,11 @@ WorldController::~WorldController() {}
 void WorldController::perFrameControl(glm::ivec2 new_player_pos) {
         // check if player pos moved
         // if so move the world accordingly
+        
+        for (int i = 0; i < number_chunks_to_delete_at_a_time; ++i) {
+                renderer->doOneQueuedChunkRemovalIfNeeded();
+        }
+
         if (new_player_pos != lastPlayerChunkPos) {
                 spdlog::debug("moving world hehe !");
                 moveWorld(new_player_pos);

@@ -15,6 +15,7 @@
 #include <memory>
 #include <unordered_map>
 
+const int number_chunks_to_delete_at_a_time = 4;
 struct MeshToLoadBundle {
   Mesh * ptr; // to be deleted when no more in use
   glm::ivec2 abs_pos;

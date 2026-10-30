@@ -42,6 +42,8 @@ class ChunkRenderer {
         void addChunkToRender(glm::ivec2 abs_pos, World *w, AABB bounding_box,
                               Mesh *mesh);
         void rebuildRenderChunk(glm::ivec2 abs_pos, World *w);
+
+        void doOneQueuedChunkRemovalIfNeeded();
         void sendCommandToRemoveChunk(glm::ivec2 chunk_pos);
 
         bool isChunkInRenderer(glm::ivec2 chunk_pos);
