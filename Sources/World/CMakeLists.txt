@@ -5,7 +5,6 @@ target_sources(${TARGET_NAME} PRIVATE
     "WorldGenerator.cpp"
     "WorldQueueOperation.cpp"
     "WorldParallelOperationsManager.cpp"
-    "LockableChunk.cpp"
     "WorldController.cpp"
 )
 
@@ -17,7 +16,6 @@ if(BUILD_TESTS)
         "WorldGenerator.cpp"
         "WorldQueueOperation.cpp"
         "WorldParallelOperationsManager.cpp"
-        "LockableChunk.cpp"
     )
 else()
 

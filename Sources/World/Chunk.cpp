@@ -1,31 +1,24 @@
 #include "Chunk.h"
 #include "CubeTexture.h"
 #include "World/ChunkMeshCreator.h"
-#include "World/WorldGenerator.h"
 #include "utils.h"
 
 #include <spdlog/spdlog.h>
 
 Chunk::Chunk()
-    : m_mesh({{}, {}, {}}),
-      blocks(CHUNK_HEIGHT * CHUNK_LENGTH * CHUNK_WIDTH, CubeAtlas::Air),
-      m_loadStatus(ChunkDataLoadStatus::None),
-      m_meshBuildStatus(ChunkMeshBuildStatus::NotStarted),
-      chunkPos(glm::ivec2(0, 0)), m_modelMat(1.f), m_viewMat(1.f),
-      m_numberVertices(0) {}
-
-Chunk::Chunk(glm::ivec2 pos)
-    : m_mesh({{}, {}, {}}),
-      blocks(CHUNK_HEIGHT * CHUNK_LENGTH * CHUNK_WIDTH, CubeAtlas::Air),
-      m_loadStatus(ChunkDataLoadStatus::None),
-      m_meshBuildStatus(ChunkMeshBuildStatus::NotStarted), chunkPos(pos),
+    : blocks(CHUNK_HEIGHT * CHUNK_LENGTH * CHUNK_WIDTH, CubeAtlas::Air),
+      m_loadStatus(ChunkDataLoadStatus::None), chunkPos(glm::ivec2(0, 0)),
       m_modelMat(1.f), m_viewMat(1.f), m_numberVertices(0) {}
 
+Chunk::Chunk(glm::ivec2 pos)
+    : blocks(CHUNK_HEIGHT * CHUNK_LENGTH * CHUNK_WIDTH, CubeAtlas::Air),
+      m_loadStatus(ChunkDataLoadStatus::None), chunkPos(pos), m_modelMat(1.f),
+      m_viewMat(1.f), m_numberVertices(0) {}
+
 Chunk::Chunk(int x, int y)
-    : m_mesh({{}, {}, {}}),
-      blocks(CHUNK_HEIGHT * CHUNK_LENGTH * CHUNK_WIDTH, CubeAtlas::Air),
+    : blocks(CHUNK_HEIGHT * CHUNK_LENGTH * CHUNK_WIDTH, CubeAtlas::Air),
       m_loadStatus(ChunkDataLoadStatus::None),
-      m_meshBuildStatus(ChunkMeshBuildStatus::NotStarted),
+
       chunkPos(glm::ivec2(x, y)), m_modelMat(1.f), m_viewMat(1.f),
       m_numberVertices(0) {}
 
@@ -75,57 +68,6 @@ void Chunk::setBlockAt(int x, int y, int z, CubeAtlas ca) {
                     ca;
         }
 }
-
-void Chunk::load(World *w) {
-        // generate the chunk if not loaded
-        spdlog::debug("Loading chunk at pos : {}, {}", chunkPos.x, chunkPos.y);
-        if (m_loadStatus != ChunkDataLoadStatus::FinishedLoaded) {
-                WorldGenerator::buildChunk(*this, *w);
-        }
-        createBoundingBox();
-        m_loadStatus = ChunkDataLoadStatus::FinishedLoaded;
-        spdlog::debug("Finished loading chunk at pos : {}, {}", chunkPos.x,
-                      chunkPos.y);
-}
-
-bool Chunk::isLoaded() {
-        return m_loadStatus == ChunkDataLoadStatus::FinishedLoaded;
-}
-
-void Chunk::createMesh(World *w, CubeTexture &ct) {
-        spdlog::debug("Creating mesh for chunk : {}, {}", chunkPos.x,
-                      chunkPos.y);
-
-        ChunkMeshCreator builder(*this, ct.FactorHeight(), *w, &m_mesh);
-        builder.buildMesh();
-        m_meshBuildStatus = ChunkMeshBuildStatus::DoneNotLoaded;
-        spdlog::debug(" End creating mesh for chunk : {}, {}", chunkPos.x,
-                      chunkPos.y);
-}
-
-bool Chunk::hasMesh() {
-        return m_meshBuildStatus == ChunkMeshBuildStatus::DoneNotLoaded ||
-               m_meshBuildStatus == ChunkMeshBuildStatus::DoneLoaded;
-}
-
-// void Chunk::loadMeshOnGPU() {
-//         spdlog::debug("Loading mesh for chunk : {}, {}", chunkPos.x,
-//                       chunkPos.y);
-//         m_model.loadData(m_mesh, {3, 2, 3});
-//         m_meshBuildStatus = ChunkMeshBuildStatus::DoneLoaded;
-//         spdlog::debug("Finished loading mesh for chunk : {}, {}", chunkPos.x,
-//                       chunkPos.y);
-// }
-
-// bool Chunk::hasOnGPUMesh() {
-//         return m_meshBuildStatus == ChunkMeshBuildStatus::DoneLoaded;
-// }
-
-// void Chunk::bindModel() { m_model.bindVAO(); }
-
-// void Chunk::draw(Camera &cam, ChunkRenderer &renderer) {
-//         renderer.render(*this, cam, m_mesh.vertexPositions.size());
-// }
 
 void Chunk::createBoundingBox() {
         glm::vec3 pos = fromChunkToBlockCoordinates(chunkPos, 0);

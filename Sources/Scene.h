@@ -1,45 +1,50 @@
 #ifndef SCENE_H
 #define SCENE_H
 
-#include "Configuration.h"
 #include "Camera.h"
+#include "Configuration.h"
 
-#include "Renderer/ChunkRenderer.h"
 #include "OpenGLWindow.h"
+#include "Renderer/ChunkRenderer.h"
 #include "World/World.h"
 #include "World/WorldController.h"
 #include "World/WorldParallelOperationsManager.h"
 
-// class OpenGLWindow;
+/// This class handles the main logic of the game. It orchestrates the main
+/// components
 
 class Game {
-public:
-  Game(Configuration &c);
+      public:
+        /// The expected constructor. You need a configuration to tell it what to do.
+        /// \param c is the configuration.
+        Game(Configuration &c);
 
-  // avec une camera précédement initialisée avec la configuration
-  // Game(Configuration &c, Camera &cam);
+        Game();
 
-  // avec une camera précédement initialisée avec la configuration
-  // Game(Configuration &c, Camera &cam, World &world);
+        /// The mainloop of the game, keeps executing until window asked to
+        /// close
+        void mainLoop();
 
-  Game();
+        /// Do a check with terrain for collision
+        /// \param checkColTerrain whether to check collisions with terrain is
+        /// enabled or not
+        void updateCollisionWithTerrainCheck(bool checkColTerrain);
+        /// The configuration of the game (general parameters)
+        Configuration configuration;
+        /// The window in which we render things
+        OpenGLWindow window;
+        /// Where the player sees the world
+        Camera camera;
+        /// A renderer for chunks, where mesh are stored
+        ChunkRenderer renderer;
+        /// Where world data is stored
+        World world;
+        /// Handles the world generation, deletion...
+        WorldController world_controller;
+        /// Thread pool controller, assign tasks, execute them in parallel pool
+        WorldParallelOperationsManager *thread_pool_manager;
 
-  // Camera &getCamera();
-  // Configuration &getConfig();
-  // World &getWorld();
-  //
- void mainLoop();
-
-  void updateCollisionWithTerrainCheck(bool checkColTerrain);
-  Configuration configuration;
-  OpenGLWindow window;
-  Camera camera;
-  ChunkRenderer renderer;
-  World world;
-  WorldController world_controller;
-  WorldParallelOperationsManager *thread_pool_manager;
-
-private:
+      private:
 };
 
 #endif

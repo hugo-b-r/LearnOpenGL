@@ -88,14 +88,14 @@ std::optional<NeighboringChunks> World::getChunkNeighbors(glm::ivec2 abs_pos) {
 }
 
 //
-void World::loadChunk(glm::ivec2 chunk_pos) {
-        // for now, the only source for a chunk is the chunk builder
-        auto c = std::make_shared<Chunk>(Chunk(chunk_pos));
+// void World::loadChunk(glm::ivec2 chunk_pos) {
+//         // for now, the only source for a chunk is the chunk builder
+//         auto c = std::make_shared<Chunk>(Chunk(chunk_pos));
 
-        WorldGenerator::buildChunk(*(chunks[chunk_pos].get()), *this);
+//         WorldGenerator::buildChunk(*(chunks[chunk_pos].get()), *this);
 
-        loadChunk(c);
-}
+//         loadChunk(c);
+// }
 
 void World::loadChunk(ReadSafeChunk chunk) {
         // for now, the only source for a chunk is the chunk builder

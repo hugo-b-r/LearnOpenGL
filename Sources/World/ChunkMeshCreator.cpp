@@ -8,23 +8,6 @@
 #include <memory>
 #include <spdlog/spdlog.h>
 
-struct NeighbooringFaces {
-        void update(int x, int y, int z) {
-                left = {x - 1, y, z};
-                right = {x + 1, y, z};
-                up = {x, y + 1, z};
-                down = {x, y - 1, z};
-                front = {x, y, z + 1};
-                rear = {x, y, z - 1};
-        }
-
-        glm::ivec3 left;
-        glm::ivec3 right;
-        glm::ivec3 up;
-        glm::ivec3 down;
-        glm::ivec3 front;
-        glm::ivec3 rear;
-};
 
 std::array<GLfloat, 48> ChunkMeshCreator::upFace(int select, float x, float y,
                                                  float z) const {
@@ -352,7 +335,7 @@ std::array<GLfloat, 48> ChunkMeshCreator::rearFace(int select, float x, float y,
 ChunkMeshCreator::ChunkMeshCreator(Chunk &c, float tex_factor_height, World &w,
                                    Mesh *result_location)
     :m_mesh(result_location), tex_vertical_factor(tex_factor_height), data(c),
-      status(ChunkMeshBuildStatus::Running), world(w)  {
+       world(w)  {
         *result_location = {{}, {}, {}};
 }
 
@@ -436,7 +419,6 @@ bool ChunkMeshCreator::buildMesh() {
         } else {
                 return false;
         }
-        status = ChunkMeshBuildStatus::DoneLoaded;
         return true;
 }
 

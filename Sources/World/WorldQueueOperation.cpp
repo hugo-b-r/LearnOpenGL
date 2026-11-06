@@ -2,7 +2,6 @@
 
 #include "Mesh.h"
 #include "World/ChunkMeshCreator.h"
-#include "World/LockableChunk.h"
 
 #include "Chunk.h"
 #include "World/World.h"
@@ -10,8 +9,6 @@
 #include "Renderer/ChunkRenderer.h"
 #include "World/WorldGenerator.h"
 
-#include <iostream>
-#include <thread>
 
 using namespace std::chrono_literals;
 
