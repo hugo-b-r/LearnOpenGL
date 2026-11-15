@@ -1,11 +1,10 @@
-#include <tracy/Tracy.hpp>
 #include "WorldGenerator.h"
 #include "CubeTexture.h"
 #include "Mathematics/Noise.h"
 #include "World/Chunk.h"
 #include "World/World.h"
 #include "utils.h"
-
+#include <tracy/Tracy.hpp>
 
 #include <spdlog/spdlog.h>
 
@@ -20,14 +19,14 @@ const int TREES_LOW_MARGIN = 5;
 WorldGenerator::WorldGenerator() {}
 
 void WorldGenerator::buildChunk(Chunk &c, World &world) {
-         ZoneScoped; // Need at least one call into Tracy;
+        ZoneScoped; // Need at least one call into Tracy;
         spdlog::debug("building Chunk at pos : {}, {}", c.getChunkPos().x,
                       c.getChunkPos().y);
         const int cote = CHUNK_WIDTH;
         for (int i = 0; i < cote; i++) {
                 for (int j = 0; j < cote; j++) {
 
-                         ZoneScoped; // Need at least one call into Tracy;
+                        ZoneScoped; // Need at least one call into Tracy;
                         glm::ivec3 blockPosGlobal =
                             fromInChunkToGlobalCoordinates(glm::vec3(i, 0, j),
                                                            c.getChunkPos());
@@ -44,7 +43,8 @@ void WorldGenerator::buildChunk(Chunk &c, World &world) {
                                 for (int k = 0; k < height - sand_h; k++) {
                                         c.setBlockAt(i, k, j, CubeAtlas::Stone);
                                 }
-                                for (int k = height - sand_h; k <= height; k++) {
+                                for (int k = height - sand_h; k <= height;
+                                     k++) {
                                         c.setBlockAt(i, k, j, CubeAtlas::Sand);
                                 }
                         } else {
@@ -73,9 +73,10 @@ void WorldGenerator::buildChunk(Chunk &c, World &world) {
                                       blockPosGlobal.z * factor + offsetZ),
                             1, 0.1, 0.65, 10);
 
-                        if (tree_noise >= 1.55 && height >= WATER_ALTITUDE+sand_h+TREES_LOW_MARGIN) {
-                                addTreeAt(blockPosGlobal.x, height,
-                                          blockPosGlobal.z, world);
+                        if (tree_noise >= 1.55 &&
+                            height >=
+                                WATER_ALTITUDE + sand_h + TREES_LOW_MARGIN) {
+                                addTreeAt(i, height, j, world, c);
                         }
                 }
         }
@@ -87,35 +88,40 @@ int WorldGenerator::soilHeightAt(glm::vec2 pos) {
         return Noise::turbulence(pos, 45., 0.00005, 0.85, 10) + 128;
 }
 
-void WorldGenerator::addTreeAt(int i, int j, int k, World &world) {
+void WorldGenerator::addTreeAt(int i, int j, int k, World &world,
+                               Chunk &chunk) {
         // create a trunk
         for (int l = j; l < std::min(j + 4, 255); l++) {
-                // if (world.getBlockAt(glm::ivec3(i, l, k)) == CubeAtlas::Air)
-                        // world.setBlockAt(glm::ivec3(i, l, k), CubeAtlas::Wood);
+                auto pos = glm::ivec3(i, l, k);
+                if (chunk.getBlockAt(pos) == CubeAtlas::Air &&
+                    chunk.containRelPos(pos)) {
+                        chunk.setBlockAt(i, l, k, CubeAtlas::Wood);
+                }
         }
-        // for (int a = i - 2; a <= i + 2; a++) {
-        //         for (int b = k - 2; b <= k + 2; b++) {
-        //                 for (int m = 0; m < 2; m++) {
-        //                         if (world.getBlockAt(glm::ivec3(
-        //                                 a, j + 2 + m, b)) == CubeAtlas::Air)
-        //                                 world.setBlockAt(
-        //                                     glm::ivec3(a, j + 2 + m, b),
-        //                                     CubeAtlas::Leaves);
-        //                 }
-        //         }
-        // }
-        // for (int a = i - 1; a <= i + 1; a++) {
-        //         for (int b = k - 1; b <= k + 1; b++) {
-        //                 // if (world.getBlockAt(glm::ivec3(a, j + 4, b)) ==
-        //                     // CubeAtlas::Air)
-        //                         // world.setBlockAt(glm::ivec3(a, j + 4, b),
-        //                                          // CubeAtlas::Leaves);
-        //         }
-        // }
+        for (int a = i - 2; a <= i + 2; a++) {
+                for (int b = k - 2; b <= k + 2; b++) {
+                        for (int m = 0; m < 2; m++) {
+                                auto res = chunk.getBlockAt(
+                                    glm::ivec3(a, j + 2 + m, b));
+                                if (res == CubeAtlas::Air)
+                                        chunk.setBlockAt(
+                                            glm::ivec3(a, j + 2 + m, b),
+                                            CubeAtlas::Leaves);
+                        }
+                }
+        }
+        for (int a = i - 1; a <= i + 1; a++) {
+                for (int b = k - 1; b <= k + 1; b++) {
+                        auto res = chunk.getBlockAt(glm::ivec3(a, j + 4, b));
+                        if (res == CubeAtlas::Air)
+                                chunk.setBlockAt(glm::ivec3(a, j + 4, b),
+                                                 CubeAtlas::Leaves);
+                }
+        }
 }
 
 int WorldGenerator::sand_height(glm::ivec2 pos) {
-        int n_value = floor(Noise::turbulence(pos, 3., 0.0001, 0.85, 10))+10;
+        int n_value = floor(Noise::turbulence(pos, 3., 0.0001, 0.85, 10)) + 10;
         if (n_value > 0)
                 return n_value;
         else

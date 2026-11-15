@@ -69,6 +69,15 @@ if(BUILD_TESTS)
 
 
   add_executable(test_learnopengl Tests/test_test.cpp)
+
+
+  option(TRACY_ENABLE "Enable profiling" ON)
+  add_subdirectory(deps/tracy)
+
+  # After your existing add_executable(...) call:
+  target_link_libraries(test_learnopengl PRIVATE Tracy::TracyClient)
+
+  
   target_include_directories(test_learnopengl PUBLIC Sources/)
   target_link_libraries(${TARGET_NAME} PUBLIC GTest::gtest_main asan  glm::glm imgui implot glad glfw OpenGL::GL spdlog::spdlog glm::glm)
 

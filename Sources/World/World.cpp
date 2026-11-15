@@ -24,9 +24,13 @@ World::World(const World &w) : chunks(w.chunks) {}
 World::~World() {}
 
 std::optional<ReadSafeChunk> World::getAbsoluteChunkAt(glm::ivec2 abs_pos) {
+        chunk_map_locker.lock();
         if (chunks.contains(abs_pos)) {
-                return chunks.at(abs_pos);
+                auto res = chunks.at(abs_pos);
+                chunk_map_locker.unlock();
+                return res;
         } else {
+                chunk_map_locker.unlock();
                 return std::nullopt;
         }
 }
@@ -105,7 +109,11 @@ void World::loadChunk(ReadSafeChunk chunk) {
         ;
 }
 
-void World::unloadChunk(glm::ivec2 chunk_pos) { chunks.erase(chunk_pos); }
+void World::unloadChunk(glm::ivec2 chunk_pos) {
+        // chunk_map_locker.lock();
+        chunks.erase(chunk_pos);
+        // chunk_map_locker.unlock();
+}
 
 bool World::isChunkLoaded(glm::ivec2 chunk_pos) {
         return chunks.contains(chunk_pos);

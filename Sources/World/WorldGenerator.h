@@ -18,7 +18,7 @@ class WorldGenerator {
         static int soilHeightAt(glm::vec2);
 
         /// Adds a tree without replacing existing blocks at pos
-        static void addTreeAt(int i, int j, int k, World &world);
+        static void addTreeAt(int i, int j, int k, World &world, Chunk& chunk);
 
       protected:
         /// How much sand to put here, supposing there would be sand

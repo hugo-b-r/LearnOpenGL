@@ -55,6 +55,12 @@ CubeAtlas Chunk::getBlockAt(glm::ivec3 pos) {
         return res;
 }
 
+
+void Chunk::setBlockAt(glm::ivec3 block_pos, CubeAtlas ca) {
+        return setBlockAt(block_pos.x, block_pos.y, block_pos.z, ca);
+}
+
+
 void Chunk::setBlockAt(int x, int y, int z, CubeAtlas ca) {
         if (x >= 0 && x < CHUNK_WIDTH && y >= 0 && y < CHUNK_HEIGHT && z >= 0 &&
             z < CHUNK_LENGTH) {
@@ -74,3 +80,15 @@ void Chunk::createBoundingBox() {
 }
 
 AABB &Chunk::getBoundingBox() { return m_boundingBox; }
+
+
+bool Chunk::containAbsPos(glm::ivec3 block_pos) {
+        return fromBlockToChunkCoordinates(block_pos) == chunkPos;
+}
+bool Chunk::containRelPos(glm::ivec3 block_pos) {
+        int x = block_pos.x;
+        int y = block_pos.y;
+        int z = block_pos.z;
+        return x >= 0 && x < CHUNK_WIDTH && y >= 0 && y < CHUNK_HEIGHT && z >= 0 &&
+            z < CHUNK_LENGTH;
+}

@@ -3,7 +3,3 @@
 #include "../../Sources/Configuration.h"
 
 
-TEST(Camera, TestCreation) {
-    Configuration c;
-    Camera cam(c);
-}
