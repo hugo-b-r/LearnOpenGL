@@ -35,7 +35,7 @@ class Configuration {
         /// With r being rendered (at least loaded on the gpu, maybe not
         /// actually rendered because of frustum culling), and x the chunk where
         /// the player stands.
-        int renderDistance = 8;
+        int renderDistance = 16;
         /// Th field of view which is used to compute the camera projection
         /// matrix.
         int fov = 90;

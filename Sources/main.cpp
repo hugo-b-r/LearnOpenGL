@@ -1,4 +1,5 @@
 
+#include <tracy/Tracy.hpp>
 #include "DebugInfos.h"
 #include "Scene.h"
 #include <glad/glad.h>
@@ -11,6 +12,7 @@
 // #define STB_IMAGE_IMPLEMENTATION
 #include "../deps/stb_image.h"
 #include <GLFW/glfw3.h>
+
 
 
 ///

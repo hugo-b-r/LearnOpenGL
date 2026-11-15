@@ -7,20 +7,18 @@
 
 Chunk::Chunk()
     : blocks(CHUNK_HEIGHT * CHUNK_LENGTH * CHUNK_WIDTH, CubeAtlas::Air),
-      m_loadStatus(ChunkDataLoadStatus::None), chunkPos(glm::ivec2(0, 0)),
-      m_modelMat(1.f), m_viewMat(1.f), m_numberVertices(0) {}
+      chunkPos(glm::ivec2(0, 0)),
+      m_modelMat(1.f), m_viewMat(1.f) {}
 
 Chunk::Chunk(glm::ivec2 pos)
     : blocks(CHUNK_HEIGHT * CHUNK_LENGTH * CHUNK_WIDTH, CubeAtlas::Air),
-      m_loadStatus(ChunkDataLoadStatus::None), chunkPos(pos), m_modelMat(1.f),
-      m_viewMat(1.f), m_numberVertices(0) {}
+      chunkPos(pos), m_modelMat(1.f),
+      m_viewMat(1.f)  {}
 
 Chunk::Chunk(int x, int y)
     : blocks(CHUNK_HEIGHT * CHUNK_LENGTH * CHUNK_WIDTH, CubeAtlas::Air),
-      m_loadStatus(ChunkDataLoadStatus::None),
 
-      chunkPos(glm::ivec2(x, y)), m_modelMat(1.f), m_viewMat(1.f),
-      m_numberVertices(0) {}
+      chunkPos(glm::ivec2(x, y)), m_modelMat(1.f), m_viewMat(1.f) {}
 
 Chunk::~Chunk() {}
 

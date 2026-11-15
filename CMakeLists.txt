@@ -11,6 +11,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 
+
+
 include(FetchContent)
 FetchContent_Declare(
   googletest
@@ -79,8 +81,13 @@ if(BUILD_TESTS)
 
 else()
 
-
   add_executable(learnopengl)
+  option(TRACY_ENABLE "Enable profiling" ON)
+  add_subdirectory(deps/tracy)
+
+  # After your existing add_executable(...) call:
+  target_link_libraries(learnopengl PRIVATE Tracy::TracyClient)
+
 
   add_subdirectory(Sources/)
   target_link_libraries(learnopengl PUBLIC imgui implot glad glfw OpenGL::GL spdlog::spdlog glm::glm)

@@ -1,3 +1,4 @@
+#include <tracy/Tracy.hpp>
 #include "WorldGenerator.h"
 #include "CubeTexture.h"
 #include "Mathematics/Noise.h"
@@ -19,12 +20,14 @@ const int TREES_LOW_MARGIN = 5;
 WorldGenerator::WorldGenerator() {}
 
 void WorldGenerator::buildChunk(Chunk &c, World &world) {
+         ZoneScoped; // Need at least one call into Tracy;
         spdlog::debug("building Chunk at pos : {}, {}", c.getChunkPos().x,
                       c.getChunkPos().y);
         const int cote = CHUNK_WIDTH;
         for (int i = 0; i < cote; i++) {
                 for (int j = 0; j < cote; j++) {
 
+                         ZoneScoped; // Need at least one call into Tracy;
                         glm::ivec3 blockPosGlobal =
                             fromInChunkToGlobalCoordinates(glm::vec3(i, 0, j),
                                                            c.getChunkPos());

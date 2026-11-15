@@ -3,6 +3,7 @@
 #include "Configuration.h"
 #include "Renderer/ChunkRenderer.h"
 #include "World/World.h"
+#include <tracy/Tracy.hpp>
 
 #include "World/WorldController.h"
 #include "World/WorldParallelOperationsManager.h"
@@ -38,6 +39,7 @@ Game::Game()
 void Game::mainLoop() {
 
         while (window.shouldContinue()) {
+                ZoneScoped;
                 glfwPollEvents();
 
                 window.beginFrameActions();

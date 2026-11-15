@@ -3,6 +3,7 @@
 #include "Scene.h"
 #include "World/WorldQueueOperation.h"
 #include <spdlog/spdlog.h>
+#include <tracy/Tracy.hpp>
 
 WorldController::WorldController(World *w, ChunkRenderer *r, Game *g,
                                  int render_distance)
@@ -17,6 +18,7 @@ void WorldController::perFrameControl(glm::ivec2 new_player_pos) {
         // check if player pos moved
         // if so move the world accordingly
 
+        ZoneScoped;
         for (int i = 0; i < number_chunks_to_delete_at_a_time; ++i) {
                 renderer->doOneQueuedChunkRemovalIfNeeded();
         }
@@ -27,6 +29,12 @@ void WorldController::perFrameControl(glm::ivec2 new_player_pos) {
         }
 
         meshes_to_load_lock.lock();
+        if (meshes_to_load.size() > 0) {
+                loadOneMeshOnGpu();
+        }
+        if (meshes_to_load.size() > 0) {
+                loadOneMeshOnGpu();
+        }
         if (meshes_to_load.size() > 0) {
                 loadOneMeshOnGpu();
         }
