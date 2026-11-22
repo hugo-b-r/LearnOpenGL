@@ -22,9 +22,15 @@ Camera::Camera(Game &s) : m_scene(s) {
         lastX = 0.0;
         lastY = 0.0;
 
-        position = glm::vec3(initial_pos.x, WorldGenerator::soilHeightAt(glm::vec2(initial_pos.x, initial_pos.z)) + initial_pos.y, initial_pos.z);
+        position = glm::vec3(initial_pos.x,
+                             WorldGenerator::soilHeightAt(
+                                 glm::vec2(initial_pos.x, initial_pos.z)) +
+                                 initial_pos.y,
+                             initial_pos.z);
 
-        m_frontPos = glm::vec3(0.0f, 0.0f, 1.0f);
+        double m_yaw_rad = m_yaw / 180 * M_PI;
+
+        m_frontPos = glm::vec3(cos(m_yaw_rad), 0.0f, sin(m_yaw_rad));
         m_upVector = glm::vec3(0.0f, 1.0f, 0.0f);
 
         updateTranslateFunc(s.configuration.getCheckCollisions());
@@ -48,7 +54,6 @@ void Camera::update() {
 void Camera::translate(glm::vec3 trans) {
         // calls the correct function used by parameters
         (this->*translate_func)(trans);
-
 }
 void Camera::updateTranslateFunc(bool checkCol) {
         if (checkCol) {
@@ -79,9 +84,9 @@ void Camera::translate_with_collisions(glm::vec3 trans) {
                                 for (int z = min.z; z < max.z; ++z) {
                                         glm::vec3 tmp_pos(x, y, z);
                                         std::optional<CubeAtlas> block =
-                                            m_scene.world.getBlockAt(
-                                                tmp_pos);
-                                        if (block.has_value() && block.value() != CubeAtlas::Air) {
+                                            m_scene.world.getBlockAt(tmp_pos);
+                                        if (block.has_value() &&
+                                            block.value() != CubeAtlas::Air) {
                                                 collided = true;
                                                 break;
                                         }
@@ -134,9 +139,10 @@ std::string Camera::debug_pos() {
 }
 
 std::string Camera::debug_direction() {
-        std::string res =
-            std::format("Direction : x : {:0.2f}; y : {:0.2f}; z : {:0.2f};\nYaw : {:.02f}; Pitch : {:0.2f}, lastX : {:02F}",
-                        m_frontPos.x, m_frontPos.y, m_frontPos.z, m_yaw, m_pitch, lastX);
+        std::string res = std::format(
+            "Direction : x : {:0.2f}; y : {:0.2f}; z : {:0.2f};\nYaw : "
+            "{:.02f}; Pitch : {:0.2f}, lastX : {:02F}",
+            m_frontPos.x, m_frontPos.y, m_frontPos.z, m_yaw, m_pitch, lastX);
         return res;
 }
 
