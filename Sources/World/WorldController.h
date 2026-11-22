@@ -61,11 +61,23 @@ class WorldController {
         void addMeshToLoadJob(glm::ivec2 abs_pos, Mesh *mesh,
                               AABB bounding_box);
 
+        /// Add the mesh to reload queue
+        void addMeshToReloadJob(glm::ivec2 abs_pos, Mesh *mesh,
+                              AABB bounding_box);
+
         /// Do the initial loading of the world
         void initialLoad(WorldParallelOperationsManager *thread_pool_manager);
         /// callback from a queue operation to tell what to do once chunk is
         /// generated Also does the chunk loading in the world
         void addMeshAndGPULoadChunkJob(std::shared_ptr<Chunk>);
+
+
+        /// callback from a queue operation to tell what to do once chunk is
+        /// generated Also does the chunk loading in the world
+        void addMeshAndGPUReloadChunkJob(std::shared_ptr<Chunk>);
+
+        /// callback from the world to reload chunks when edited
+        void addChunkToReload(glm::ivec2);
 
       protected:
         /// The chunk position of the player just before this call
@@ -76,6 +88,13 @@ class WorldController {
         std::queue<MeshToLoadBundle> meshes_to_load;
         /// The locker for #meshes_to_load
         std::mutex meshes_to_load_lock;
+
+
+        /// The queue of meshes waiting to be reloaded. Use the
+        /// #meshes_to_reload_lock !!!!
+        std::queue<MeshToLoadBundle> meshes_to_reload;
+        /// The locker for #meshes_to_reload
+        std::mutex meshes_to_reload_lock;
 
         /// Whether chunks are stored in the world, and or loaded on the
         /// renderer
@@ -96,11 +115,13 @@ class WorldController {
         /// The whole game
         Game *game;
 
-
         /// Move the world when the player change chunks
         void moveWorld(glm::ivec2 new_player_pos);
         /// Take one mehs out of the queue and load it on the gpu
         void loadOneMeshOnGpu();
+
+        /// Take one mehs out of the queue and load it on the gpu
+        void reloadOneMeshOnGpu();
 
         /// Remove one chunk from the gpu
         void removeChunkFromGPU(glm::ivec2 abs_pos);

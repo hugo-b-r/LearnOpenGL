@@ -9,6 +9,7 @@
 #include <spdlog/spdlog.h>
 
 #include <algorithm>
+#include <utility>
 
 const int DIRT_HEIGHT = 3;
 const int GRASS_HEIGHT = 1;
@@ -80,6 +81,8 @@ void WorldGenerator::buildChunk(Chunk &c, World &world) {
                         }
                 }
         }
+
+        world.applyUnloadedBlockstoNewChunk(c);
         spdlog::debug("Finished building Chunk at pos : {}, {}",
                       c.getChunkPos().x, c.getChunkPos().y);
 }
@@ -90,11 +93,11 @@ int WorldGenerator::soilHeightAt(glm::vec2 pos) {
 
 void WorldGenerator::addTreeAt(int i, int j, int k, World &world,
                                Chunk &chunk) {
+        std::vector<std::pair<glm::ivec3, CubeAtlas>> blocks_to_add_after;
         // create a trunk
         for (int l = j; l < std::min(j + 4, 255); l++) {
                 auto pos = glm::ivec3(i, l, k);
-                if (chunk.getBlockAt(pos) == CubeAtlas::Air &&
-                    chunk.containRelPos(pos)) {
+                if (chunk.getBlockAt(pos) == CubeAtlas::Air) {
                         chunk.setBlockAt(i, l, k, CubeAtlas::Wood);
                 }
         }
@@ -103,21 +106,46 @@ void WorldGenerator::addTreeAt(int i, int j, int k, World &world,
                         for (int m = 0; m < 2; m++) {
                                 auto res = chunk.getBlockAt(
                                     glm::ivec3(a, j + 2 + m, b));
-                                if (res == CubeAtlas::Air)
-                                        chunk.setBlockAt(
-                                            glm::ivec3(a, j + 2 + m, b),
-                                            CubeAtlas::Leaves);
+                                if (res == CubeAtlas::Air) {
+                                        auto block_pos =
+                                            glm::ivec3(a, j + 2 + m, b);
+                                        if (chunk.containRelPos(block_pos)) {
+                                                chunk.setBlockAt(
+                                                    block_pos,
+                                                    CubeAtlas::Leaves);
+                                        } else {
+                                                blocks_to_add_after.push_back(
+                                                    std::make_pair(
+                                                        fromInChunkToGlobalCoordinates(
+                                                            block_pos,
+                                                            chunk
+                                                                .getChunkPos()),
+                                                        CubeAtlas::Leaves));
+                                        }
+                                }
                         }
                 }
         }
         for (int a = i - 1; a <= i + 1; a++) {
                 for (int b = k - 1; b <= k + 1; b++) {
                         auto res = chunk.getBlockAt(glm::ivec3(a, j + 4, b));
-                        if (res == CubeAtlas::Air)
-                                chunk.setBlockAt(glm::ivec3(a, j + 4, b),
-                                                 CubeAtlas::Leaves);
+                        if (res == CubeAtlas::Air) {
+                                auto block_pos = glm::ivec3(a, j + 4, b);
+                                if (chunk.containRelPos(block_pos)) {
+                                        chunk.setBlockAt(block_pos,
+                                                         CubeAtlas::Leaves);
+                                } else {
+                                        blocks_to_add_after.push_back(
+                                            std::make_pair(
+                                                fromInChunkToGlobalCoordinates(
+                                                    block_pos,
+                                                    chunk.getChunkPos()),
+                                                CubeAtlas::Leaves));
+                                }
+                        }
                 }
         }
+        world.appendNewUnloadedBlocks(blocks_to_add_after);
 }
 
 int WorldGenerator::sand_height(glm::ivec2 pos) {

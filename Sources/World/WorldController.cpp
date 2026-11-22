@@ -28,6 +28,19 @@ void WorldController::perFrameControl(glm::ivec2 new_player_pos) {
                 moveWorld(new_player_pos);
         }
 
+        meshes_to_reload_lock.lock();
+        if (meshes_to_reload.size() > 0) {
+                reloadOneMeshOnGpu();
+        }
+        if (meshes_to_reload.size() > 0) {
+                reloadOneMeshOnGpu();
+        }
+        if (meshes_to_reload.size() > 0) {
+                reloadOneMeshOnGpu();
+        }
+
+        meshes_to_reload_lock.unlock();
+
         meshes_to_load_lock.lock();
         if (meshes_to_load.size() > 0) {
                 loadOneMeshOnGpu();
@@ -61,7 +74,6 @@ void WorldController::removeChunkFromGPU(glm::ivec2 abs_pos) {
         chunk_properties_lock.unlock();
         renderer->sendCommandToRemoveChunk(abs_pos);
 }
-
 
 void WorldController::moveWorld(glm::ivec2 new_player_pos) {
         int manhattan_radius_limit = game->configuration.renderDistance;
@@ -132,6 +144,24 @@ void WorldController::loadOneMeshOnGpu() {
         chunk_properties_lock.unlock();
 }
 
+void WorldController::reloadOneMeshOnGpu() {
+        MeshToLoadBundle &meshB = meshes_to_reload.front();
+        meshes_to_reload.pop();
+        chunk_properties_lock.lock();
+        if (chunk_properties.contains(meshB.abs_pos) &&
+            !chunk_properties.at(meshB.abs_pos).in_renderer) {
+
+                renderer->addChunkToRender(meshB.abs_pos, meshB.bounding_box,
+                                           meshB.ptr);
+                chunk_properties.at(meshB.abs_pos).in_renderer = true;
+        } else if (chunk_properties.contains(meshB.abs_pos) &&
+                   chunk_properties.at(meshB.abs_pos).in_renderer) {
+                renderer->replaceChunkToRender(meshB.abs_pos,
+                                               meshB.bounding_box, meshB.ptr);
+        }
+        chunk_properties_lock.unlock();
+}
+
 void WorldController::addMeshAndGPULoadChunkJob(std::shared_ptr<Chunk> chunk) {
         glm::ivec2 chunk_pos = chunk.get()->getChunkPos();
 
@@ -163,11 +193,57 @@ void WorldController::addMeshAndGPULoadChunkJob(std::shared_ptr<Chunk> chunk) {
         chunk_properties_lock.unlock();
 }
 
+void WorldController::addMeshAndGPUReloadChunkJob(
+    std::shared_ptr<Chunk> chunk) {
+        glm::ivec2 chunk_pos = chunk.get()->getChunkPos();
+
+        chunk_properties_lock.lock();
+        chunk_properties.insert({chunk.get()->getChunkPos(), {true, false}});
+        chunk_properties_lock.unlock();
+        world->loadChunk(chunk);
+        chunk_properties_lock.lock();
+        chunk_properties[chunk_pos].in_world = true;
+        game->thread_pool_manager->pushBackOperation(WorldQueueOperation(
+            chunk.get()->getChunkPos(), WldQOperationType::RecreateMesh));
+
+        // for each neighbor, if exists and not in renderer -> create their mesh
+        // ???
+        for (const auto &key : {
+                 chunk_pos + glm::ivec2(1, 0),
+                 chunk_pos + glm::ivec2(-1, 0),
+                 chunk_pos + glm::ivec2(0, 1),
+                 chunk_pos + glm::ivec2(0, -1),
+             }) {
+                if (chunk_properties.contains(key) &&
+                    !chunk_properties.at(key).in_renderer &&
+                    chunk_properties.at(key).in_world) {
+                        game->thread_pool_manager->pushBackOperation(
+                            WorldQueueOperation(key,
+                                                WldQOperationType::CreateMesh));
+                }
+        }
+
+        chunk_properties_lock.unlock();
+}
+
+void WorldController::addChunkToReload(glm::ivec2 chunk_pos) {
+
+        game->thread_pool_manager->pushBackOperation(
+            WorldQueueOperation(chunk_pos, WldQOperationType::ReloadThenMesh));
+}
+
 void WorldController::addMeshToLoadJob(glm::ivec2 abs_pos, Mesh *mesh,
                                        AABB bounding_box) {
         meshes_to_load_lock.lock();
         meshes_to_load.emplace(MeshToLoadBundle(mesh, abs_pos, bounding_box));
         meshes_to_load_lock.unlock();
+}
+
+void WorldController::addMeshToReloadJob(glm::ivec2 abs_pos, Mesh *mesh,
+                                         AABB bounding_box) {
+        meshes_to_reload_lock.lock();
+        meshes_to_reload.emplace(MeshToLoadBundle(mesh, abs_pos, bounding_box));
+        meshes_to_reload_lock.unlock();
 }
 
 void WorldController::initialLoad(

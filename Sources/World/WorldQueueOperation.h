@@ -10,7 +10,9 @@
 enum class WldQOperationType {
         LoadOrGenerate,
         LoadOrGenerateThenMesh,
-        CreateMesh
+        CreateMesh,
+        ReloadThenMesh,
+        RecreateMesh
 };
 
 class World;
@@ -45,6 +47,12 @@ class WorldQueueOperation {
 
         /// execution for Mesh creation, using \a world_controller
         void executeCreateMesh(WorldController &world_controller);
+
+        /// Same as #executeCreateMesh, but remove the older one, using \a world_controller
+        void executeRecreateMesh(WorldController &world_controller);
+
+        /// execution when reloading chunk, using \a world_controller
+        void executeReloadThenMesh(WorldController &world_controller);
 };
 
 #endif

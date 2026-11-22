@@ -1,6 +1,7 @@
 #ifndef WORLD_H
 #define WORLD_H
 
+#include "World/WorldParallelOperationsManager.h"
 #include "WorldQueueOperation.h"
 #include "glm/fwd.hpp"
 #include <glm/glm.hpp>
@@ -29,7 +30,7 @@ using ReadSafeChunk = std::shared_ptr<Chunk>;
 class World {
       public:
         /// Default constructor
-        World();
+        World(WorldController& world_controller);
         /// Default copoy constructor
         World(const World &w);
         /// Default destructor
@@ -62,6 +63,31 @@ class World {
             chunks;
         /// The locker for #chunks
         std::mutex chunk_map_locker;
+
+        /// Finds blocks to be loaded from #blocks_to_load, adds them to the \a
+        /// chunk and finally remove them from the world
+        void applyUnloadedBlockstoNewChunk(Chunk &chunk);
+
+        /// Adds \a blocks to the list of blocks that needs to be loaded for other chunks
+        void appendNewUnloadedBlocks(std::vector<std::pair<glm::ivec3, CubeAtlas>> blocks);
+
+        /// Build a new chunk at \a pos adequate with the changes in cache in #blocks_to_load
+        /// Optional because it can be non existing
+        std::optional<std::shared_ptr<Chunk>> buildNextChunkFor(glm::ivec2 pos);
+
+      protected:
+
+        /// to allow the world to indirecly control itself
+        WorldController& world_controller;
+        /// Stores the blocks that can't be added to chunks that are not yet
+        /// loaded but might be.
+        std::unordered_map<glm::ivec2,
+                           std::vector<std::pair<glm::ivec3, CubeAtlas>>,
+                           KeyFuncs, KeyFuncs>
+            blocks_to_load;
+
+        /// Mutex for #blocks_to_load
+        std::mutex blocks_to_load_locker;
 };
 
 #endif
