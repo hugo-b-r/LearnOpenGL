@@ -16,14 +16,15 @@ const glm::vec3 initial_pos = glm::vec3(0.0, 4.0, 0.0);
 
 Camera::Camera(Game &s) : m_scene(s) {
 
-        m_yaw = 0.;
+        m_yaw = 90.;
         m_pitch = 0.;
-        lastX = (float)s.configuration.windowWidth / 2.f;
-        lastY = (float)s.configuration.windowHeight / 2.f;
+        // lastX = (float)s.configuration.windowWidth / 2.f;
+        lastX = 0.0;
+        lastY = 0.0;
 
         position = glm::vec3(initial_pos.x, WorldGenerator::soilHeightAt(glm::vec2(initial_pos.x, initial_pos.z)) + initial_pos.y, initial_pos.z);
 
-        m_frontPos = position - glm::vec3(0.0f, 0.0f, 4.0f);
+        m_frontPos = glm::vec3(0.0f, 0.0f, 1.0f);
         m_upVector = glm::vec3(0.0f, 1.0f, 0.0f);
 
         updateTranslateFunc(s.configuration.getCheckCollisions());
@@ -134,8 +135,8 @@ std::string Camera::debug_pos() {
 
 std::string Camera::debug_direction() {
         std::string res =
-            std::format("Direction : x : {:0.2f}; y : {:0.2f}; z : {:0.2f}; ",
-                        m_frontPos.x, m_frontPos.y, m_frontPos.z);
+            std::format("Direction : x : {:0.2f}; y : {:0.2f}; z : {:0.2f};\nYaw : {:.02f}; Pitch : {:0.2f}, lastX : {:02F}",
+                        m_frontPos.x, m_frontPos.y, m_frontPos.z, m_yaw, m_pitch, lastX);
         return res;
 }
 
