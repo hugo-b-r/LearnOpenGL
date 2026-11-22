@@ -13,7 +13,8 @@ enum class CubeAtlas {
         Stone = 4,
         Planks = 5,
         Wood = 6,
-        Leaves = 7
+        Leaves = 7,
+        Water= 8
 };
 
 /// Holds data for the textures of a cube (actually of the world). It is a big

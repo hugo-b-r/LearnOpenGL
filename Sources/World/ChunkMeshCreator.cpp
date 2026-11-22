@@ -354,6 +354,8 @@ bool ChunkMeshCreator::shouldMakeFace(glm::ivec3 side_block,
                         return true;
                 case CubeAtlas::Leaves:
                         return true;
+                case CubeAtlas::Water:
+                        return true;
                 default:
                         return false;
                 }
@@ -373,6 +375,8 @@ bool ChunkMeshCreator::shouldMakeFace(glm::ivec3 side_block,
                 case CubeAtlas::Air:
                         return true;
                 case CubeAtlas::Leaves:
+                        return true;
+                case CubeAtlas::Water:
                         return true;
                 default:
                         return false;

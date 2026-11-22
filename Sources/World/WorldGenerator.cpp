@@ -14,7 +14,7 @@
 const int DIRT_HEIGHT = 3;
 const int GRASS_HEIGHT = 1;
 const int WATER_ALTITUDE = 64;
-const int AVG_SAND_HEIGHT = 4;
+const int AVG_SAND_HEIGHT = -2;
 const int TREES_LOW_MARGIN = 5;
 
 WorldGenerator::WorldGenerator() {}
@@ -47,6 +47,9 @@ void WorldGenerator::buildChunk(Chunk &c, World &world) {
                                 for (int k = height - sand_h; k <= height;
                                      k++) {
                                         c.setBlockAt(i, k, j, CubeAtlas::Sand);
+                                }
+                                for (int k = height; k <= WATER_ALTITUDE; ++k) {
+                                        c.setBlockAt(i, k, j, CubeAtlas::Water);
                                 }
                         } else {
 

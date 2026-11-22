@@ -77,7 +77,7 @@ OpenGLWindow::OpenGLWindow(Configuration* configuration, Game*game): game(game) 
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);
         // glEnable(GL_BLEND);
-        // glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
+        // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         Shader mainShader("Sources/Shaders/textured_cube_vertex.glsl",
                           "Sources/Shaders/textured_cube_fragment.glsl");
