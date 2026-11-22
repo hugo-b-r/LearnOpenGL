@@ -79,6 +79,12 @@ class WorldController {
         /// callback from the world to reload chunks when edited
         void addChunkToReload(glm::ivec2);
 
+
+        /// adds the neighbors of \a chunk_pos to load
+        void addNeighborsToLoad(glm::ivec2 chunk_pos);
+
+
+
       protected:
         /// The chunk position of the player just before this call
         glm::ivec2 lastPlayerChunkPos;
