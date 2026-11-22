@@ -47,10 +47,10 @@ struct NeighboringChunks {
         std::shared_ptr<Chunk> y_m;
 };
 
-
 /// A piece of the world
 ///
-/// Because the world is infinite, we subdivide it into smaller pieces, called chunks
+/// Because the world is infinite, we subdivide it into smaller pieces, called
+/// chunks
 class Chunk {
       public:
         /// The basic constructor
@@ -71,6 +71,8 @@ class Chunk {
         CubeAtlas getBlockAt(glm::ivec3 pos);
         /// Set the blokc at chunk coordinates \a x, \a y, \a z.
         void setBlockAt(int x, int y, int z, CubeAtlas ca);
+        /// Set the blokc at chunk coordinates \a block_pos.
+        void setBlockAt(glm::ivec3 block_pos, CubeAtlas ca);
 
         /// Returns chunk pos in chunks grid.
         glm::ivec2 getChunkPos();
@@ -86,8 +88,16 @@ class Chunk {
         /// #createBoundingBox.
         AABB &getBoundingBox();
 
+        /// Returns if \a block_pos is contained inside what the chunk stores
+        /// when \a block_pos refers to a block relative to the origin of the
+        /// world (i.e. absolute)
+        bool containAbsPos(glm::ivec3 block_pos);
+        /// Returns if \a block_pos is contained inside what the chunk stores
+        /// when \a block_pos refers to a block relative to the chunk
+        bool containRelPos(glm::ivec3 block_pos);
+
       protected:
-              /// Content of the chunk
+        /// Content of the chunk
         std::vector<CubeAtlas> blocks;
         /// Pos of the chunk among other chunks
         glm::ivec2 chunkPos;

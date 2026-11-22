@@ -12,21 +12,26 @@
 #include <memory>
 #include <optional>
 #include <spdlog/spdlog.h>
+#include <vector>
 
-World::World() {
+World::World(WorldController& world_controller) : world_controller(world_controller){
         // chunkWidth include a border of chunks needed to build the other
         // chunks so that explains : (2 * (cam.getRenderDistance() + 1) + 1)
         // chunks.reserve(chunksNb);
 }
 
-World::World(const World &w) : chunks(w.chunks) {}
+World::World(const World &w) : chunks(w.chunks), world_controller(w.world_controller) {}
 
 World::~World() {}
 
 std::optional<ReadSafeChunk> World::getAbsoluteChunkAt(glm::ivec2 abs_pos) {
+        chunk_map_locker.lock();
         if (chunks.contains(abs_pos)) {
-                return chunks.at(abs_pos);
+                auto res = chunks.at(abs_pos);
+                chunk_map_locker.unlock();
+                return res;
         } else {
+                chunk_map_locker.unlock();
                 return std::nullopt;
         }
 }
@@ -105,8 +110,90 @@ void World::loadChunk(ReadSafeChunk chunk) {
         ;
 }
 
-void World::unloadChunk(glm::ivec2 chunk_pos) { chunks.erase(chunk_pos); }
+void World::unloadChunk(glm::ivec2 chunk_pos) {
+        // chunk_map_locker.lock();
+        chunks.erase(chunk_pos);
+        // chunk_map_locker.unlock();
+}
 
 bool World::isChunkLoaded(glm::ivec2 chunk_pos) {
         return chunks.contains(chunk_pos);
 }
+
+
+void World::applyUnloadedBlockstoNewChunk(Chunk& chunk) {
+        blocks_to_load_locker.lock();
+        auto chunk_pos = chunk.getChunkPos();
+        if (blocks_to_load.contains(chunk_pos)) {
+                auto blocks_to_add = blocks_to_load.at(chunk_pos);
+                for (auto it_block = blocks_to_add.begin(); it_block != blocks_to_add.end(); ++it_block) {
+                        auto block_pos = fromGlobalToInChunkCoordinates(it_block.base()->first);
+                        auto block_value = it_block.base()->second;
+                        spdlog::info("adding block to pos {} {} {} ", block_pos.x, block_pos.y, block_pos.z);
+                        chunk.setBlockAt(block_pos, block_value);
+                }
+        }
+        
+        
+        blocks_to_load_locker.unlock();
+}
+
+
+void World::appendNewUnloadedBlocks(std::vector<std::pair<glm::ivec3, CubeAtlas>> blocks) {
+        // remember which chunks were modified
+        std::unordered_set<glm::ivec2, KeyFuncs, KeyFuncs> chunks_to_reload;
+        blocks_to_load_locker.lock();
+        for (auto it_block = blocks.begin(); it_block != blocks.end(); ++it_block) {
+                auto chunk_pos = fromBlockToChunkCoordinates(it_block.base()->first);
+                auto block_in_chunk_pos = fromGlobalToInChunkCoordinates(it_block.base()->first);
+                auto block_type_to_add = it_block.base()->second;
+                auto block_pos_type = *it_block.base();
+
+                // access chunks data
+                chunk_map_locker.lock();
+                if (!(chunks.contains(chunk_pos) && chunks[chunk_pos].get()->getBlockAt(block_in_chunk_pos) == block_type_to_add)) {
+                        if (blocks_to_load.contains(chunk_pos)) {
+                                blocks_to_load.at(chunk_pos).push_back(block_pos_type);
+                        } else {
+                                blocks_to_load[chunk_pos] = {block_pos_type};
+                        }
+                        // this chunk has been modified
+                        chunks_to_reload.insert(chunk_pos);
+                }
+                chunk_map_locker.unlock();
+        }
+        blocks_to_load_locker.unlock();
+
+        for (auto it = chunks_to_reload.begin(); it != chunks_to_reload.end(); ++it) {
+                world_controller.addChunkToReload(*it);
+        }
+
+        
+}
+
+
+std::optional<std::shared_ptr<Chunk>> World::buildNextChunkFor(glm::ivec2 pos) {
+        chunk_map_locker.lock();
+        if (!chunks.contains(pos)) {
+                chunk_map_locker.unlock();
+                return std::nullopt;
+        }
+
+        
+        std::shared_ptr<Chunk> new_chunk = std::make_shared<Chunk>(*chunks[pos]);
+                
+        chunk_map_locker.unlock();
+
+        blocks_to_load_locker.lock();
+        if (blocks_to_load.contains(pos)) {
+                auto blocks_to_add_for_this_chunk = blocks_to_load[pos];
+
+                for (auto it = blocks_to_add_for_this_chunk.begin(); it != blocks_to_add_for_this_chunk.end(); ++it) {
+                        new_chunk->setBlockAt(it.base()->first, it.base()->second);
+                }
+                blocks_to_load.erase(pos);
+        }
+        blocks_to_load_locker.unlock();
+        return new_chunk;
+}
+

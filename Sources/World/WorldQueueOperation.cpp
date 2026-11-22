@@ -1,3 +1,4 @@
+#include <memory>
 #include <spdlog/spdlog.h>
 
 #include "Mesh.h"
@@ -32,6 +33,12 @@ void WorldQueueOperation::execute(WorldController &world_controller) {
         case WldQOperationType::CreateMesh:
                 return executeCreateMesh(world_controller);
                 break;
+        case WldQOperationType::RecreateMesh:
+                return executeRecreateMesh(world_controller);
+                break;
+        case WldQOperationType::ReloadThenMesh:
+                return executeReloadThenMesh(world_controller);
+                break;
         }
         spdlog::info("end of execution !, type : {}", (int)type);
 }
@@ -60,4 +67,37 @@ void WorldQueueOperation::executeCreateMesh(WorldController &world_controller) {
                         world_controller.addMeshToLoadJob(abs_pos, m, bounding_box);
                 }
         }
+}
+
+
+/// create the mesh for an existing chunk
+void WorldQueueOperation::executeRecreateMesh(WorldController &world_controller) {
+        // std::this_thread::sleep_for(1000ms);
+        auto l_chunk_res = world_controller.world->getAbsoluteChunkAt(abs_pos);
+        if (l_chunk_res.has_value()) { // should normally but hey let's check
+                Mesh * m = new Mesh();
+                ChunkMeshCreator builder (*l_chunk_res.value().get(), world_controller.renderer->texture.FactorHeight(), *world_controller.world, m);
+
+                if (builder.buildMesh()) {
+                        l_chunk_res.value().get()->createBoundingBox();
+                        AABB bounding_box = l_chunk_res.value().get()->getBoundingBox();
+                        world_controller.addMeshToReloadJob(abs_pos, m, bounding_box);
+                }
+        }
+}
+
+/// create an existing chunk, then relaunch
+void WorldQueueOperation::executeReloadThenMesh(WorldController &world_controller) {
+
+        // build the new chunk
+        auto res_from_world = world_controller.world->buildNextChunkFor(abs_pos);
+        // spdlog::info("rebuilt chunk !");
+        std::shared_ptr<Chunk> res = res_from_world.has_value() ? res_from_world.value() : std::make_shared<Chunk>(Chunk(abs_pos));
+        if (!res_from_world.has_value()) {
+                WorldGenerator::buildChunk(*res, *world_controller.world);
+        }
+        spdlog::info("rebuilt chunk !");
+
+        world_controller.addMeshAndGPUReloadChunkJob(res);
+        spdlog::info("job reload added");
 }

@@ -55,6 +55,10 @@ class ChunkRenderer {
         void addChunkToRender(glm::ivec2 abs_pos, AABB bounding_box,
                               Mesh *mesh);
 
+        /// Add one chunk to the render loading queue
+        void replaceChunkToRender(glm::ivec2 abs_pos, AABB bounding_box,
+                              Mesh *mesh);
+
         /// Remove one chunk removal if one in queue
         ///
         /// It is used to remove chunks synchronously
