@@ -208,20 +208,8 @@ void WorldController::addMeshAndGPUReloadChunkJob(
 
         // for each neighbor, if exists and not in renderer -> create their mesh
         // ???
-        for (const auto &key : {
-                 chunk_pos + glm::ivec2(1, 0),
-                 chunk_pos + glm::ivec2(-1, 0),
-                 chunk_pos + glm::ivec2(0, 1),
-                 chunk_pos + glm::ivec2(0, -1),
-             }) {
-                if (chunk_properties.contains(key) &&
-                    !chunk_properties.at(key).in_renderer &&
-                    chunk_properties.at(key).in_world) {
-                        game->thread_pool_manager->pushBackOperation(
-                            WorldQueueOperation(key,
-                                                WldQOperationType::CreateMesh));
-                }
-        }
+
+        addNeighborsToLoad(chunk_pos);
 
         chunk_properties_lock.unlock();
 }
@@ -283,4 +271,22 @@ void WorldController::initialLoad(
                 }
         }
         spdlog::debug("Finished loading the world");
+}
+
+
+void WorldController::addNeighborsToLoad(glm::ivec2 chunk_pos) {
+ for (const auto &key : {
+                 chunk_pos + glm::ivec2(1, 0),
+                 chunk_pos + glm::ivec2(-1, 0),
+                 chunk_pos + glm::ivec2(0, 1),
+                 chunk_pos + glm::ivec2(0, -1),
+             }) {
+                if (chunk_properties.contains(key) &&
+                    !chunk_properties.at(key).in_renderer &&
+                    chunk_properties.at(key).in_world) {
+                        game->thread_pool_manager->pushBackOperation(
+                            WorldQueueOperation(key,
+                                                WldQOperationType::CreateMesh));
+                }
+        }       
 }
