@@ -53,7 +53,7 @@ class ChunkMeshCreator {
         /// Whether we should make a face or not in direction \a side_block
         /// Use \a neighbors to get data on close blocks
         bool shouldMakeFace(glm::ivec3 side_block,
-                            const NeighboringChunks &neighbors);
+                            const NeighboringChunks &neighbors, CubeAtlas block);
 
         /// Return block value from neighbor when not accessible from inside the
         /// studied chunk
